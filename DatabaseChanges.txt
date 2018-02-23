@@ -1,0 +1,2 @@
+ALTER TABLE `quotes` CHANGE `installation_incorporate_amount` `installation_incorporate_amount` VARCHAR(50) NOT NULL; 
+ALTER TABLE `quotes` CHANGE `installation_incorporate_amount` `installation_incorporate_amount` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL; 
