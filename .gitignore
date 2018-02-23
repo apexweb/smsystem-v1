@@ -1,6 +1,7 @@
 /vendor/*
 /config/app.php
 /tmp/*
+/nbproject/*
 /logs/*
 
 /**Add File/folder to be ignored from tracking*/
