@@ -248,3 +248,4 @@ Email::configTransport('emaildefault', [
     'className' => 'Smtp'
 ]);
 
+Configure::load('default_pm_settings', 'default');

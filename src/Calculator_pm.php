@@ -9,7 +9,7 @@
 namespace App;
 
 use Cake\ORM\TableRegistry;
-
+use Cake\Core\Configure;
 
 class Calculator_pm
 {
@@ -1270,12 +1270,14 @@ class Calculator_pm
     }
 
 	function getPartPrice($key = null){
-		$part_code = array('DRCLS','PDSML','PDMED','PDLGE','DRFLUBLT','BLDUTSML','BLDUTSMLKT','BLDUTSLGE','BLDUTSLGEKT','TRKU','TRKH','TRKJ','TRKPP','CHNLU25','SNGTRKHD','SNGTRKSL','SNGTRKJM','DBLTRKHD','DBLTRKSL','DBLTRKJM','BIFLDSL','BIFLDHD','DBLWINTRKBOT','DBLWINTRKTP','SNGWINTRKTP','TRKSECWIN','FFSNGTRKTP','FFSNGTRKBOT','STPBD','INTLKFRM','INTLKFLT','INTLK3MM','INTLK7MM','BGSTP25WFRNG','BGSTP25','RECVRH','RECVRHWL','DBLHNGDRCV','ANG1225','ANG1220','CHNLU2519','DBLHNGDRT','RECVRHLRG','TRKTPBLDUT','DRJMBOFFST','SSMESH','SECDRFRM','SECDRCRNSTK','SECDRWDGPT1','SECDRWDGPT2','SECWNFRM11','SECWNFRM9','SECWNCRNSTK11','SECWNCRNSTK9','SECMIDRL','PERFMESH','PERFWEG','DGDRFRM','DGDRCRNSTK','DGWNFRM11','DGWNFRM9','DGWNCRNSTK11','DGWNCRNSTK9','7MMDG','INSDRFRM','INSDRCRNSTK','INSMIDRL','INSWNFRM11','INSWNFRM9','INSWNCRNSTK11','INSWNCRNSTK9','INSWNMIDRL','INSMSH','INSPETMSH','INSSPLN','ROLLR','HNG','SNGLOCKSLD','SNGLOCKHNG','TRPLOCKSLD','TRPLOCKHNG','LCKCYL','SNGLOCK','TRPLOCK');
-		if(isset($this->mc_partsArray[$key]['price'])){
+		
+        if(isset($this->mc_partsArray[$key]['price'])){
 			return $this->mc_partsArray[$key]['price'];
+		}else if(isset(Configure::read('PM_DEFAULT_PRICE.'.$key))){
+			return Configure::read('PM_DEFAULT_PRICE.'.$key);           
 		}else{
-			return 0;
-		}
+            return 0;
+        }
 	}
 
 
