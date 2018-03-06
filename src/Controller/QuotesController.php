@@ -1,7 +1,10 @@
 <?php
 namespace App\Controller;
 
-use App\Calculator;
+//use App\Calculator;
+use App\Calculator_mx;
+use App\Calculator_pm;
+use App\Calculator_hybrid;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use CakePdf\Pdf\CakePdf;
@@ -637,8 +640,17 @@ class QuotesController extends AppController
             if ($this->request->data['sendtoinstaller']) {
                 $sendToInstaller = true;
             }
+			$systemPlatform = $_SESSION['Auth']['User']['system_platform'];
+			if($systemPlatform != '' && $systemPlatform == 'mx'){
+				$cal = new Calculator_mx($quote, $this->Auth, $this->Quotes->Stockmetas);
+			}
+			if($systemPlatform != '' && $systemPlatform == 'pm'){
+				$cal = new Calculator_pm($quote, $this->Auth, $this->Quotes->Stockmetas);
+			}
+			if($systemPlatform != '' && $systemPlatform == 'hybrid'){
+				$cal = new Calculator_hybrid($quote, $this->Auth, $this->Quotes->Stockmetas);
+			}
 
-            $cal = new Calculator($quote, $this->Auth, $this->Quotes->Stockmetas);
             $stocks = $cal->calculatePrices();
                        
             if ($this->Quotes->save($quote)) {
@@ -811,7 +823,19 @@ class QuotesController extends AppController
                       
 
             $Stockmetas = TableRegistry::get('Stockmetas');
-            $cal = new Calculator($quote, $this->Auth, $Stockmetas);
+			$systemPlatform = $_SESSION['Auth']['User']['system_platform'];
+			if($systemPlatform != '' && $systemPlatform == 'mx'){
+				$cal = new Calculator_mx($quote, $this->Auth, $Stockmetas);
+			}
+			if($systemPlatform != '' && $systemPlatform == 'pm'){
+				$cal = new Calculator_pm($quote, $this->Auth, $Stockmetas);
+			}
+			if($systemPlatform != '' && $systemPlatform == 'hybrid'){
+				$cal = new Calculator_hybrid($quote, $this->Auth, $Stockmetas);
+			}
+				//$cal = new Calculator_.$systemPlatform($quote, $this->Auth, $Stockmetas);
+				//$cal = new Calculator($quote, $this->Auth, $Stockmetas);
+            
             $stocks = $cal->calculatePrices();
 
 
@@ -1237,8 +1261,18 @@ class QuotesController extends AppController
         } else {
             $quote->status = 'pending';
         }       
+		$systemPlatform = $_SESSION['Auth']['User']['system_platform'];
 
-        $cal = new Calculator($quote, $this->Auth, $this->Quotes->Stockmetas);
+		if($systemPlatform != '' && $systemPlatform == 'mx'){
+			$cal = new Calculator_mx($quote, $this->Auth, $this->Quotes->Stockmetas);
+		}
+		if($systemPlatform != '' && $systemPlatform == 'pm'){
+			$cal = new Calculator_pm($quote, $this->Auth, $this->Quotes->Stockmetas);
+		}
+		if($systemPlatform != '' && $systemPlatform == 'hybrid'){
+			$cal = new Calculator_hybrid($quote, $this->Auth, $this->Quotes->Stockmetas);
+		}
+        //$cal = new Calculator($quote, $this->Auth, $this->Quotes->Stockmetas);
         $stocks = $cal->calculatePrices();
 
         if ($this->Quotes->save($quote)) {            

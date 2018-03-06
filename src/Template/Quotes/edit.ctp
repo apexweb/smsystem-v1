@@ -1,80 +1,227 @@
 <?php
+$systemPlatform = $_SESSION['Auth']['User']['system_platform'];
+if($systemPlatform != ''){
+	if($systemPlatform == 'mx' ){
+		$standards = [];
+		$color1 = [];
+		$color2 = [];
+		$color3 = [];
+		$color4 = [];
+		$conf = [];
+		$additional_per_meter = [];
+		$additional_per_length = [];
+		$accessories = [];
+		$mc_parts = [];
+		$colours = [];
 
-$standards = [];
-$color1 = [];
-$color2 = [];
-$color3 = [];
-$color4 = [];
-$conf = [];
+		$StandardColor = $Anodized = $CustomColour = $PremiumColour = $SpecialColour = [];
+
+		foreach ($dropdowns as $dropdown) {
+			$name = $dropdown->name;
+			if ($dropdown->type == 'Standard Color') {
+				$standards[$name] = $name;
+				$StandardColor['Standard Color|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 1') {
+				$color1[$name] = $name;
+				$CustomColour['Custom Colour|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 2') {
+				$color2[$name] = $name;
+				$PremiumColour['Premium Colour|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 3') {
+				$color3[$name] = $name;
+				$Anodized['Anodized|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 4') {
+				$color4[$name] = $name;
+				$colours['']['Special Colour|'.$name] = $name;
+			} else if ($dropdown->type == 'Door Configuration') {
+				$conf[$name] = ['text' => $name, 'code' => $dropdown->rule_code];
+			}
+		}
+
+		if ($StandardColor)
+			$colours['Standard Color'] = $StandardColor;
+
+		if ($Anodized)
+			$colours['Anodized'] = $Anodized;
+
+		if ($CustomColour)
+			$colours['Custom Colour'] = $CustomColour;
+
+		if ($PremiumColour)
+			$colours['Premium Colour'] = $PremiumColour;
+
+		if ($SpecialColour)
+			$colours['Special Colour'] = $SpecialColour;
 
 
-$additional_per_meter = [];
-$additional_per_length = [];
-$accessories = [];
-$mc_parts = [];
-$colours = [];
+		foreach ($parts as $part) {
+			$id = $part->id;
+			$title = $part->title;
+			$price = $part->users_parts[0]->price_per_unit;
+			$code = $part->part_code;
 
-$StandardColor = $Anodized = $CustomColour = $PremiumColour = $SpecialColour = [];
+			if ($part->users_parts[0]->show_in_additional_section_dropdown) {
+				$additional_per_meter[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
+			}
+			if ($part->users_parts[0]->show_in_additional_section_by_length_dropdown) {
+				$additional_per_length[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
+			}
+			if ($part->users_parts[0]->show_in_accessories_dropdown) {
+				$accessories[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
+			}
+			if ($part->users_parts[0]->master_calculator_value) {
+				$mc_parts[$id] = ['title' => $title, 'price' => $price, 'data-code' => $code];
+			}
+		}
+	}else if($systemPlatform == 'pm' ){
+		$standards = [];
+		$color1 = [];
+		$color2 = [];
+		$color3 = [];
+		$color4 = [];
+		$conf = [];
 
-foreach ($dropdowns as $dropdown) {
-    $name = $dropdown->name;
-    if ($dropdown->type == 'Standard Color') {
-        $standards[$name] = $name;
-        $StandardColor['Standard Color|'.$name] = $name;
-    } else if ($dropdown->type == 'Color 1') {
-        $color1[$name] = $name;
-        $CustomColour['Custom Colour|'.$name] = $name;
-    } else if ($dropdown->type == 'Color 2') {
-        $color2[$name] = $name;
-        $PremiumColour['Premium Colour|'.$name] = $name;
-    } else if ($dropdown->type == 'Color 3') {
-        $color3[$name] = $name;
-        $Anodized['Anodized|'.$name] = $name;
-    } else if ($dropdown->type == 'Color 4') {
-        $color4[$name] = $name;
-        $colours['']['Special Colour|'.$name] = $name;
-    } else if ($dropdown->type == 'Door Configuration') {
-        $conf[$name] = ['text' => $name, 'code' => $dropdown->rule_code];
-    }
+
+		$additional_per_meter = [];
+		$additional_per_length = [];
+		$accessories = [];
+		$mc_parts = [];
+		$colours = [];
+		$StandardColor = $Anodized = $CustomColour = $PremiumColour = $SpecialColour = [];
+		foreach ($dropdowns as $dropdown) {
+			$name = $dropdown->name;
+			if ($dropdown->type == 'Standard Color') {
+				$standards[$name] = $name;
+				$StandardColor['Standard Color|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 1') {
+				$color1[$name] = $name;
+				$CustomColour['Custom Colour|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 2') {
+				$color2[$name] = $name;
+				$PremiumColour['Premium Colour|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 3') {
+				$color3[$name] = $name;
+				$Anodized['Anodized|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 4') {
+				$color4[$name] = $name;
+				$colours['']['Special Colour|'.$name] = $name;
+			} else if ($dropdown->type == 'Door Configuration') {
+				$conf[$name] = ['text' => $name, 'code' => $dropdown->rule_code];
+			}
+		}
+		if ($StandardColor)
+			$colours['Standard Color'] = $StandardColor;
+
+		if ($Anodized)
+			$colours['Anodized'] = $Anodized;
+
+		if ($CustomColour)
+			$colours['Custom Colour'] = $CustomColour;
+
+		if ($PremiumColour)
+			$colours['Premium Colour'] = $PremiumColour;
+
+		if ($SpecialColour)
+			$colours['Special Colour'] = $SpecialColour;
+
+
+
+
+
+		foreach ($parts as $part) {
+			$id = $part->id;
+			$title = $part->title;
+			$price = $part->users_parts[0]->price_per_unit;
+			$code = $part->part_code;
+			$color_code = $part->color_code;
+
+			if (isset($part->users_parts[0]->show_in_additional_section_dropdown)) {
+				$additional_per_meter[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
+			}
+			if (isset($part->users_parts[0]->show_in_additional_section_by_length_dropdown)) {
+				$additional_per_length[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
+			}
+			if (isset($part->users_parts[0]->show_in_accessories_dropdown)) {
+				$accessories[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
+			}
+			if ($part->master_calculator_value) {
+				$mc_parts[trim($code)] = ['title' => $title, 'price' => $price, 'data-code' => trim($code), 'color-code' => $color_code];
+			}
+		}
+	}else{
+		$standards = [];
+		$color1 = [];
+		$color2 = [];
+		$color3 = [];
+		$color4 = [];
+		$conf = [];
+		$additional_per_meter = [];
+		$additional_per_length = [];
+		$accessories = [];
+		$mc_parts = [];
+		$colours = [];
+
+		$StandardColor = $Anodized = $CustomColour = $PremiumColour = $SpecialColour = [];
+
+		foreach ($dropdowns as $dropdown) {
+			$name = $dropdown->name;
+			if ($dropdown->type == 'Standard Color') {
+				$standards[$name] = $name;
+				$StandardColor['Standard Color|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 1') {
+				$color1[$name] = $name;
+				$CustomColour['Custom Colour|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 2') {
+				$color2[$name] = $name;
+				$PremiumColour['Premium Colour|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 3') {
+				$color3[$name] = $name;
+				$Anodized['Anodized|'.$name] = $name;
+			} else if ($dropdown->type == 'Color 4') {
+				$color4[$name] = $name;
+				$colours['']['Special Colour|'.$name] = $name;
+			} else if ($dropdown->type == 'Door Configuration') {
+				$conf[$name] = ['text' => $name, 'code' => $dropdown->rule_code];
+			}
+		}
+
+		if ($StandardColor)
+			$colours['Standard Color'] = $StandardColor;
+
+		if ($Anodized)
+			$colours['Anodized'] = $Anodized;
+
+		if ($CustomColour)
+			$colours['Custom Colour'] = $CustomColour;
+
+		if ($PremiumColour)
+			$colours['Premium Colour'] = $PremiumColour;
+
+		if ($SpecialColour)
+			$colours['Special Colour'] = $SpecialColour;
+
+
+		foreach ($parts as $part) {
+			$id = $part->id;
+			$title = $part->title;
+			$price = $part->users_parts[0]->price_per_unit;
+			$code = $part->part_code;
+
+			if ($part->users_parts[0]->show_in_additional_section_dropdown) {
+				$additional_per_meter[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
+			}
+			if ($part->users_parts[0]->show_in_additional_section_by_length_dropdown) {
+				$additional_per_length[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
+			}
+			if ($part->users_parts[0]->show_in_accessories_dropdown) {
+				$accessories[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
+			}
+			if ($part->users_parts[0]->master_calculator_value) {
+				$mc_parts[$id] = ['title' => $title, 'price' => $price, 'data-code' => $code];
+			}
+		}
+	}
 }
-
-if ($StandardColor)
-    $colours['Standard Color'] = $StandardColor;
-
-if ($Anodized)
-    $colours['Anodized'] = $Anodized;
-
-if ($CustomColour)
-    $colours['Custom Colour'] = $CustomColour;
-
-if ($PremiumColour)
-    $colours['Premium Colour'] = $PremiumColour;
-
-if ($SpecialColour)
-    $colours['Special Colour'] = $SpecialColour;
-
-
-foreach ($parts as $part) {
-    $id = $part->id;
-    $title = $part->title;
-    $price = $part->users_parts[0]->price_per_unit;
-    $code = $part->part_code;
-
-    if ($part->users_parts[0]->show_in_additional_section_dropdown) {
-        $additional_per_meter[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
-    }
-    if ($part->users_parts[0]->show_in_additional_section_by_length_dropdown) {
-        $additional_per_length[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
-    }
-    if ($part->users_parts[0]->show_in_accessories_dropdown) {
-        $accessories[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
-    }
-    if ($part->users_parts[0]->master_calculator_value) {
-        $mc_parts[$id] = ['title' => $title, 'price' => $price, 'data-code' => $code];
-    }
-}
-
-
 ?>
 
 
@@ -82,8 +229,8 @@ foreach ($parts as $part) {
     <small><?= __('Edit Order') ?></small>
 </h1>
 
-
-<?= $this->Form->create($quote, ['class' => 'form-horizontal add-quote-form', 'enctype' => 'multipart/form-data']) ?>
+<input type="hidden" id="role" value="<?php echo $authUser['role']; ?>"/>
+<?= $this->Form->create($quote, ['class' => 'form-horizontal add-quote-form', 'enctype' => 'multipart/form-data', 'id' => 'add-quote-form']) ?>
 
 <?= $this->Form->hidden('role', ['id' => 'role']); ?>
 <?= $this->Form->hidden('mfrole', ['id' => 'mf-role']) ?>
@@ -504,8 +651,12 @@ foreach ($parts as $part) {
             <div class="panel-body">
 
                 <fieldset class="col-xs-12">
-
-                    <?= $this->element('Quotes/mc_tables'); ?>
+					<?php 
+					if($systemPlatform != ''){ ?>
+						<?= $this->element('Quotes/mc_tables_'.$systemPlatform); ?>
+						
+					<?php } ?>
+                    <!-- <?= $this->element('Quotes/mc_tables'); ?> -->
 
                 </fieldset>
 
@@ -526,7 +677,11 @@ foreach ($parts as $part) {
         </div>
         <div id="collapseSix-2" class="panel-collapse collapse" aria-expanded="false">
             <div class="panel-body">
-                <?= $this->element('Quotes/mc_values', ['mcvalues' => $mcvalues, 'mc_parts' => $mc_parts, 'installation' => $installation]); ?>
+				<?php 
+				if($systemPlatform != ''){ ?>
+					<?= $this->element('Quotes/mc_values_'.$systemPlatform, ['mcvalues' => $mcvalues, 'mc_parts' => $mc_parts, 'installation' => $installation]); ?>
+				<?php } ?>
+                
             </div>
         </div>
     </div>
@@ -612,5 +767,8 @@ foreach ($parts as $part) {
         </form>        
     </div>
 </div>
+<?php 
+if($systemPlatform != ''){ ?>
+	<?= $this->Html->script('add-quote-'.$systemPlatform.'.js', ['block' => 'script']); ?>
+<?php } ?>
 
-<?= $this->Html->script('add-quote.js', ['block' => 'script']); ?>

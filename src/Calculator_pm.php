@@ -11,7 +11,7 @@ namespace App;
 use Cake\ORM\TableRegistry;
 
 
-class Calculator_mx
+class Calculator_pm
 {
 
     private $quote;
@@ -31,9 +31,19 @@ class Calculator_mx
 
 
     private $mc_parts = [];
+    private $mc_partsArray = [];
     private $additionals_m = [];
     private $additionals_l = [];
     private $accessories = [];
+    
+    private $securityWindowMesh = 0;
+    private $securityDoorMesh = 0;
+    private $dgDoorMesh = 0;
+    private $dgWindowMesh = 0;
+    private $fibrDoorMesh = 0;
+    private $fibrWindowMesh = 0;
+    private $perfDoorMesh = 0;
+    private $perfWindowMesh = 0;
 
 
 //**** Hourly Rates ****//
@@ -48,6 +58,8 @@ class Calculator_mx
 
     //----------
     private $incMidrail;
+    private $midrailCost;
+    private $midrailMarkup;
 
 
     /*** Clean Ups ***/
@@ -76,14 +88,87 @@ class Calculator_mx
 
 
     //Lock Typees
-    private $singleLock;
-    private $tripleLock;
+    private $singleLockSld;
+    private $singleLockHng;
+    private $tripleLockSld;
+    private $tripleLockHng;
+    
+    private $lockCyl;
 
 
-//**** Parts ****//
+    //**** Parts ****//
+    private $sgSSMesh;// = 75.60;
+    private $grille7mm;// = 21.51;
+    private $petMesh;// = 10.55;
+    private $insectMesh;// = 1.26;
+    private $perfAliMesh;// = 82.82;
+
+    
+    private $secDoorPart ;
+    private $secDoorFrame ;
+    private $secDoorCnrStake ;
+    private $secWinPart ;
+    private $secWinFrame ;
+    private $secWinCnrStake ;
+    
+    private $dgDoorPart ;
+    private $dgDoorFrame ;
+    private $dgDoorCnrStake ;
+    private $dgWindowPart ; 
+    private $dgWindowFrame ;
+    private $dgWindowCnrStake ;
+
+    private $fibrDoorPartPetMesh ;
+    private $fibrDoorPartMesh ;
+    private $fibrDoorFrame ;
+    private $fibrDoorCnrStake ;
+    private $fibrWindowPartPetMesh ;
+    private $fibrWindowPartMesh ;
+    private $fibrWindowFrame ;
+    private $fibrWindowCnrStake ;
+
+    private $perfDoorPart ;
+    private $perfDoorFrame ;
+    private $perfDoorCnrStake ;
+    private $perfWindowPart ;
+    private $perfWindowFrame ;
+    private $perfWindowCnrStake ;
+    
+    private $freightConsumables = 1.00;
+   
+
+    private $flyFrame;// = 1.48;
+
+    //private $winCnrStake;// = 0.51;
+    //private $doorCnrStake;// = 0.69;
+
+    //private $cnrStakeFFrame;// = 0.18; //Corner stake for F/Frame
+
+    private $PVCLSeat;// = 2.37;
+    private $PVCWedge;// = 4.69;
+
+    private $rollerHinges;// = 2.15;
+
+    //private $singleLock;// = 23.74;
+    private $tripleHngd;// = 66.34;
+    private $tripleSliding;// = 66.34;
+
+    private $spline;// = 0.11;
+
+    private $perfSheetFixingBead;// = 3.79;
 
 
     /** Master Markups **/
+    /** Master Markups **/
+    private $secPerf_dist;
+    private $dgfibr_dist;
+
+    private $secperf_whsl;
+    private $dgfibr_whsl;
+
+    private $secperf_re;
+    private $dgfibr_re;
+    
     private $masterMarkup = [];
 
     private $auth;
@@ -96,11 +181,7 @@ class Calculator_mx
     private $custom_color_door;
     private $custom_color_win;
     private $pr_color_door;
-    private $pr_color_win;    
-    private $anodized_color_door;
-    private $anodized_color_win;
-    private $special_color_door;
-    private $special_color_win;
+    private $pr_color_win;
 
 
     private $dgInsDoorPetMarkup;// = 0;
@@ -125,6 +206,7 @@ class Calculator_mx
         foreach ($this->quote['products'] as $product) {
             $this->calculateProduct($product);
         }
+
 //        foreach ($this->quote['midrails'] as $midrail) {
 //            $this->calculateMidrail($midrail);
 //        }
@@ -149,20 +231,13 @@ class Calculator_mx
             $this->totalInstallation = round($this->installation + $this->quote['freight_cost'], 2);
             $this->quote['installation_preset_amount'] = $this->installation;
             $this->quote['installation_custom_amount'] = 0;
-        } else if ($this->quote['installation_type'] == 'custom amount') {
+        } else {
             $this->totalInstallation = round($this->quote['installation_custom_amount'] + $this->quote['freight_cost']);
             $this->quote['installation_preset_amount'] = 0;
         }
-        else if ($this->quote['installation_type'] == 'incorporate install') {
-            $this->totalInstallation = round($this->installation + $this->quote['freight_cost'], 2);
-            $this->quote['installation_preset_amount'] = 0;
-            $this->quote['installation_custom_amount'] = 0;
-        }
-       
 
         $this->quote['discount_amount'] = $this->discountedAmount;
         $this->quote['installation_total_cost'] = $this->totalInstallation;
-        
         $this->quote['total_sell_price'] = round($this->totalSellPrice + $this->totalInstallation - $this->discountedAmount, 2);
         $this->quote['profit'] = round($this->profit - $this->discountedAmount, 2);
 
@@ -170,12 +245,352 @@ class Calculator_mx
         $this->quote['dg_markup_amount'] = $this->dgMarkedup;
         $this->quote['fibr_markup_amount'] = $this->fibrMarkedup;
         $this->quote['perf_markup_amount'] = $this->perfMarkedup;
-       
+
         return $this->stockMetas;
     }
 
-
     private function calculateProduct($product)
+    {
+
+        $qty = $product->product_qty;
+        $secDigFibr = $product->product_sec_dig_perf_fibr;
+        $ssgalpet = $product->product_316_ss_gal_pet;
+        $winDoor = $product->product_window_or_door;
+        $height = $product->product_height;
+        $width = $product->product_width;
+        $lockCounts = $product->product_number_of_locks;
+        $lockType = $product->product_lock_type;
+        $emergencyWindow = $product->product_emergency_window;
+        $incMidrail = $product->product_inc_midrail;
+
+
+        $isSecDoor = false;
+        $isSecWindow = false;
+        $isDgDoor = false;
+        $isDgWindow = false;
+        $isFibrDoor = false;
+        $isFibrWindow = false;
+        $isPerfDoor = false;
+        $isPerfWindow = false;
+
+
+        if ($secDigFibr == '316 S/S' && $winDoor == 'Door') {
+            $isSecDoor = true;
+        } else if ($secDigFibr == '316 S/S' && $winDoor == 'Window') {
+            $isSecWindow = true;
+        } else if ($secDigFibr == 'D/Grille' && $winDoor == 'Door') {
+            $isDgDoor = true;
+        } else if ($secDigFibr == 'D/Grille' && $winDoor == 'Window') {
+            $isDgWindow = true;
+        } else if ($secDigFibr == 'Insect' && $winDoor == 'Door') {
+            $isFibrDoor = true;
+        } else if ($secDigFibr == 'Insect' && $winDoor == 'Window') {
+            $isFibrWindow = true;
+        } else if ($secDigFibr == 'Perf' && $winDoor == 'Door') {
+            $isPerfDoor = true;
+        } else if ($secDigFibr == 'Perf' && $winDoor == 'Window') {
+            $isPerfWindow = true;
+        }
+
+
+        $pwdCoat = ($width + $height) * 2 / 5000;
+        $productLmtr = ($width + $height) * 2 / 1000;
+
+
+        $heightMesh = 0.0;
+        $widthMesh = 0.0;
+        $frame = 0.0;
+        $cnrStake = 0.0;
+        $hingedCalculated = 0.0;
+        $cleanUp = 0.0;
+        $hrlyRate = 0.0;
+        $sqmPart = 0.0;
+        $markup = 0.0;
+
+        $hasSpline = false;
+        $hasInsectMesh = false;
+        $hasComponentsHinges = false;
+        $hasPvc = false;
+        $hasPerfSheetFixing = false;
+
+
+        if ($isSecDoor) {
+            $heightMesh = $height - $this->securityDoorMesh;
+            $widthMesh = $width - $this->securityDoorMesh;
+            $frame = $this->secDoorFrame;
+            $cnrStake = $this->secDoorCnrStake;
+            $cleanUp = $this->secDoorCleanUp;
+            $hrlyRate = $this->sdHrlyRate;
+            $sqmPart = $this->secDoorPart; //$this->sgSSMesh;
+            $hasComponentsHinges = true;
+            $hasPvc = true;
+            $markup = $this->sdMarkup;
+        } else if ($isSecWindow) {
+            $heightMesh = $height - $this->securityWindowMesh;
+            $widthMesh = $width - $this->securityWindowMesh;
+            $frame = $this->secWinFrame;
+            $cnrStake = $this->secWinCnrStake;
+            $cleanUp = $this->secWindowCleanUp;
+            $hrlyRate = $this->swHrlyRate;
+            $sqmPart = $this->secWinPart;//$this->sgSSMesh;
+            $hasPvc = true;
+            $markup = $this->swMarkup;
+        } else if ($isDgDoor) {
+            $heightMesh = $height - $this->dgDoorMesh;
+            $widthMesh = $width - $this->dgDoorMesh;
+            $sqmPart = $this->dgDoorPart;//$this->grille7mm;
+            $frame = $this->dgDoorFrame;
+            $cnrStake = $this->dgDoorCnrStake;
+            $hasSpline = true;
+            $cleanUp = $this->dgDoorCleanup;
+            $hrlyRate = $this->ddHrlyRate;
+            $hasComponentsHinges = true;
+            $hasInsectMesh = true;
+            $markup = $this->ddMarkup;
+        } else if ($isDgWindow) {
+            $heightMesh = $height - $this->dgWindowMesh;
+            $widthMesh = $width - $this->dgWindowMesh;
+            $sqmPart = $this->dgWindowPart; //$this->grille7mm;
+            $frame = $this->dgWindowFrame;
+            $cnrStake = $this->dgWindowCnrStake;
+            $cleanUp = $this->dgWindowCleanup;
+            $hrlyRate = $this->dwHrlyRate;
+            $hasSpline = true;
+            $hasInsectMesh = true;
+            $markup = $this->dwMarkup;
+        } else if ($isFibrDoor) {
+            $heightMesh = $height;
+            $widthMesh = $width;
+            $hasComponentsHinges = true;
+            $frame = $this->fibrDoorFrame;
+            if ($ssgalpet == "Pet") {
+                $sqmPart = $this->fibrDoorPartPetMesh;//$this->petMesh;
+            } else {
+                $sqmPart = $this->fibrDoorPartMesh; //$this->insectMesh;
+            }
+
+            $cnrStake = $this->fibrDoorCnrStake;
+            $hasSpline = true;
+            $cleanUp = $this->fibrDoorCleanup;
+            $hrlyRate = $this->fdHrlyRate;
+            $markup = $this->fdMarkup;
+        } else if ($isFibrWindow) {
+            $heightMesh = $height;
+            $widthMesh = $width;
+            $hasSpline = true;
+            $frame = $this->fibrWindowFrame;//$this->flyFrame;
+            if ($ssgalpet == "Pet") {
+                $sqmPart = $this->fibrWindowPartPetMesh;//$this->petMesh;
+            } else {
+                $sqmPart = $this->fibrWindowPartMesh;//$this->insectMesh;
+            }
+
+            $cnrStake = $this->fibrWindowCnrStake;//$this->cnrStakeFFrame;
+            $cleanUp = $this->fibrWindowCleanup;
+            $hrlyRate = $this->fwHrlyRate;
+            $markup = $this->fwMarkup;
+        } else if ($isPerfDoor) {
+            $heightMesh = $height - $this->perfDoorMesh;
+            $widthMesh = $width - $this->perfDoorMesh;
+            $sqmPart = $this->perfDoorPart;//$this->perfAliMesh;
+            $frame = $this->perfDoorFrame;//$this->dgDoorFrame;
+            $cnrStake = $this->perfDoorCnrStake;//$this->doorCnrStake;
+            $cleanUp = $this->perfDoorCleanup;
+            $hrlyRate = $this->pdHrlyRate;
+            $hasComponentsHinges = true;
+            $hasPerfSheetFixing = true;
+            $markup = $this->pdMarkup;
+        } else if ($isPerfWindow) {
+            $heightMesh = $height - $this->perfWindowMesh;
+            $widthMesh = $width - $this->perfWindowMesh;
+            $sqmPart = $this->perfDoorPart;//$this->perfAliMesh;
+            $frame = $this->perfWindowFrame;//$this->dgWindowFrame;
+            $cnrStake = $this->perfWindowCnrStake;//$this->winCnrStake;
+            $cleanUp = $this->perfWindowCleanup;
+            $hrlyRate = $this->pwHrlyRate;
+            $hasPerfSheetFixing = true;
+            $markup = $this->pwMarkup;
+        }
+
+        $sqm = ($heightMesh * $widthMesh / 1000000);
+        $sqmCalculated = ($sqm * $sqmPart);
+         
+        $frameCalculated = ($frame * $productLmtr);
+        $cnrstakeCalculated = ($cnrStake * 4);
+
+
+        $lSeatCalculated = 0;
+        $pvcCalculated = 0;
+        $splineCalculated = 0;
+        $perfSheetFixingCalculated = 0;
+        $insectMeshCalculated = 0;
+
+        $this->fillStocks($frame, 'frame');
+        $this->fillStocks($cnrStake, 'component');
+
+
+        if ($hasSpline) {
+            $splineCalculated = ($this->spline * $productLmtr);
+            $this->fillStocks($this->spline, 'component');
+        }
+
+        if ($hasInsectMesh) {
+            if ($ssgalpet == 'Insect') {
+                $insectMeshCalculated = ($sqm * $this->insectMesh);
+                $this->fillStocks($this->insectMesh, 'component');
+            } else {
+                $insectMeshCalculated = ($sqm * $this->petMesh);
+                $this->fillStocks($this->petMesh, 'component');
+            }
+        }
+
+        if ($hasPvc) {
+            $lSeatCalculated = ($this->PVCLSeat * $productLmtr);
+            $pvcCalculated = ($this->PVCWedge * $productLmtr);
+
+            $this->fillStocks($this->PVCLSeat, 'component');
+            $this->fillStocks($this->PVCWedge, 'component');
+        }
+       
+        if ($hasComponentsHinges) {
+            $hingedCalculated = ($this->rollerHinges * 4);
+        }
+
+        if ($hasPerfSheetFixing) {
+            if ($isPerfDoor) {
+                $perfSheetFixingCalculated = ($this->PVCLSeat * $this->perfSheetFixingBead);
+            } else if ($isPerfWindow) {
+                $perfSheetFixingCalculated = ($this->PVCLSeat * $productLmtr);
+            }
+
+        }
+
+        $pwdCoatSpec1 = 0.00;
+        $pwdCoatSpec2 = 0.00;
+        $pwdCoatSpec3 = 0.00;
+        $pwdCoatSpec4 = 0.00;
+
+
+        //*** Calculates Powder Coats ****
+        if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
+            $pwdCoatSpec1 = ($this->spec1 * $pwdCoat);
+        }
+        if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
+            $pwdCoatSpec2 = ($this->spec2 * $pwdCoat);
+        }
+
+        if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
+            $pwdCoatSpec3 = ($this->spec3 * $pwdCoat);
+        }
+
+        if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
+            $pwdCoatSpec4 = ($this->spec4 * $pwdCoat);
+        }
+
+
+        // Sum of All "Calculated" Values:
+        $materialCost = 0.00;
+
+        if ($secDigFibr && $winDoor) {
+            $materialCost = $sqmCalculated + $frameCalculated + $perfSheetFixingCalculated + $insectMeshCalculated
+                + $cnrstakeCalculated + $lSeatCalculated + $pvcCalculated
+                + $pwdCoatSpec1 + $pwdCoatSpec2 + $pwdCoatSpec3 + $pwdCoatSpec4
+                + $splineCalculated + $this->freightConsumables + $hingedCalculated;
+        }
+
+        $labourIncCutting = ($hrlyRate / 60) * $cleanUp;
+
+        $totalCost = ($materialCost + $labourIncCutting);
+
+        $increasedTotalCost = ($totalCost * ($markup + 100)) / 100;
+
+        $locksTotalCost = 0;
+        /*if ($lockType == 'Single') {
+            $locksTotalCost = ($this->singleLock * $lockCounts);
+            $this->fillStocks($this->singleLock, 'locks');
+        } else if ($lockType == 'Trple Hngd') {
+            $locksTotalCost = ($this->tripleHngd * $lockCounts);
+            $this->fillStocks($this->tripleHngd, 'locks');
+        } else if ($lockType == 'Trple Sldng') {
+            $locksTotalCost = ($this->tripleSliding * $lockCounts);
+            $this->fillStocks($this->tripleSliding, 'locks');
+        }*/
+        
+        if ($winDoor == 'Door') {
+            /*if ($secDigFibr == 'Insect') {
+                $totalCost = $totalPrice - ($this->singleLock * $newQty);
+            } else {
+                $totalCost = $totalPrice - ($this->tripleLock * $newQty);
+            }*/
+
+            if ($lockType == 'Single Sld' && $lockCounts > 0) {
+                $locksTotalCost = ($lockCounts * $this->singleLockSld) + $this->lockCyl;
+                $this->fillStocks($this->singleLockSld, 'locks');
+            } else if ($lockType == 'Single Hng' && $lockCounts > 0) {
+                $locksTotalCost = ($lockCounts * $this->singleLockHng) + $this->lockCyl;
+                $this->fillStocks($this->singleLockHng, 'locks');
+            } else if ($lockType == 'Triple Sld' && $lockCounts > 0) {
+                $locksTotalCost = ($lockCounts * $this->tripleLockSld) + $this->lockCyl;
+                $this->fillStocks($this->tripleLockSld, 'locks');
+            } else if ($lockType == 'Triple Hng' && $lockCounts > 0) {
+                $locksTotalCost = ($lockCounts * $this->tripleLockHng) + $this->lockCyl;
+                $this->fillStocks($this->tripleLockHng, 'locks');
+            }
+        }
+        
+        
+
+
+        $this->calculateInstallation($qty, $secDigFibr, $winDoor);
+
+        $resultTotal = ($increasedTotalCost * $qty) + $locksTotalCost;
+        
+        //If Include Midrail Checkbox is Ticked
+        if ($incMidrail && is_numeric($this->incMidrail)) {
+            $resultTotal = $resultTotal + $this->incMidrail;
+            //$midrailMarkupPrice = $this->midrailCost * $this->midrailMarkup / 100;
+            //$resultTotal = $resultTotal + $midrailMarkupPrice + $this->midrailCost;
+        }
+
+        $role = $this->getRole();
+        $masterMarkup = 0;
+        $masterMarkup = $this->getMasterMarkupByRole($role, $secDigFibr); //@TODO this was not in javascript side
+
+
+        $priceInclGst = ($resultTotal * ($masterMarkup + 100)) / 100;
+        $priceIncGstPlusEmergency = $priceInclGst;
+        if ($emergencyWindow) {
+            $priceIncGstPlusEmergency = $priceInclGst + 140;
+        }
+
+        $sellPrice = $priceIncGstPlusEmergency;
+        /*if ($role != 'retailer') { //@TODO
+            if ($secDigFibr) {
+                $markup = $this->getMarkupBySecDgFibr($secDigFibr);
+                $sellPrice = round(($priceInclGst * $markup / 100) + $priceIncGstPlusEmergency, 2);
+
+            }
+        }*/
+
+        $profit = round($sellPrice - $priceIncGstPlusEmergency, 2);
+        $this->setMarkedupAmount($secDigFibr, $profit);
+
+        $discount = $this->quote['discount'];
+        if ($discount > 0) {
+
+            $discounted = round($sellPrice * $discount / 100, 2);
+            $this->discountedAmount += $discounted;
+        }
+
+        $this->profit += $profit;
+        $this->totalSellPrice += $sellPrice;
+
+        $product->product_cost = $sellPrice;
+        
+
+    }
+    
+    private function calculateProduct_back($product)
     {
         $qty = 1;
         $newQty = $product->product_qty;
@@ -187,9 +602,6 @@ class Calculator_mx
         $lockCount = $product->product_lock_qty;
         $lockType = $product->product_lock_type;
         $incMidrail = $product->product_inc_midrail;
-        
-        $productColour = $product->product_colour;
-        
 
 
         $matrixArr = null;
@@ -275,73 +687,24 @@ class Calculator_mx
 
         $customColor = 0;
         $premiumColor = 0;
-        $anodizedColor = 0;
-        $specialColor = 0;
 
-        if ($productColour) {
-            list($colourGroup, $pColour) = explode('|', $productColour);
-            
-            if ($winDoor == 'Door') {
-                if ($colourGroup == 'Custom Colour') {
-                    $customColor = ($qty * $this->custom_color_door);
-                }
-                if ($colourGroup == 'Anodized') {
-                    $anodizedColor = ($qty * $this->anodized_color_door);
-                }
-                if ($colourGroup == 'Premium Colour') {
-                    $premiumColor = ($qty * $this->pr_color_door);
-                }
-                if ($colourGroup == 'Special Colour') {
-                    $specialColor = ($qty * $this->special_color_door);
-                }                    
-            } else if ($winDoor == 'Window') {
-                if ($colourGroup == 'Custom Colour') {
-                    $customColor = ($qty * $this->custom_color_win);
-                }
-                if ($colourGroup == 'Anodized') {
-                    $anodizedColor = ($qty * $this->anodized_color_win);
-                }
-                if ($colourGroup == 'Premium Colour') {
-                    $premiumColor = ($qty * $this->pr_color_win);
-                }
-                if ($colourGroup == 'Special Colour') {
-                    $specialColor = ($qty * $this->special_color_win);
-                } 
-            }               
-        
-        } else {
-            //*** Calculates Powder Coats ****
-            if ($winDoor == 'Door') {
-                
-                if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
-                    $customColor = ($qty * $this->custom_color_door);
-                }
-                if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
-                    $premiumColor = ($qty * $this->pr_color_door);
-                }
-                if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
-                    $anodizedColor = ($qty * $this->anodized_color_door);
-                }
-                if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
-                    $specialColor = ($qty * $this->special_color_door);
-                }
-            } else if ($winDoor == 'Window') { 
-                
-                if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
-                    $customColor = ($qty * $this->custom_color_win);
-                }
-                if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
-                    $premiumColor = ($qty * $this->pr_color_win);
-                }
-                if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
-                    $anodizedColor = ($qty * $this->anodized_color_win);
-                }
-                if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
-                    $specialColor = ($qty * $this->special_color_win);
-                }
+
+        //*** Calculates Powder Coats ****
+        if ($winDoor == 'Door') {
+            if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
+                $customColor = ($qty * $this->custom_color_door);
+            }
+            if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
+                $premiumColor = ($qty * $this->pr_color_door);
+            }
+        } else if ($winDoor == 'Window') {
+            if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
+                $customColor = ($qty * $this->custom_color_win);
+            }
+            if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
+                $premiumColor = ($qty * $this->pr_color_win);
             }
         }
-       
 
         $petMeshMarkup = 0;
         if (($secDigFibr == 'Insect' || $secDigFibr == 'D/Grille') && $infill == 'Pet Mesh') {
@@ -366,7 +729,7 @@ class Calculator_mx
         $masterMarkup = $this->getMasterMarkupByMatrixTable($tableName);
         $totalPrice = $totalPrice * ($masterMarkup + 100) / 100;
 
-        $totalPrice = $totalPrice + $customColor + $premiumColor + $anodizedColor + $specialColor;
+        $totalPrice = $totalPrice + $customColor + $premiumColor;
 
 
 //        $this->fillStocks($frame, 'frame');
@@ -382,13 +745,9 @@ class Calculator_mx
         if ($incMidrail && is_numeric($this->incMidrail)) {
             $totalPrice = $totalPrice + $this->incMidrail;
         }
-        /*if ($this->quote['installation_type'] == 'incorporate install') {
-            $product->product_incorporate_install;
-            $totalPrice = $totalPrice + $product->product_incorporate_install;
-        }*/
-        $totalPrice ;
+
         $totalPrice *= $newQty;
-        
+
         /*** Increase cost when LOCK Type is Changed ***/
         if ($winDoor == 'Door') {
             if ($secDigFibr == 'Insect') {
@@ -429,7 +788,6 @@ class Calculator_mx
         $this->totalSellPrice += round($sellPrice, 2);
 
         $product->product_cost = round($sellPrice, 2);
-       
     }
 
 
@@ -529,6 +887,34 @@ class Calculator_mx
         $this->totalSellPrice += $markedUpCost;
 
     }
+    
+    private function getMasterMarkupByRole($role, $secDgFibre)
+    {
+        $masterMarkup = 0;
+        switch ($secDgFibre) {
+            case '316 S/S':
+            case 'Perf':
+                if ($role == 'distributor') {
+                    $masterMarkup = $this->secPerf_dist;
+                } else if ($role == 'wholesaler') {
+                    $masterMarkup = $this->secperf_whsl;
+                } else if ($role == 'retailer') {
+                    $masterMarkup = $this->secperf_re;
+                }
+                break;
+            case 'D/Grille':
+            case 'Insect':
+                if ($role == 'distributor') {
+                    $masterMarkup = $this->dgfibr_dist;
+                } else if ($role == 'wholesaler') {
+                    $masterMarkup = $this->dgfibr_whsl;
+                } else if ($role == 'retailer') {
+                    $masterMarkup = $this->dgfibr_re;
+                }
+                break;
+        }
+        return $masterMarkup;
+    }
 
 
     private function calculateAdditionalM($additionalM)
@@ -537,6 +923,7 @@ class Calculator_mx
         $markup = $additionalM->additional_markup;
 
         $price = 0;
+        
         if ($additionalM->additional_name) {
             $price = $this->additionals_m[$additionalM->additional_name];
         }
@@ -574,21 +961,15 @@ class Calculator_mx
     private function calculateAccessory($accessory)
     {
         $each = $accessory->accessory_each;
-        $markup = $accessory->accessory_markup;
-        
+
         $price = 0;
         if ($accessory->accessory_name) {
             $price = $this->accessories[$accessory->accessory_name];
         }
-        $markedup = round($each * $price * $markup / 100, 2);
-        
+
         $total = round($price * $each, 2);
-        $totalCharged = round(($price * $each) * ($markup + 100) / 100, 2);
-        
         $accessory->accessory_price = $total;
-        $this->profit += $markedup;
-       // $this->totalSellPrice += $total;
-        $this->totalSellPrice += $totalCharged;
+        $this->totalSellPrice += $total;
     }
 
     private function calculateCustomItem($customItem)
@@ -619,42 +1000,18 @@ class Calculator_mx
     {
         $installation = 0;
 
-        if ($qty > 0) {
+        if ($qty > 0 && $this->userInstallations) {
             if ($secDgFibr == '316 S/S' || $secDgFibr == 'D/Grille' || $secDgFibr == 'Perf') {
                 if ($winDoor == 'Door') {
-                    if($this->quote['installation_type'] == 'incorporate install'){
-                         $installation = $this->quote['installation_incorporate_amount'] * $qty;
-                    }else{
-                        if($this->userInstallations){
-                            $installation = $this->userInstallations->door_amount * $qty;
-                        }
-                    }
+                    $installation = $this->userInstallations->door_amount * $qty;
                 } else if ($winDoor == 'Window') {
-                    if($this->quote['installation_type'] == 'incorporate install'){
-                         $installation = $this->quote['installation_incorporate_amount'] * $qty;
-                    }else{
-                        if($this->userInstallations){
-                            $installation = $this->userInstallations->window_amount * $qty;
-                        }
-                    }
+                    $installation = $this->userInstallations->window_amount * $qty;;
                 }
             } else if ($secDgFibr == 'Insect') {
                 if ($winDoor == 'Door') {
-                    if($this->quote['installation_type'] == 'incorporate install'){
-                         $installation = $this->quote['installation_incorporate_amount'] * $qty;
-                    }else{
-                        if($this->userInstallations){
-                            $installation = $this->userInstallations->insect_door_amount * $qty;
-                        }
-                    }
+                    $installation = $this->userInstallations->insect_door_amount * $qty;;
                 } else if ($winDoor == 'Window') {
-                    if($this->quote['installation_type'] == 'incorporate install'){
-                         $installation = $this->quote['installation_incorporate_amount'] * $qty;
-                    }else{
-                        if($this->userInstallations){
-                            $installation = $this->userInstallations->insect_window_amount * $qty;
-                        }
-                    }
+                    $installation = $this->userInstallations->insect_window_amount * $qty;;
                 }
             }
         }
@@ -760,7 +1117,17 @@ class Calculator_mx
 
 
         ];
-
+        
+        $this->securityWindowMesh = $mcvalues['sw_deduction'];
+        $this->securityDoorMesh = $mcvalues['sd_deduction'];
+        
+        $this->dgDoorMesh = $mcvalues['dd_deduction'];
+        $this->dgWindowMesh = $mcvalues['dw_deduction'];
+        $this->fibrDoorMesh = $mcvalues['id_deduction'];
+        $this->fibrWindowMesh = $mcvalues['iw_deduction'];
+        $this->perfDoorMesh = $mcvalues['pd_deduction'];
+        $this->perfWindowMesh = $mcvalues['pw_deduction'];
+        
 
 
         /* HOURLY RATES */
@@ -799,28 +1166,93 @@ class Calculator_mx
         $this->fwMarkup = $mcvalues['markup_fw'];
         $this->pdMarkup = $mcvalues['markup_pd'];
         $this->pwMarkup = $mcvalues['markup_pw'];
-
+        
+        
 
         // **** Powder Coatings ****
         $this->custom_color_door = $mcvalues->custom_color_door;
         $this->custom_color_win = $mcvalues->custom_color_win;
         $this->pr_color_door = $mcvalues->pr_color_door;
         $this->pr_color_win = $mcvalues->pr_color_win;
-        $this->anodized_color_door = $mcvalues->anodized_color_door;
-        $this->anodized_color_win = $mcvalues->anodized_color_win;
-        $this->special_color_door = $mcvalues->special_color_door;
-        $this->special_color_win = $mcvalues->special_color_win;
-         
         
+        // Midrail Include
         
         $this->incMidrail = $mcvalues->include_midrail_amount;
+        $this->midrailCost = $mcvalues->midrail_cost;
+        $this->midrailMarkup = $mcvalues->midrail_markup;
 
         $this->initializeParts($parts);
 
-
         //**** Parts ****//
-        $this->singleLock = $mcvalues['single_lock'];
-        $this->tripleLock = $mcvalues['triple_lock'];
+        //pr($this->mc_partsArray);
+        //die;
+        
+        $this->secDoorPart				= $this->getPartPrice('SSMESH'); 
+        $this->secDoorFrame				= $this->getPartPrice('SECDRFRM'); 
+        $this->secDoorCnrStake			= $this->getPartPrice('SECDRCRNSTK'); 
+        $this->secWinPart				= $this->getPartPrice('SSMESH'); 
+        $this->secWinFrame				= $this->getPartPrice('SECWNFRM9'); 
+        $this->secWinCnrStake			= $this->getPartPrice('SECWNCRNSTK9'); 
+        
+        $this->dgDoorPart				= $this->getPartPrice('7MMDG'); 
+        $this->dgDoorFrame				= $this->getPartPrice('DGDRFRM'); 
+        $this->dgDoorCnrStake			= $this->getPartPrice('DGDRCRNSTK'); 
+        $this->dgWindowPart				= $this->getPartPrice('7MMDG'); 
+        $this->dgWindowFrame			= $this->getPartPrice('DGWNFRM9'); 
+        $this->dgWindowCnrStake			= $this->getPartPrice('DGWNFRM9');
+        
+        $this->fibrDoorPartPetMesh		= $this->getPartPrice('INSPETMSH');
+        $this->fibrDoorPartMesh			= $this->getPartPrice('INSMSH');
+        $this->fibrDoorFrame			= $this->getPartPrice('INSDRFRM');
+        $this->fibrDoorCnrStake			= $this->getPartPrice('INSDRCRNSTK');
+        $this->fibrWindowPartPetMesh	= $this->getPartPrice('INSPETMSH');
+        $this->fibrWindowPartMesh		= $this->getPartPrice('INSMSH');
+        $this->fibrWindowFrame			= $this->getPartPrice('INSWNFRM9');
+        $this->fibrWindowCnrStake		= $this->getPartPrice('INSWNCRNSTK9');
+        
+        $this->perfDoorPart				= $this->getPartPrice('PERFMESH'); //@TODO
+        $this->perfDoorFrame			= $this->getPartPrice('SECDRFRM'); //@TODO
+        $this->perfDoorCnrStake			= $this->getPartPrice('SECDRCRNSTK'); 
+        $this->perfWindowPart			= $this->getPartPrice('PERFMESH'); //@TODO
+        $this->perfWindowFrame			= $this->getPartPrice('SECWNFRM9'); //@TODO
+        $this->perfWindowCnrStake		= $this->getPartPrice('SECWNCRNSTK9');
+        
+        $this->sgSSMesh					= $this->getPartPrice('SSMESH');
+        $this->grille7mm				= $this->getPartPrice('7MMDG');
+        $this->petMesh					= $this->getPartPrice('INSPETMSH');
+        $this->insectMesh				= $this->getPartPrice('INSMSH'); 
+        $this->perfAliMesh				= $this->getPartPrice('PERFMESH');
+		
+		$this->flyFrame					= $this->getPartPrice('INSDRFRM');
+
+        //$this->winCnrStake = $this->mc_partsArray['44']['price'];
+        //$this->doorCnrStake = $this->mc_partsArray['43']['price'];
+
+        //$this->cnrStakeFFrame = $this->mc_partsArray['51']['price'];
+
+        $this->PVCLSeat = $this->getPartPrice('SECDRWDGPT2');
+        $this->PVCWedge = $this->getPartPrice('SECDRWDGPT1');
+
+        $this->rollerHinges = $this->getPartPrice('HNG');
+
+        $this->singleLockSld = $this->getPartPrice('SNGLOCKSLD');
+        $this->singleLockHng = $this->getPartPrice('SNGLOCKHNG');
+        $this->tripleLockSld = $this->getPartPrice('TRPLOCKSLD');
+        $this->tripleLockHng = $this->getPartPrice('TRPLOCKHNG');
+        
+        $this->lockCyl = $this->getPartPrice('LCKCYL');
+        //$this->tripleHngd = $this->mc_partsArray['54']['price'];
+        //$this->tripleSliding = $this->mc_partsArray['55']['price'];
+
+        $this->spline = $this->getPartPrice('INSSPLN'); 
+
+        $this->perfSheetFixingBead = $this->getPartPrice('PERFWEG');
+
+        //$this->singleLock = $this->mc_partsArray['SNGLOCK']['price'];
+        //$this->tripleLock = $this->mc_partsArray['TRPLOCK']['price'];
+        
+        //$this->singleLock = $mcvalues['single_lock'];
+        //$this->tripleLock = $mcvalues['triple_lock'];
 
 
 
@@ -837,36 +1269,49 @@ class Calculator_mx
 
     }
 
+	function getPartPrice($key = null){
+		$part_code = array('DRCLS','PDSML','PDMED','PDLGE','DRFLUBLT','BLDUTSML','BLDUTSMLKT','BLDUTSLGE','BLDUTSLGEKT','TRKU','TRKH','TRKJ','TRKPP','CHNLU25','SNGTRKHD','SNGTRKSL','SNGTRKJM','DBLTRKHD','DBLTRKSL','DBLTRKJM','BIFLDSL','BIFLDHD','DBLWINTRKBOT','DBLWINTRKTP','SNGWINTRKTP','TRKSECWIN','FFSNGTRKTP','FFSNGTRKBOT','STPBD','INTLKFRM','INTLKFLT','INTLK3MM','INTLK7MM','BGSTP25WFRNG','BGSTP25','RECVRH','RECVRHWL','DBLHNGDRCV','ANG1225','ANG1220','CHNLU2519','DBLHNGDRT','RECVRHLRG','TRKTPBLDUT','DRJMBOFFST','SSMESH','SECDRFRM','SECDRCRNSTK','SECDRWDGPT1','SECDRWDGPT2','SECWNFRM11','SECWNFRM9','SECWNCRNSTK11','SECWNCRNSTK9','SECMIDRL','PERFMESH','PERFWEG','DGDRFRM','DGDRCRNSTK','DGWNFRM11','DGWNFRM9','DGWNCRNSTK11','DGWNCRNSTK9','7MMDG','INSDRFRM','INSDRCRNSTK','INSMIDRL','INSWNFRM11','INSWNFRM9','INSWNCRNSTK11','INSWNCRNSTK9','INSWNMIDRL','INSMSH','INSPETMSH','INSSPLN','ROLLR','HNG','SNGLOCKSLD','SNGLOCKHNG','TRPLOCKSLD','TRPLOCKHNG','LCKCYL','SNGLOCK','TRPLOCK');
+		if(isset($this->mc_partsArray[$key]['price'])){
+			return $this->mc_partsArray[$key]['price'];
+		}else{
+			return 0;
+		}
+	}
+
 
     private function initializeParts($parts)
     {
         foreach ($parts as $part) {
             $id = $part->id;
             $title = $part->title;
-            $price = $part->users_parts[0]->price_per_unit;
+            $price = (isset($part->users_parts[0]->price_per_unit))?$part->users_parts[0]->price_per_unit:$part->price_per_unit;
+            $part_code = trim($part->part_code);
+            $part_number = $part->part_number;
             
-            if ($part->users_parts[0]->show_in_additional_section_dropdown) {
+            if (isset($part->users_parts[0]->show_in_additional_section_dropdown)) {
                 $this->additionals_m[$title] = $price;
             } else if ($part->show_in_additional_section_by_length_dropdown) {
                 $this->additionals_l[$title] = $price;
             }
                                    
-            if ($part->users_parts[0]->show_in_additional_section_by_length_dropdown) {
+            if (isset($part->users_parts[0]->show_in_additional_section_by_length_dropdown)) {
                 $this->additionals_l[$title] = $price;
             } else if ($part->show_in_additional_section_by_length_dropdown) {
                 $this->additionals_l[$title] = $price;
             }
             
-            if ($part->users_parts[0]->show_in_accessories_dropdown) {
+            if (isset($part->users_parts[0]->show_in_accessories_dropdown)) {
                 $this->accessories[$title] = $price;
             } else if ($part->show_in_accessories_dropdown) {
                 $this->accessories[$title] = $price;
             }
             
-            if ($part->users_parts[0]->master_calculator_value) {
-                $this->mc_parts[$id] = ['title' => $title, 'price' => $price];
+            if (isset($part->users_parts[0]->master_calculator_value)) {
+                $this->mc_parts[$id] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
+                $this->mc_partsArray[$part_code] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
             } else if ($part->master_calculator_value) {
-                $this->mc_parts[$id] = ['title' => $title, 'price' => $price];
+                $this->mc_parts[$id] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
+                $this->mc_partsArray[$part_code] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
             }
             
             /*if ($part->show_in_additional_section_dropdown) {
@@ -989,7 +1434,7 @@ class Calculator_mx
     }
 
 
-    private function getTitleByValue($value)
+    private function getTitleByValue_back($value)
     {
         $index = array_search($value, array_column($this->mc_parts, 'price'));
 
@@ -1000,10 +1445,34 @@ class Calculator_mx
     }
 
 
-    private function fillStocks($value, $type)
+    private function fillStocksback($value, $type)
     {
         $entity = $this->stocks->newEntity();
         $entity->metakey = $this->getTitleByValue($value);
+        $entity->type = $type;
+        $this->stockMetas[] = $entity;
+    }
+    
+    private function getTitleByValue($value)
+    {
+        $index = array_search($value, array_column($this->mc_parts, 'price'));
+
+        $numeric_indexed_array = array_values($this->mc_parts);
+        $title = ($numeric_indexed_array[$index]['title']);
+        $part_number = ($numeric_indexed_array[$index]['part_number']);
+        $part_code = isset($numeric_indexed_array[$index]['part_code'])?($numeric_indexed_array[$index]['part_code']):'';
+
+        return [$title, $part_number, $part_code];
+    }
+
+
+
+    private function fillStocks($value, $type)
+    {
+        $entity = $this->stocks->newEntity();
+        $entity->metakey = $this->getTitleByValue($value)[0];
+        $entity->part_number = $this->getTitleByValue($value)[1];
+        $entity->part_code = $this->getTitleByValue($value)[2];
         $entity->type = $type;
         $this->stockMetas[] = $entity;
     }

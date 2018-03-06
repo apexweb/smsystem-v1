@@ -9,5 +9,10 @@ $(document).ready(function () {
         } else {
             $('.allmfs').hide();
         }
+		if(role == 'distributor' || role == 'manufacturer'){
+			$('.system-platform').show();
+		}else{
+			$('.system-platform').hide();
+		}
     });
 });

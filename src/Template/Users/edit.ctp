@@ -6,7 +6,7 @@
     foreach ($mfs as $mf) {
         $allMfs[$mf->id] = $mf->username;
     }
-
+	$system_platform = array('mx'=>'MX','pm'=>'PM','hybrid'=>'Hybrid');
 
     if ($authUser['role'] == 'admin') {
         ?>
@@ -104,7 +104,7 @@
             </div>
         </div>
     <?php endif; ?>
-
+	
     <div class="form-group">
         <div class="col-xs-12">
             <?php
@@ -126,7 +126,26 @@
             </div>
         </div>
     </div>
-    
+    <div class="form-group">
+		<div class="col-xs-12">
+			<?php
+            $style = '';
+            $role = $user['role'];
+			$systemPlatform = $user['system_platform'];
+            if (($role == 'admin' || $role == 'supplier' || $role == 'manufacturer' || $role == 'candidate') && $systemPlatform != '') {
+                $style = 'display:none;';
+            }
+
+            ?>
+			<div class="btn-group system-platform" style="<?= $style; ?>">
+				<?= $this->Form->input('system_platform', [
+					'options' => $system_platform,
+					'class' => 'form-control',
+					'label' => 'System Platfrom'
+				]) ?>
+			</div>
+		</div>
+	</div>
     <div class="form-group">
         <div class="col-lg-3 col-md-4 col-xs-12">
             <?= $this->Form->input('monthly_fee_report', ['class' => 'form-control']) ?>

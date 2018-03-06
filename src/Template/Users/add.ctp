@@ -4,7 +4,7 @@ $allMfs = [];
 foreach ($mfs as $mf) {
     $allMfs[$mf->id] = $mf->username;
 }
-
+$system_platform = array('mx'=>'MX','pm'=>'PM','hybrid'=>'Hybrid');
 ?>
 
 
@@ -103,6 +103,17 @@ foreach ($mfs as $mf) {
                         'options' => $allMfs,
                         'class' => 'form-control',
                         'label' => 'Parent Manufacturer'
+                    ]) ?>
+                </div>
+            </div>
+        </div>
+		<div class="form-group">
+            <div class="col-xs-12">
+                <div class="btn-group system-platform" <?php if ($authUser['role'] == 'admin') echo 'style="display:none;"' ?>>
+                    <?= $this->Form->input('system_platform', [
+                        'options' => $system_platform,
+                        'class' => 'form-control',
+                        'label' => 'System Platfrom'
                     ]) ?>
                 </div>
             </div>
