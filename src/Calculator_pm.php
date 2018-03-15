@@ -13,29 +13,25 @@ use Cake\Core\Configure;
 
 class Calculator_pm
 {
-
     private $quote;
-
     private $ssMarkedup = 0;
     private $dgMarkedup = 0;
     private $fibrMarkedup = 0;
     private $perfMarkedup = 0;
-
-
     private $discountedAmount = 0;
-
     private $installation = 0;
     private $totalInstallation = 0;
     private $totalSellPrice = 0;
     private $profit = 0;
-
-
     private $mc_parts = [];
+	//different
     private $mc_partsArray = [];
+
     private $additionals_m = [];
     private $additionals_l = [];
     private $accessories = [];
-    
+
+	//different
     private $securityWindowMesh = 0;
     private $securityDoorMesh = 0;
     private $dgDoorMesh = 0;
@@ -45,8 +41,7 @@ class Calculator_pm
     private $perfDoorMesh = 0;
     private $perfWindowMesh = 0;
 
-
-//**** Hourly Rates ****//
+	//**** Hourly Rates ****//
     private $sdHrlyRate;// = 30.00;
     private $swHrlyRate;// = 30.00;
     private $ddHrlyRate;// = 30.00;
@@ -55,27 +50,21 @@ class Calculator_pm
     private $fwHrlyRate;// = 30.00;
     private $pdHrlyRate;// = 30.00;
     private $pwHrlyRate;// = 30.00;
-
-    //----------
+	//----------
     private $incMidrail;
+
+	//different
     private $midrailCost;
     private $midrailMarkup;
-
-
     /*** Clean Ups ***/
     private $secWindowCleanUp;// = 30.00;
     private $secDoorCleanUp;//= 90.00;
-
     private $dgWindowCleanup;// = 25;
     private $dgDoorCleanup;// = 90;
-
     private $fibrWindowCleanup;// = 5;
     private $fibrDoorCleanup;// = 25;
-
     private $perfDoorCleanup;// = 80;
     private $perfWindowCleanup;// = 25;
-
-
     /*** Product Markups ***/
     private $sdMarkup;
     private $swMarkup;
@@ -85,39 +74,32 @@ class Calculator_pm
     private $fwMarkup;
     private $pdMarkup;
     private $pwMarkup;
-
-
     //Lock Typees
+
+	//different
     private $singleLockSld;
     private $singleLockHng;
     private $tripleLockSld;
     private $tripleLockHng;
-    
     private $lockCyl;
-
-
     //**** Parts ****//
     private $sgSSMesh;// = 75.60;
     private $grille7mm;// = 21.51;
     private $petMesh;// = 10.55;
     private $insectMesh;// = 1.26;
     private $perfAliMesh;// = 82.82;
-
-    
     private $secDoorPart ;
     private $secDoorFrame ;
     private $secDoorCnrStake ;
     private $secWinPart ;
     private $secWinFrame ;
     private $secWinCnrStake ;
-    
     private $dgDoorPart ;
     private $dgDoorFrame ;
     private $dgDoorCnrStake ;
     private $dgWindowPart ; 
     private $dgWindowFrame ;
     private $dgWindowCnrStake ;
-
     private $fibrDoorPartPetMesh ;
     private $fibrDoorPartMesh ;
     private $fibrDoorFrame ;
@@ -126,69 +108,42 @@ class Calculator_pm
     private $fibrWindowPartMesh ;
     private $fibrWindowFrame ;
     private $fibrWindowCnrStake ;
-
     private $perfDoorPart ;
     private $perfDoorFrame ;
     private $perfDoorCnrStake ;
     private $perfWindowPart ;
     private $perfWindowFrame ;
     private $perfWindowCnrStake ;
-    
     private $freightConsumables = 1.00;
-   
-
     private $flyFrame;// = 1.48;
-
-    //private $winCnrStake;// = 0.51;
-    //private $doorCnrStake;// = 0.69;
-
-    //private $cnrStakeFFrame;// = 0.18; //Corner stake for F/Frame
-
     private $PVCLSeat;// = 2.37;
     private $PVCWedge;// = 4.69;
-
     private $rollerHinges;// = 2.15;
-
-    //private $singleLock;// = 23.74;
     private $tripleHngd;// = 66.34;
     private $tripleSliding;// = 66.34;
-
     private $spline;// = 0.11;
-
     private $perfSheetFixingBead;// = 3.79;
-
-
-    /** Master Markups **/
     /** Master Markups **/
     private $secPerf_dist;
     private $dgfibr_dist;
-
     private $secperf_whsl;
     private $dgfibr_whsl;
-
     private $secperf_re;
     private $dgfibr_re;
-    
+
     private $masterMarkup = [];
-
     private $auth;
-
     private $stocks;
     private $stockMetas = [];
     private $matrixTables;
     private $userInstallations;
-
     private $custom_color_door;
     private $custom_color_win;
     private $pr_color_door;
     private $pr_color_win;
-
-
     private $dgInsDoorPetMarkup;// = 0;
     private $dgInsWinPetMarkup;// = 0;
-
-
-// **********
+	// **********
 
 
     function __construct($quote, $auth, $stocks)
@@ -207,10 +162,6 @@ class Calculator_pm
             $this->calculateProduct($product);
         }
 
-//        foreach ($this->quote['midrails'] as $midrail) {
-//            $this->calculateMidrail($midrail);
-//        }
-//
         foreach ($this->quote['additionalpermeters'] as $additionalpermeter) {
             $this->calculateAdditionalM($additionalpermeter);
         }
@@ -251,8 +202,7 @@ class Calculator_pm
 
     private function calculateProduct($product)
     {
-
-        $qty = $product->product_qty;
+		$qty = $product->product_qty;
         $secDigFibr = $product->product_sec_dig_perf_fibr;
         $ssgalpet = $product->product_316_ss_gal_pet;
         $winDoor = $product->product_window_or_door;
@@ -505,23 +455,8 @@ class Calculator_pm
         $increasedTotalCost = ($totalCost * ($markup + 100)) / 100;
 
         $locksTotalCost = 0;
-        /*if ($lockType == 'Single') {
-            $locksTotalCost = ($this->singleLock * $lockCounts);
-            $this->fillStocks($this->singleLock, 'locks');
-        } else if ($lockType == 'Trple Hngd') {
-            $locksTotalCost = ($this->tripleHngd * $lockCounts);
-            $this->fillStocks($this->tripleHngd, 'locks');
-        } else if ($lockType == 'Trple Sldng') {
-            $locksTotalCost = ($this->tripleSliding * $lockCounts);
-            $this->fillStocks($this->tripleSliding, 'locks');
-        }*/
         
         if ($winDoor == 'Door') {
-            /*if ($secDigFibr == 'Insect') {
-                $totalCost = $totalPrice - ($this->singleLock * $newQty);
-            } else {
-                $totalCost = $totalPrice - ($this->tripleLock * $newQty);
-            }*/
 
             if ($lockType == 'Single Sld' && $lockCounts > 0) {
                 $locksTotalCost = ($lockCounts * $this->singleLockSld) + $this->lockCyl;
@@ -548,8 +483,6 @@ class Calculator_pm
         //If Include Midrail Checkbox is Ticked
         if ($incMidrail && is_numeric($this->incMidrail)) {
             $resultTotal = $resultTotal + $this->incMidrail;
-            //$midrailMarkupPrice = $this->midrailCost * $this->midrailMarkup / 100;
-            //$resultTotal = $resultTotal + $midrailMarkupPrice + $this->midrailCost;
         }
 
         $role = $this->getRole();
@@ -564,13 +497,6 @@ class Calculator_pm
         }
 
         $sellPrice = $priceIncGstPlusEmergency;
-        /*if ($role != 'retailer') { //@TODO
-            if ($secDigFibr) {
-                $markup = $this->getMarkupBySecDgFibr($secDigFibr);
-                $sellPrice = round(($priceInclGst * $markup / 100) + $priceIncGstPlusEmergency, 2);
-
-            }
-        }*/
 
         $profit = round($sellPrice - $priceIncGstPlusEmergency, 2);
         $this->setMarkedupAmount($secDigFibr, $profit);
@@ -667,7 +593,6 @@ class Calculator_pm
             $markup = $this->pwMarkup;
         }
 
-        //die(debug($this->matrixTables));
         $price = 0;
         if ($matrixArr) {
 
@@ -730,13 +655,6 @@ class Calculator_pm
         $totalPrice = $totalPrice * ($masterMarkup + 100) / 100;
 
         $totalPrice = $totalPrice + $customColor + $premiumColor;
-
-
-//        $this->fillStocks($frame, 'frame');
-//        $this->fillStocks($cnrStake, 'component');
-
-
-
 
         $this->calculateInstallation($newQty, $secDigFibr, $winDoor);
 
@@ -845,20 +763,6 @@ class Calculator_pm
             $matrixArr = $this->matrixTables[$type]['prices'];
         }
 
-//        $customColor = 0;
-//        $premiumColor = 0;
-//
-//
-//        //*** Calculates Powder Coats ****
-//        if ($winDoor == 'Window') {
-//            if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
-//                $customColor = ($qty * $this->custom_color_win);
-//            }
-//            if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
-//                $premiumColor = ($qty * $this->pr_color_win);
-//            }
-//        }
-
         //Calculate Price
         $price = 0;
         if ($matrixArr) {
@@ -877,12 +781,6 @@ class Calculator_pm
 
         $markedUpCost = $price * ($masterMarkup + 100) / 100;
 
-        //$totalCost = round($markedUpCost + $customColor + $premiumColor, 2);
-//
-//        $role = $this->getRole();
-//        $masterMarkup = $this->getMasterMarkupByRole($role, $secDigFibr);
-//        $priceInclGst = round(($resultTotal * ($masterMarkup + 100)) / 100, 2);
-//
         $midrail->midrail_cost = $markedUpCost;
         $this->totalSellPrice += $markedUpCost;
 
@@ -1225,10 +1123,6 @@ class Calculator_pm
 		
 		$this->flyFrame					= $this->getPartPrice('INSDRFRM');
 
-        //$this->winCnrStake = $this->mc_partsArray['44']['price'];
-        //$this->doorCnrStake = $this->mc_partsArray['43']['price'];
-
-        //$this->cnrStakeFFrame = $this->mc_partsArray['51']['price'];
 
         $this->PVCLSeat = $this->getPartPrice('SECDRWDGPT2');
         $this->PVCWedge = $this->getPartPrice('SECDRWDGPT1');
@@ -1241,20 +1135,10 @@ class Calculator_pm
         $this->tripleLockHng = $this->getPartPrice('TRPLOCKHNG');
         
         $this->lockCyl = $this->getPartPrice('LCKCYL');
-        //$this->tripleHngd = $this->mc_partsArray['54']['price'];
-        //$this->tripleSliding = $this->mc_partsArray['55']['price'];
 
         $this->spline = $this->getPartPrice('INSSPLN'); 
 
         $this->perfSheetFixingBead = $this->getPartPrice('PERFWEG');
-
-        //$this->singleLock = $this->mc_partsArray['SNGLOCK']['price'];
-        //$this->tripleLock = $this->mc_partsArray['TRPLOCK']['price'];
-        
-        //$this->singleLock = $mcvalues['single_lock'];
-        //$this->tripleLock = $mcvalues['triple_lock'];
-
-
 
         /** Master Markups **/
         $this->secPerf_dist = $mcvalues['secperf_dist'];
@@ -1270,10 +1154,10 @@ class Calculator_pm
     }
 
 	function getPartPrice($key = null){
-		
+		$pm_price = Configure::read('PM_DEFAULT_PRICE');
         if(isset($this->mc_partsArray[$key]['price'])){
 			return $this->mc_partsArray[$key]['price'];
-		}else if(isset(Configure::read('PM_DEFAULT_PRICE.'.$key))){
+		}else if(isset($pm_price[$key])){
 			return Configure::read('PM_DEFAULT_PRICE.'.$key);           
 		}else{
             return 0;
@@ -1316,18 +1200,6 @@ class Calculator_pm
                 $this->mc_partsArray[$part_code] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
             }
             
-            /*if ($part->show_in_additional_section_dropdown) {
-                $this->additionals_m[$title] = $price;
-            }
-            if ($part->show_in_additional_section_by_length_dropdown) {
-                $this->additionals_l[$title] = $price;
-            }
-            if ($part->show_in_accessories_dropdown) {
-                $this->accessories[$title] = $price;
-            }
-            if ($part->master_calculator_value) {
-                $this->mc_parts[$id] = ['title' => $title, 'price' => $price];
-            }*/
         }
     }
 
@@ -1458,7 +1330,8 @@ class Calculator_pm
     private function getTitleByValue($value)
     {
         $index = array_search($value, array_column($this->mc_parts, 'price'));
-
+		pr($this->mc_parts);
+		die('123');
         $numeric_indexed_array = array_values($this->mc_parts);
         $title = ($numeric_indexed_array[$index]['title']);
         $part_number = ($numeric_indexed_array[$index]['part_number']);

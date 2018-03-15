@@ -1,37 +1,26 @@
 var productsCount = 0;
 var productMAX = 29;
 var productMIN = 0;
-
 var midrailsCount = 0;
 var midrailMax = 2;
 var midrailMIN = 0;
-
 var additionalsCount = 4;
 var additionalMAX = 9;
 var additionalMIN = 4;
-
 var additionalsLengthCount = 4;
 var additionalLengthMAX = 9;
 var additionalLengthMIN = 4;
-
 var customitemsCount = 2;
 var customitemMAx = 9;
 var customitemMIN = 2;
 var cutsheetsCount = 2;
-
 var copyToMidrail = 1;
-
-
 var productMcTableHtml = '';
 var productResultTableHtml = '';
-
 var midrailMcTableHtml = '';
 var midrailResultTableHtml = '';
-
 var isEdit = false;
-
 var role, mfrole, markupRole;
-
 var flagSaveBtnClicked = false;
 
 var securityWindowMesh;// = 52;
@@ -42,124 +31,26 @@ var fibrDoorMesh;// = 0;
 var fibrWindowMesh;// = 0;
 var perfDoorMesh;// = 105;
 var perfWindowMesh;// = 52;
-
 var perfSheetFixingBead;// = 3.79;
-
-//
-//
-// var securityWindowMesh = 52;
-// var securityDoorMesh = 105;
-// var dgDoorMesh = 115;
-// var dgWindowMesh = 50;
-// var fibrDoorMesh = 0;
-// var fibrWindowMesh = 0;
-// var perfDoorMesh = 105;
-// var perfWindowMesh = 52;
-//
- var freightConsumables = 1.00;
-//
-// //**** Hourly Rates ****//
-// var sdHrlyRate;// = 30.00;
-// var swHrlyRate;// = 30.00;
-// var ddHrlyRate;// = 30.00;
-// var dwHrlyRate;// = 30.00;
-// var fdHrlyRate;// = 30.00;
-// var fwHrlyRate;// = 30.00;
-// var pdHrlyRate;// = 30.00;
-// var pwHrlyRate;// = 30.00;
-//
-//
-// /*** Clean Ups ***/
-// var secWindowCleanUp;// = 30.00;
-// var secDoorCleanUp;//= 90.00;
-//
-// var dgWindowCleanup;// = 25;
-// var dgDoorCleanup;// = 90;
-//
-// var fibrWindowCleanup;// = 5;
-// var fibrDoorCleanup;// = 25;
-//
-// var perfDoorCleanup;// = 80;
-// var perfWindowCleanup;// = 25;
-//
-//
-// /*** Product Markups ***/
-// var sdMarkup;
-// var swMarkup;
-// var ddMarkup;
-// var dwMarkup;
-// var fdMarkup;
-// var fwMarkup;
-// var pdMarkup;
-// var pwMarkup;
-//
-//
-// // **** Powder Coatings ****
-// var std;// = 0;
-// var spec1;// = 4.50;
-// var spec2;// = 5.50;
-// var spec3;// = 7.00;
-// var spec4;// = 8.00;
-//
-//
+var freightConsumables = 1.00;
 // //**** Parts ****//
  var sgSSMesh;// = 75.60;
-// var grille7mm;// = 21.51;
 var petMesh;// = 10.55;
-var insectMesh;// = 1.26;
-// var perfAliMesh;// = 82.82;
-//
-//
-// var secWinFrame;// = 4.14;
-// var secDoorFrame;// = 7.16;
-//
-// var dgDoorFrame;// = 5.37;
-// var dgWindowFrame;// = 2.93;
-//
-// var flyFrame;// = 1.48;
-//
-// var winCnrStake;// = 0.51;
-// var doorCnrStake;// = 0.69;
-//
-// var cnrStakeFFrame;// = 0.18; //Corner stake for F/Frame
-//
-// var PVCLSeat;// = 2.37;
-// var PVCWedge;// = 4.69;
-//
- var rollerHinges;// = 2.15;
- 
+var insectMesh;
+var rollerHinges;// = 2.15;
 var singleLockSld;// = 23.74;
 var singleLockHng;// = 2.15;
 var tripleLockSld;// = 23.74;
 var tripleLockHng;// = 23.74;
 var lockCyl;// = 23.74;
- 
-// var tripleLock;// = 66.34;
-// var tripleSliding;// = 66.34;
-//
- var spline;// = 0.11;
- var splineName;
-//
-// var perfSheetFixingBead;// = 3.79;
-//
-//
-// /**Midrail parts**/
-//
-// var midrailPart;// = 5.09;
-// var crossBrace;// = 1.50;
-//
-// // **********
-
+var spline;// = 0.11;
+var splineName;
 
 /* Cost Variables */
-
 var screensTotal = [];
 var midrailsTotal = [];
-
-//For Mfs: NO Master Markup Applied
 var productsNoMarkup = [];
 var midrailsNoMarkup = [];
-
 var additionalMeters = [];
 var additonalLengths = [];
 var accessories = [];
@@ -168,24 +59,20 @@ var additionalPerMeter = [];
 var additionalPerLength = [];
 var additionalPerEach = [];
 var installations = [];
-
-
+var incorporateInstallations = [];
 var SCREENS_TOTAL = 0;
 var MIDRAILS_TOTAL = 0;
 var SECTIONS_ACC_TOTAL = 0;
 var CUSTOM_ITEMS_TOTAL = 0;
 var TOTAL_BUY_PRICE = 0;
-
-
 var DISCOUNT = 0;
 var DISCOUNT_AMOUNT = 0;
-
-
 var PRESET_INSTALLATION = 0;
 var CUSTOM_INSTALLATION = 0;
+var INCORPORATE_INSTALLATION = 0;
+var INCORPORATE_INSTALLATION_TOTAL = 0;
 var FREIGHTCOST = 0;
 var INSTALLATION_TOTAL = 0;
-
 var TOTAL_SELL_PRICE = 0;
 var PROFIT = 0; // install not included
 var CUSTOM_QUOTED_AMOUNT = 0;
@@ -352,6 +239,64 @@ function calculateInstallation(productRow, index, isAdd) {
 
 
     var qty = Number(productRow.find('.product-qty').val());
+    var installationType = $('input[name="installation_type"]:checked').val();
+
+
+    if (qty > 0) {
+
+        if (installationType == 'preset amount') {
+            var secDgFibr = productRow.find('.product-sec-dg-fibr').val();
+            var winDoor = productRow.find('.product-win-door').val();
+
+            if (secDgFibr == '316 S/S' || secDgFibr == 'D/Grille' || secDgFibr == 'Perf') {
+                if (winDoor == 'Window') {
+                    installation = Number($('span.ins-ssperfdg-win').text()) * qty;
+                } else if (winDoor == 'Door') {
+                    installation = Number($('span.ins-ssperfdg-door').text()) * qty;
+                }
+            } else if (secDgFibr == 'Insect') {
+                if (winDoor == 'Window') {
+                    installation = Number($('span.ins-insect-win').text()) * qty;
+                } else if (winDoor == 'Door') {
+                    installation = Number($('span.ins-insect-door').text()) * qty;
+                }
+            }
+            // if (installation) {
+            if (isAdd) {
+                installations[index] = installation;
+            } else {
+                installations[index] = 0;
+            }
+
+            PRESET_INSTALLATION = Number(installations.reduce(sum, 0)).toFixed(2);
+            $('input[name="installation_preset_amount"]').val(PRESET_INSTALLATION);
+
+        }else if(installationType == 'incorporate install'){
+            installation = Number($('input[name="installation_incorporate_amount"]').val()) * qty;
+
+            // if (installation) {
+            if (isAdd) {
+                incorporateInstallations[index] = installation;
+            } else {
+                incorporateInstallations[index] = 0;
+            }
+
+            //INCORPORATE_INSTALLATION_TOTAL = Number(incorporateInstallations.reduce(sum, 0)).toFixed(2);
+            //$('input[name="installation_incorporate_amount"]').val(INCORPORATE_INSTALLATION);
+        }
+    }
+   
+
+    //console.log(INCORPORATE_INSTALLATION + 'INCORPORATE_INSTALLATION');
+    calculateTotalInstallation();
+    // }
+}
+
+function calculateIncorporateInstallation(productRow) {
+    var installation = 0;
+
+
+    var qty = Number(productRow.find('.product-qty').val());
 
 
     if (qty > 0) {
@@ -361,32 +306,21 @@ function calculateInstallation(productRow, index, isAdd) {
 
         if (secDgFibr == '316 S/S' || secDgFibr == 'D/Grille' || secDgFibr == 'Perf') {
             if (winDoor == 'Window') {
-                installation = Number($('span.ins-ssperfdg-win').text()) * qty;
+                installation = Number($('span.ins-ssperfdg-win').text());
             } else if (winDoor == 'Door') {
-                installation = Number($('span.ins-ssperfdg-door').text()) * qty;
+                installation = Number($('span.ins-ssperfdg-door').text());
             }
         } else if (secDgFibr == 'Insect') {
             if (winDoor == 'Window') {
-                installation = Number($('span.ins-insect-win').text()) * qty;
+                installation = Number($('span.ins-insect-win').text());
             } else if (winDoor == 'Door') {
-                installation = Number($('span.ins-insect-door').text()) * qty;
+                installation = Number($('span.ins-insect-door').text());
             }
         }
     }
-    // if (installation) {
-    if (isAdd) {
-        installations[index] = installation;
-    } else {
-        installations[index] = 0;
-    }
-
-    PRESET_INSTALLATION = Number(installations.reduce(sum, 0)).toFixed(2);
-    $('input[name="installation_preset_amount"]').val(PRESET_INSTALLATION);
-    calculateTotalInstallation();
-    // }
+    productRow.find('.product_incorporate_install').val(installation);
+    return installation;
 }
-
-
 function calculateTotalInstallation() {
     var installationType = $('input[name="installation_type"]:checked').val();
     var installationValue = 0;
@@ -395,8 +329,18 @@ function calculateTotalInstallation() {
         installationValue = PRESET_INSTALLATION;
     } else if (installationType == 'custom amount') {
         installationValue = CUSTOM_INSTALLATION;
-    }
+    } else if (installationType == 'incorporate install') {
 
+        var qnty = 0;
+        $('.product-options-row').each(function (i, el) {   
+            qnty = $(el).find('.product-qty').val();
+            if (qnty > 0) {     
+               
+                installationValue = ( (Number(INCORPORATE_INSTALLATION) * qnty) + Number(installationValue)).toFixed(2);
+            }        
+        });
+        
+    }
 
     INSTALLATION_TOTAL = (Number(installationValue) + Number(FREIGHTCOST)).toFixed(2);
 
@@ -449,13 +393,29 @@ $(document).ready(function () {
         if (value == 'preset amount') {
             $('input[name="installation_preset_amount"]').show();
             $('input[name="installation_custom_amount"]').hide();
+            $('input[name="installation_incorporate_amount"]').hide();
             $('.installation-label').text('Preset Amount:');
-
+            $('.freight-cost').text('Freight Cost');
+            $('input[name="freight_cost"]').parents('tr').show();
         } else if (value == 'custom amount') {
             $('input[name="installation_preset_amount"]').hide();
             $('input[name="installation_custom_amount"]').show();
+            $('input[name="installation_incorporate_amount"]').hide();
             $('.installation-label').text('Custom Amount:');
+            $('.freight-cost').text('Freight Cost');
+            $('input[name="freight_cost"]').parents('tr').show();
+        }else if (value == 'incorporate install') {
+            $('input[name="installation_preset_amount"]').hide();
+            $('input[name="installation_custom_amount"]').hide();
+            $('.installation-label').text('Incorporate Install Amount:');
+            $('input[name="installation_incorporate_amount"]').show();
+            $('.freight-cost').text('Additional Install Cost');
+            $('input[name="freight_cost"]').parents('tr').show();            
         }
+            //$('.product_incorporate_install').val(0);
+        $('.product-options-row').each(function(){
+                $(this).find('.product-qty').trigger('change');
+        });
         calculateTotalInstallation();
     });
 
@@ -468,7 +428,14 @@ $(document).ready(function () {
         FREIGHTCOST = Number($(this).val());
         calculateTotalInstallation();
     });
-
+	
+	$('input[name="installation_incorporate_amount"]').on('change', function () {
+        INCORPORATE_INSTALLATION = Number($(this).val());
+        $('.product-options-row').each(function(){
+            $(this).find('.product-qty').trigger('change');
+	    });
+        calculateTotalInstallation();
+    });
 
     $('.panel-heading a').on('click', function () {
         if ($(this).hasClass('collapsed')) {
@@ -1044,9 +1011,10 @@ $(document).ready(function () {
         var lockCounts = Number($lockCount.val());
         var lockType = $lockType.val();
         var includeMidrailCheckbox = productOptions.find('.product-inc-midrail').is(':checked');
+		var includeIncorporateInstallCheckbox = $('#installation-type-incorporate-install').is(':checked');
         var productConf = product.find('.product-conf').find('option:selected').attr('data-code');
         var productColour = product.find('.product-colour').val();
-                
+        var discountPercentage = Number($('input[name=discount]').val());
 
         //------ Change Dropdown Color on Window/Door change ------)
         var winDoorDropdown = product.find('.product-win-door');
@@ -1722,11 +1690,29 @@ $(document).ready(function () {
             }
         }
         var profit = (Number(sellPrice) - Number(resultTotal)).toFixed(2);
+		var profitPerProduct = profit;
+        var sellPricePerProduct = sellPrice;
+        if(discountPercentage > 0){
+                var discountPrice = Number(sellPrice * Number(discountPercentage) / 100).toFixed(2);
+                profitPerProduct =  Number(profit - discountPrice).toFixed(2);
+                sellPrice = Number(sellPrice - discountPrice).toFixed(2);
+         }
 
+        var inclGst = resultTotal;
+        if (includeIncorporateInstallCheckbox) {
+            //inclGst = (Number(inclGst) - (Number(calculateIncorporateInstallation(product)) * Number(newQty))).toFixed(2);
+            sellPricePerProduct = (Number(sellPricePerProduct) + Number(INCORPORATE_INSTALLATION) * Number(newQty)).toFixed(2);
+        }
+        noMarkupCost = (Number(noMarkupCost) * Number(newQty)).toFixed(2);
+        productOptions.find('input.product-price-incl-gst').val(inclGst);
+        productOptions.find('input.product-sell-price').val(sellPricePerProduct);
+
+
+        productOptions.find('input.product-profit').val(profitPerProduct);
         
-        productOptions.find('input.product-price-incl-gst').val(resultTotal);
-        productOptions.find('input.product-sell-price').val(sellPrice);
-        productOptions.find('input.product-profit').val(profit);
+        //productOptions.find('input.product-price-incl-gst').val(resultTotal);
+        //productOptions.find('input.product-sell-price').val(sellPrice);
+       // productOptions.find('input.product-profit').val(profit);
 
         markups.addToMarkups(profit, productIndex, secDigFibr);
         
@@ -2057,6 +2043,10 @@ $(document).ready(function () {
                 var productOptions = product.next();
                 var productIndex = findIndexById(product);
                 var priceInclGst = Number(productOptions.find('input.product-price-incl-gst').val()).toFixed(2);
+                var newQty = Number(product.find('.product-qty').val());
+                if ($('#installation-type-incorporate-install').is(':checked')) {
+                    priceInclGst = (Number(priceInclGst) + (Number(calculateIncorporateInstallation(product)) * Number(newQty))).toFixed(2);
+                }
                 var profit = Number(priceInclGst * Number(markupAmount) / 100).toFixed(2);
                 var sellPrice = Number(Number(priceInclGst) + Number(profit)).toFixed(2);
                 
@@ -2070,12 +2060,15 @@ $(document).ready(function () {
                 }
                 productOptions.find('input.product-sell-price').val(sellPriceAfterDiscount);
                 productOptions.find('input.product-profit').val(profitAfterDiscount);
+                markups.addToMarkups(profit, productIndex, secdgfibr, true);
+                /*productOptions.find('input.product-sell-price').val(sellPriceAfterDiscount);
+                productOptions.find('input.product-profit').val(profitAfterDiscount);
                 
                
                 //productOptions.find('input.product-sell-price').val(sellPrice);
                 //productOptions.find('input.product-profit').val(profit);
 
-                markups.addToMarkups(profitAfterDiscount, productIndex, secdgfibr, true);
+                markups.addToMarkups(profitAfterDiscount, productIndex, secdgfibr, true);*/
             }
             markups._updateMarkups();
 
@@ -2085,15 +2078,17 @@ $(document).ready(function () {
     });
 
 
-    $('#discount').on('change', function () {
+    $('#discount').on('change', function (event, param) {
         var percent = Number($(this).val());
         var discountedAmount = (percent * (Number(markups.getTotalMarkups()) + Number(SCREENS_TOTAL)) / 100).toFixed(2);
         $('#discount-amount').val(discountedAmount);
         DISCOUNT = percent;
         DISCOUNT_AMOUNT = discountedAmount;
         calculateProfit();
-        calculateTotalSell();        
-        updateOrderTablePrice();
+        calculateTotalSell();  
+		if(!param){
+			updateOrderTablePrice();
+		}
     });
 
     /************************************/
@@ -2125,11 +2120,15 @@ $(document).ready(function () {
                 var productIndex = findIndexById(product);
                 var priceInclGst = Number(productOptions.find('input.product-price-incl-gst').val()).toFixed(2);
                 //console.log(priceInclGst);
+                var newQty = Number(product.find('.product-qty').val());
+                if ($('#installation-type-incorporate-install').is(':checked')) {
+                    priceInclGst = (Number(priceInclGst) + (Number(calculateIncorporateInstallation(product)) * Number(newQty))).toFixed(2);
+                }
                 var profit =  0;
                 var sellPrice = 0;
                 var profitAfterDiscount = 0;
                 var sellPriceAfterDiscount = 0;
-
+                
                 var profit = Number(priceInclGst * Number(markupAmount) / 100).toFixed(2);
                 var sellPrice = Number(Number(priceInclGst) + Number(profit)).toFixed(2);
 
@@ -2147,6 +2146,7 @@ $(document).ready(function () {
                 productOptions.find('input.product-profit').val(profitAfterDiscount);
             }
         });
+        markups._updateMarkups();
     }
 
     $('.save-quote-btn').on('click', function () {
@@ -2687,6 +2687,7 @@ function editPageFunctions() {
 
     /** Inialize Variables **/
     CUSTOM_INSTALLATION = Number($('#installation-custom-amount').val());
+	INCORPORATE_INSTALLATION = Number($('#installation-incorporate-amount').val());
     FREIGHTCOST = Number($('#freight-cost').val());
 
 

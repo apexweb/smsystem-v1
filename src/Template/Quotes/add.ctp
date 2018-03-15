@@ -123,11 +123,7 @@ if($systemPlatform != ''){
 
 		if ($SpecialColour)
 			$colours['Special Colour'] = $SpecialColour;
-
-
-
-
-
+		
 		foreach ($parts as $part) {
 			$id = $part->id;
 			$title = $part->title;
@@ -148,8 +144,6 @@ if($systemPlatform != ''){
 				$mc_parts[trim($code)] = ['title' => $title, 'price' => $price, 'data-code' => trim($code), 'color-code' => $color_code];
 			}
 		}
-
-
 	}else{
 		$standards = [];
 		$color1 = [];
@@ -199,15 +193,12 @@ if($systemPlatform != ''){
 		if ($SpecialColour)
 			$colours['Special Colour'] = $SpecialColour;
 
-
-
-
-
 		foreach ($parts as $part) {
 			$id = $part->id;
 			$title = $part->title;
 			$price = $part->users_parts[0]->price_per_unit;
 			$code = $part->part_code;
+			$color_code = $part->color_code;
 
 			if ($part->users_parts[0]->show_in_additional_section_dropdown) {
 				$additional_per_meter[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
@@ -218,8 +209,11 @@ if($systemPlatform != ''){
 			if ($part->users_parts[0]->show_in_accessories_dropdown) {
 				$accessories[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
-			if ($part->users_parts[0]->master_calculator_value) {
+			/*if ($part->users_parts[0]->master_calculator_value) {
 				$mc_parts[$id] = ['title' => $title, 'price' => $price, 'data-code' => $code];
+			}*/
+			if ($part->master_calculator_value) {
+				$mc_parts[trim($code)] = ['title' => $title, 'price' => $price, 'data-code' => trim($code), 'color-code' => $color_code];
 			}
 		}
 	}
@@ -618,8 +612,16 @@ if($systemPlatform != ''){
 
                 <fieldset class="col-xs-12">
 					<?php 
-					if($systemPlatform != ''){ ?>
-						<?= $this->element('Quotes/mc_tables_'.$systemPlatform); ?>
+					if($systemPlatform != '' && $systemPlatform != 'hybrid'){ ?>
+						<?= $this->element('Quotes/mc_tables_'.$systemPlatform, ['mc_parts' => $mc_parts]); ?>
+					<?php } 
+					if($systemPlatform != '' && $systemPlatform == 'hybrid'){ ?>
+						<!-- <div class="hybrid-pm"> -->
+							<?= $this->element('Quotes/mc_tables_hybrid', ['mc_parts' => $mc_parts]); ?>
+						<!-- </div> 
+						<div class="hybrid-mx">
+							<?= $this->element('Quotes/mc_tables_mx', ['mc_parts' => $mc_parts]); ?>
+						</div>-->
 					<?php } ?>
                     
 
@@ -640,10 +642,17 @@ if($systemPlatform != ''){
         <div id="collapseSix-2" class="panel-collapse collapse" aria-expanded="false">
             <div class="panel-body">
 				<?php 
-				if($systemPlatform != ''){ ?>
+				if($systemPlatform != '' && $systemPlatform != 'hybrid'){ ?>
 					<?= $this->element('Quotes/mc_values_'.$systemPlatform, ['mcvalues' => $mcvalues, 'mc_parts' => $mc_parts, 'installation' => $installation]); ?>
+				<?php } 
+				if($systemPlatform != '' && $systemPlatform == 'hybrid'){ ?>
+					<!-- <div class="hybrid-pm"> -->
+						<?= $this->element('Quotes/mc_values_hybrid', ['mcvalues' => $mcvalues, 'mc_parts' => $mc_parts, 'installation' => $installation]); ?>
+					<!-- </div> -->
+					<!-- <div class="hybrid-mx">
+						<?= $this->element('Quotes/mc_values_mx', ['mcvalues' => $mcvalues, 'mc_parts' => $mc_parts, 'installation' => $installation]); ?>
+					</div> -->
 				<?php } ?>
-                
             </div>
         </div>
     </div>
@@ -655,10 +664,10 @@ if($systemPlatform != ''){
 
 <div class="form-inline date-inputs">
 
-    <?= $this->Form->Button('Save Quote', ['class' => 'btn btn-primary waves-effect save-quote-btn btn-sm', 'type' => 'button']) ?>
+    <?= $this->Form->Button('Save Quote', ['class' => 'btn btn-primary waves-effect save-quote-btn btn-sm autosavequote', 'type' => 'button']) ?>
 
     <span>
-        <?= $this->Form->Button('Save and Convert to Order', ['class' => 'btn btn-primary waves-effect convert-to-order-btn btn-sm', 'type' => 'button']) ?>
+        <?= $this->Form->Button('Save and Convert to Order', ['class' => 'btn btn-primary waves-effect convert-to-order-btn btn-sm autosavequote', 'type' => 'button']) ?>
     </span>
 
     <span>Order Date: <input type="text" class="form-control created-date input-sm" disabled="disabled"></span>

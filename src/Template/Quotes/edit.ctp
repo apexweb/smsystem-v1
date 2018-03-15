@@ -652,9 +652,16 @@ if($systemPlatform != ''){
 
                 <fieldset class="col-xs-12">
 					<?php 
-					if($systemPlatform != ''){ ?>
-						<?= $this->element('Quotes/mc_tables_'.$systemPlatform); ?>
-						
+					if($systemPlatform != '' && $systemPlatform != 'hybrid'){ ?>
+						<?= $this->element('Quotes/mc_tables_'.$systemPlatform, ['mc_parts' => $mc_parts]); ?>
+					<?php } 
+					if($systemPlatform != '' && $systemPlatform == 'hybrid'){ ?>
+						<!-- <div class="hybrid-pm" style="display:none;"> -->
+							<?= $this->element('Quotes/mc_tables_hybrid', ['mc_parts' => $mc_parts]); ?>
+						<!-- </div>
+						<div class="hybrid-mx" style="display:none;">
+							<?= $this->element('Quotes/mc_tables_mx', ['mc_parts' => $mc_parts]); ?>
+						</div> -->
 					<?php } ?>
                     <!-- <?= $this->element('Quotes/mc_tables'); ?> -->
 
@@ -678,8 +685,16 @@ if($systemPlatform != ''){
         <div id="collapseSix-2" class="panel-collapse collapse" aria-expanded="false">
             <div class="panel-body">
 				<?php 
-				if($systemPlatform != ''){ ?>
+				if($systemPlatform != '' && $systemPlatform != 'hybrid'){ ?>
 					<?= $this->element('Quotes/mc_values_'.$systemPlatform, ['mcvalues' => $mcvalues, 'mc_parts' => $mc_parts, 'installation' => $installation]); ?>
+				<?php } 
+				if($systemPlatform != '' && $systemPlatform == 'hybrid'){ ?>
+					<!-- <div class="hybrid-pm" style="display:none;"> -->
+						<?= $this->element('Quotes/mc_values_hybrid', ['mcvalues' => $mcvalues, 'mc_parts' => $mc_parts, 'installation' => $installation]); ?>
+					<!-- </div>
+					<div class="hybrid-mx">
+						<?= $this->element('Quotes/mc_values_mx', ['mcvalues' => $mcvalues, 'mc_parts' => $mc_parts, 'installation' => $installation]); ?>
+					</div> -->
 				<?php } ?>
                 
             </div>
@@ -703,10 +718,10 @@ if($systemPlatform != ''){
 <div class="form-inline date-inputs">
     <?php 
     if ( !in_array($quote->status, array('in progress', 'complete') )): ?>
-        <?= $this->Form->Button('Save Changes', ['class' => 'btn btn-primary waves-effect save-quote-btn btn-sm', 'type' => 'button']) ?>
+        <?= $this->Form->Button('Save Changes', ['class' => 'btn btn-primary waves-effect save-quote-btn btn-sm autosavequote', 'type' => 'button']) ?>
     <?php endif; ?>
     
-    <?= $this->Form->Button('Save as a new Quote', ['class' => 'btn btn-primary waves-effect new-quote-btn btn-sm', 'type' => 'button']) ?>
+    <?= $this->Form->Button('Save as a new Quote', ['class' => 'btn btn-primary waves-effect new-quote-btn btn-sm autosavequote', 'type' => 'button']) ?>
 
     <span></span>
 

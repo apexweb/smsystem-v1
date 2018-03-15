@@ -2588,7 +2588,8 @@ jQuery(document).ready(function (e) {
                 {
                     response = JSON.parse(response);
                     if(response.result) {
-                        jQuery("#draftid").val(response.id);  
+                        jQuery("#draftid").val(response.id); 
+						$('.autosavequote').attr("disabled", false);
                     }
                 }
             });
@@ -2596,7 +2597,7 @@ jQuery(document).ready(function (e) {
     }
 
     setInterval(function(){
-        autoSaveQuote()}, 30000);
+        autoSaveQuote(), $('.autosavequote').attr("disabled", true)}, 30000);
 
 
 });
