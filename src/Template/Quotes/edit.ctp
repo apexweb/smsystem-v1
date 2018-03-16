@@ -206,6 +206,7 @@ if($systemPlatform != ''){
 			$title = $part->title;
 			$price = $part->users_parts[0]->price_per_unit;
 			$code = $part->part_code;
+			$color_code = $part->color_code;
 
 			if ($part->users_parts[0]->show_in_additional_section_dropdown) {
 				$additional_per_meter[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
@@ -216,8 +217,11 @@ if($systemPlatform != ''){
 			if ($part->users_parts[0]->show_in_accessories_dropdown) {
 				$accessories[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
-			if ($part->users_parts[0]->master_calculator_value) {
+			/*if ($part->users_parts[0]->master_calculator_value) {
 				$mc_parts[$id] = ['title' => $title, 'price' => $price, 'data-code' => $code];
+			}*/
+			if ($part->master_calculator_value) {
+				$mc_parts[trim($code)] = ['title' => $title, 'price' => $price, 'data-code' => trim($code), 'color-code' => $color_code];
 			}
 		}
 	}
@@ -718,10 +722,10 @@ if($systemPlatform != ''){
 <div class="form-inline date-inputs">
     <?php 
     if ( !in_array($quote->status, array('in progress', 'complete') )): ?>
-        <?= $this->Form->Button('Save Changes', ['class' => 'btn btn-primary waves-effect save-quote-btn btn-sm autosavequote', 'type' => 'button']) ?>
+        <?= $this->Form->Button('Save Changes', ['class' => 'btn btn-primary waves-effect save-quote-btn btn-sm', 'type' => 'button']) ?>
     <?php endif; ?>
     
-    <?= $this->Form->Button('Save as a new Quote', ['class' => 'btn btn-primary waves-effect new-quote-btn btn-sm autosavequote', 'type' => 'button']) ?>
+    <?= $this->Form->Button('Save as a new Quote', ['class' => 'btn btn-primary waves-effect new-quote-btn btn-sm', 'type' => 'button']) ?>
 
     <span></span>
 

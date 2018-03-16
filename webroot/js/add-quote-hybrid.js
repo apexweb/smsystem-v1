@@ -540,7 +540,7 @@ $(document).ready(function () {
         productsCount++;
 		
 		/* For Hybrid */
-		if(isHybrid){
+		//if(isHybrid){
 			if (productsCount > 0) {
 				var productMcTable = productMcTableHtml.replace('product-mc-0', 'product-mc-' + productsCount);
 				var productResultTable = productResultTableHtml.replace('product-result-0', 'product-result-' + productsCount);
@@ -548,7 +548,7 @@ $(document).ready(function () {
 				$('#products-mc-container').append(productMcTable);
 				$('#products-mc-container').append(productResultTable);
 			}
-		}
+		//}
 		/* End For Hybrid */
         if (productsCount >= productMAX) {
             $('.product-btns').css('visibility', 'hidden');
@@ -1018,18 +1018,17 @@ $(document).ready(function () {
 		var secDigFibr = product.find('.product-sec-dg-fibr').val();
 		if (secDigFibr == '316 S/S' || secDigFibr == 'Perf') {
 			isHybrid = true;
+		}else{
+			isHybrid = false;
 		}
 		if(isHybrid){
 			var productOptions = product.next();
 			var productIndex = findIndexById(product);
-
 			var qty = 1;
-
 			//*****Dom Elements*****:
 			var $qty = product.find('.product-qty');
 			var $lockCount = product.find('.product-lock-qty');
 			var $lockType = product.find('.product-lock-type');
-			
 			//Values
 			var newQty = Number(product.find('.product-qty').val());
 			var secDigFibr = product.find('.product-sec-dg-fibr').val();
@@ -1044,10 +1043,8 @@ $(document).ready(function () {
 			var productConf = product.find('.product-conf').find('option:selected').attr('data-code');
 			var productColour = product.find('.product-colour').val();
 			var discountPercentage = Number($('input[name=discount]').val());
-
 			//------ Change Dropdown Color on Window/Door change ------)
 			var winDoorDropdown = product.find('.product-win-door');
-
 			if (winDoor == 'Door') {
 				winDoorDropdown.css('background', '#ffab26');
 			} else if (winDoor == 'Window') {
@@ -1057,10 +1054,8 @@ $(document).ready(function () {
 				winDoorDropdown.css('background', '#fff');
 			}
 
-
 			//---------- Disable Frame Type When Door is Selected --------------
 			var productFrameType = product.find('.product-frame-type');
-			
 			var frameType = '';
 			switch (productFrameType.val()) {
 				case '9mm':
@@ -1073,14 +1068,13 @@ $(document).ready(function () {
 					frameType = 'default';
 					break;            
 			}
-			
 			if (product.find('.product-win-door').val() == 'Door') {
 				productFrameType.prop('disabled', true);
 				productFrameType.val('');
 			} else {
 				productFrameType.prop('disabled', false);
 			}
-			
+	
 			//------------------------
 
 
@@ -1091,11 +1085,9 @@ $(document).ready(function () {
 			var tableName = '';
 			var matrixArr = null;
 			var petMeshMarkup = 0;
-			
 			//**** Get Master Calculator Tables *****
 			var productMc = $('table#product-mc-' + productIndex);
 			var productResult = $('table#product-result-' + productIndex);
-			
 			var isSecDoor = false;
 			var isSecWindow = false;
 			var isDgDoor = false;
@@ -1104,7 +1096,6 @@ $(document).ready(function () {
 			var isFibrWindow = false;
 			var isPerfDoor = false;
 			var isPerfWindow = false;
-			
 			var hasSpline = false;
 			var hasInsectMesh = false;
 			var hasComponentsHinges = false;
@@ -1118,28 +1109,22 @@ $(document).ready(function () {
 			var frame = 0;
 			var cnrStake = 0;
 			var hingedCalculated = 0;
-
 			if (secDigFibr == '316 S/S') {
 				if (winDoor == 'Door') {
-					
 					heightMesh = Number(height - securityDoorMesh);
 					widthMesh = Number(width - securityDoorMesh);
 					isSecDoor = true;  
 					hasComponentsHinges = true;
 					hasPvc = true;
-					
 					matrixArr = JSON.parse($('input[data-name="S/S Hinged and Sliding Doors"]').val()); 
 					pricingArr = JSON.parse($('input[data-name="secDoor"]').val()); 
-					
 					tableName = $('input[data-name="S/S Hinged and Sliding Doors"]').data('name');
 					cleanUp = secDoorCleanUp;
 					hrlyRate = sdHrlyRate;
 					markup = sdMarkup;                
-
 					sqmPart = pricingArr.sqmpart.price; //Confirm
 					frame = pricingArr.frame.price;
 					cnrStake = pricingArr.crnstake.price;
-					
 					productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
 					productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
 					productMc.find('span.product-winframe-name').text( pricingArr.frame.label );
@@ -1170,120 +1155,6 @@ $(document).ready(function () {
 				}
 
 				productOptions.find('td').css('background-color', '#FAEBE6');
-
-			} else if (secDigFibr == 'D/Grille') {
-				if (winDoor == 'Door') {
-					heightMesh = Number(height - dgDoorMesh);
-					widthMesh = Number(width - dgDoorMesh);
-					
-					isDgDoor = true;
-					hasComponentsHinges = true;
-					hasSpline = true;
-					hasInsectMesh = true;
-					
-					matrixArr = JSON.parse($('input[data-name="DG Hinged and Sliding Doors"]').val());
-					pricingArr = JSON.parse($('input[data-name="dgDoor"]').val());
-					tableName = $('input[data-name="DG Hinged and Sliding Doors"]').data('name');
-					cleanUp = dgDoorCleanup;
-					hrlyRate = ddHrlyRate;
-					markup = ddMarkup;              
-					
-					sqmPart = pricingArr.sqmpart.price; //Confirm
-					frame = pricingArr.frame.price;
-					cnrStake = pricingArr.crnstake.price;
-					
-					productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
-					productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
-					productMc.find('span.product-winframe-name').text( pricingArr.frame.label );
-					productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake.label );                
-
-				} else if (winDoor == 'Window') {
-					heightMesh = Number(height - dgWindowMesh);
-					widthMesh = Number(width - dgWindowMesh);
-					isDgWindow = true;
-					hasSpline = true;
-					hasInsectMesh = true;
-					
-					matrixArr = JSON.parse($('input[data-name="DG Windows"]').val());
-					pricingArr = JSON.parse($('input[data-name="dgWindow"]').val());
-					tableName = $('input[data-name="DG Windows"]').data('name');
-					cleanUp = dgWindowCleanup;
-					hrlyRate = dwHrlyRate;
-					markup = dwMarkup;
-					
-					sqmPart = pricingArr.sqmpart.price; //Confirm
-					frame = pricingArr.frame[frameType].price; 
-					cnrStake = pricingArr.crnstake[frameType].price;
-								   
-					productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
-					productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
-					productMc.find('span.product-winframe-name').text( pricingArr.frame[frameType].label );
-					productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake[frameType].label );               
-				}
-
-				productOptions.find('td').css('background-color', '#FCFCE1');
-
-			} else if (secDigFibr == 'Insect') {
-				if (winDoor == 'Door') {
-					heightMesh = Number(height - fibrDoorMesh);
-					widthMesh = Number(height - fibrDoorMesh);
-					
-					isFibrDoor = true;
-					hasComponentsHinges = true;
-					hasSpline = true;
-					
-					matrixArr = JSON.parse($('input[data-name="Insect Hinged and Sliding Doors"]').val());
-					pricingArr = JSON.parse($('input[data-name="fibrDoor"]').val());
-					tableName = $('input[data-name="Insect Hinged and Sliding Doors"]').data('name');
-					cleanUp = fibrDoorCleanup;
-					hrlyRate = fdHrlyRate;
-					markup = fdMarkup;
-									
-					if (ssgalpet == 'Pet Mesh') {
-						meshType = 'petmesh';  
-					} else {
-						meshType = 'mesh'; 
-					}  
-					
-					sqmPart = pricingArr.sqmpart[meshType].price; //Confirm
-					frame = pricingArr.frame.price;
-					cnrStake = pricingArr.crnstake.price;
-					
-					productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
-					productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
-					productMc.find('span.product-winframe-name').text( pricingArr.frame.label );
-					productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake.label );
-
-				} else if (winDoor == 'Window') {
-					heightMesh = Number(height - fibrWindowMesh);
-					widthMesh = Number(height - fibrWindowMesh);
-					isFibrWindow = true;
-					hasSpline = true;
-					matrixArr = JSON.parse($('input[data-name="Insect Screens"]').val());
-					pricingArr = JSON.parse($('input[data-name="fibrWindow"]').val());
-					tableName = $('input[data-name="Insect Screens"]').data('name');
-					cleanUp = fibrWindowCleanup;
-					hrlyRate = fwHrlyRate;
-					markup = fwMarkup;
-					
-					if (ssgalpet == 'Pet Mesh') {
-						meshType = 'petmesh';  
-					} else {
-						meshType = 'mesh'; 
-					}  
-					
-					sqmPart = pricingArr.sqmpart[meshType].price; //Confirm
-					frame = pricingArr.frame[frameType].price; 
-					cnrStake = pricingArr.crnstake[frameType].price;
-								   
-					productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
-					productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
-					productMc.find('span.product-winframe-name').text( pricingArr.frame[frameType].label );
-					productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake[frameType].label );                
-					
-				}
-
-				productOptions.find('td').css('background-color', '#F2F1EF');
 
 			} else if (secDigFibr == 'Perf') {
 				if (winDoor == 'Door') {
