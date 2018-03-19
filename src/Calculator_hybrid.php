@@ -52,7 +52,6 @@ class Calculator_hybrid
     private $pwHrlyRate;// = 30.00;
     //----------
     private $incMidrail;
-
 	private $midrailCost;
     private $midrailMarkup;
     /*** Clean Ups ***/
@@ -375,11 +374,11 @@ class Calculator_hybrid
 					$markup = $this->pwMarkup;
 				}
 
-				$sqm = ($heightMesh * $widthMesh / 1000000);
-				$sqmCalculated = ($sqm * $sqmPart);
+				$sqm = ($heightMesh * $widthMesh / 1000000).' <br />';
+				$sqmCalculated = ($sqm * $sqmPart).' <br />';
 				 
-				$frameCalculated = ($frame * $productLmtr);
-				$cnrstakeCalculated = ($cnrStake * 4);
+				$frameCalculated = ($frame * $productLmtr).' <br />';
+				$cnrstakeCalculated = ($cnrStake * 4).' <br />';
 
 
 				$lSeatCalculated = 0;
@@ -460,7 +459,6 @@ class Calculator_hybrid
 						+ $pwdCoatSpec1 + $pwdCoatSpec2 + $pwdCoatSpec3 + $pwdCoatSpec4
 						+ $splineCalculated + $this->freightConsumables + $hingedCalculated;
 				}
-
 				$labourIncCutting = ($hrlyRate / 60) * $cleanUp;
 
 				$totalCost = ($materialCost + $labourIncCutting);
@@ -470,7 +468,6 @@ class Calculator_hybrid
 				$locksTotalCost = 0;
 				
 				if ($winDoor == 'Door') {
-
 					if ($lockType == 'Single Sld' && $lockCounts > 0) {
 						$locksTotalCost = ($lockCounts * $this->singleLockSld) + $this->lockCyl;
 						$this->fillStocks($this->singleLockSld, 'locks');
@@ -526,8 +523,7 @@ class Calculator_hybrid
 
 				$product->product_cost = $sellPrice;
 						
-			}
-			if($product->product_sec_dig_perf_fibr == 'D/Grille' || $product->product_sec_dig_perf_fibr == 'Insect'){
+			}else {
 				$qty = 1;
 				$newQty = $product->product_qty;
 				$secDigFibr = $product->product_sec_dig_perf_fibr;
@@ -538,8 +534,9 @@ class Calculator_hybrid
 				$lockCount = $product->product_lock_qty;
 				$lockType = $product->product_lock_type;
 				$incMidrail = $product->product_inc_midrail;
-				$productColour = $product->product_colour;
 				
+				$productColour = $product->product_colour;
+
 				$matrixArr = null;
 				$hrlyRate = 0;
 				$cleanUp = 0;
@@ -723,6 +720,7 @@ class Calculator_hybrid
 				if ($incMidrail && is_numeric($this->incMidrail)) {
 					$totalPrice = $totalPrice + $this->incMidrail;
 				}
+
 				$totalPrice ;
 				$totalPrice *= $newQty;
 				
@@ -757,6 +755,7 @@ class Calculator_hybrid
 
 				$discount = $this->quote['discount'];
 				if ($discount > 0) {
+
 					$discounted = round($sellPrice * $discount / 100, 2);
 					$this->discountedAmount += $discounted;
 				}
@@ -848,6 +847,67 @@ class Calculator_hybrid
         $this->totalSellPrice += $markedUpCost;
 
     }
+
+	private function calculateAdditionalM($additionalM)
+    {
+        $perMeter = $additionalM->additional_per_meter;
+        $markup = $additionalM->additional_markup;
+
+        $price = 0;
+        if ($additionalM->additional_name) {
+            $price = $this->additionals_m[$additionalM->additional_name];
+        }
+        /** Added the marked up logic for Additional meter to calculate sell price */
+        $markedup = round($perMeter * $price * $markup / 100, 2);
+        
+        $total = round($price * $perMeter, 2);
+        $totalCharged = round(($price * $perMeter) * ($markup + 100) / 100, 2);
+        
+        $additionalM->additional_price = $total;
+        $this->profit += $markedup;
+        $this->totalSellPrice += $totalCharged;
+    }
+
+	private function calculateAdditionalL($additionalL)
+    {
+        $perLength = $additionalL->additional_per_length;
+        $markup = $additionalL->additional_markup;
+
+        $price = 0;
+        if ($additionalL->additional_name) {
+            $price = $this->additionals_l[$additionalL->additional_name];
+        }
+        /** Added the marked up logic for Additional length to calculate sell price */
+        $markedup = round($perLength * $price * $markup / 100, 2);
+
+        $total = round($price * $perLength, 2);
+        $totalCharged = round(($price * $perLength) * ($markup + 100) / 100, 2);
+        
+        $additionalL->additional_price = $total;
+        $this->profit += $markedup;
+        $this->totalSellPrice += $totalCharged;
+    }
+	
+	private function calculateAccessory($accessory)
+    {
+        $each = $accessory->accessory_each;
+        $markup = $accessory->accessory_markup;
+        
+        $price = 0;
+        if ($accessory->accessory_name) {
+            $price = $this->accessories[$accessory->accessory_name];
+        }
+        $markedup = round($each * $price * $markup / 100, 2);
+        
+        $total = round($price * $each, 2);
+        $totalCharged = round(($price * $each) * ($markup + 100) / 100, 2);
+        
+        $accessory->accessory_price = $total;
+        $this->profit += $markedup;
+		// $this->totalSellPrice += $total;
+        $this->totalSellPrice += $totalCharged;
+    }
+
 	private function getMasterMarkupByRole($role, $secDgFibre)
     {
         $masterMarkup = 0;
@@ -876,65 +936,9 @@ class Calculator_hybrid
         return $masterMarkup;
     }
 
-    private function calculateAdditionalM($additionalM)
-    {
-        $perMeter = $additionalM->additional_per_meter;
-        $markup = $additionalM->additional_markup;
+    
 
-        $price = 0;
-        if ($additionalM->additional_name) {
-            $price = $this->additionals_m[$additionalM->additional_name];
-        }
-        /** Added the marked up logic for Additional meter to calculate sell price */
-        $markedup = round($perMeter * $price * $markup / 100, 2);
-        
-        $total = round($price * $perMeter, 2);
-        $totalCharged = round(($price * $perMeter) * ($markup + 100) / 100, 2);
-        
-        $additionalM->additional_price = $total;
-        $this->profit += $markedup;
-        $this->totalSellPrice += $totalCharged;
-    }
-
-    private function calculateAdditionalL($additionalL)
-    {
-        $perLength = $additionalL->additional_per_length;
-        $markup = $additionalL->additional_markup;
-
-        $price = 0;
-        if ($additionalL->additional_name) {
-            $price = $this->additionals_l[$additionalL->additional_name];
-        }
-        /** Added the marked up logic for Additional length to calculate sell price */
-        $markedup = round($perLength * $price * $markup / 100, 2);
-
-        $total = round($price * $perLength, 2);
-        $totalCharged = round(($price * $perLength) * ($markup + 100) / 100, 2);
-        
-        $additionalL->additional_price = $total;
-        $this->profit += $markedup;
-        $this->totalSellPrice += $totalCharged;
-    }
-
-    private function calculateAccessory($accessory)
-    {
-        $each = $accessory->accessory_each;
-        $markup = $accessory->accessory_markup;
-        
-        $price = 0;
-        if ($accessory->accessory_name) {
-            $price = $this->accessories[$accessory->accessory_name];
-        }
-        $markedup = round($each * $price * $markup / 100, 2);
-        
-        $total = round($price * $each, 2);
-        $totalCharged = round(($price * $each) * ($markup + 100) / 100, 2);
-        
-        $accessory->accessory_price = $total;
-        $this->profit += $markedup;
-		// $this->totalSellPrice += $total;
-        $this->totalSellPrice += $totalCharged;
-    }
+    
 
     private function calculateCustomItem($customItem)
     {
@@ -1165,6 +1169,10 @@ class Calculator_hybrid
         $this->custom_color_win = $mcvalues->custom_color_win;
         $this->pr_color_door = $mcvalues->pr_color_door;
         $this->pr_color_win = $mcvalues->pr_color_win;
+		$this->anodized_color_door = $mcvalues->anodized_color_door;
+        $this->anodized_color_win = $mcvalues->anodized_color_win;
+        $this->special_color_door = $mcvalues->special_color_door;
+        $this->special_color_win = $mcvalues->special_color_win;
         
         // Midrail Include
         
@@ -1232,7 +1240,8 @@ class Calculator_hybrid
         $this->spline = $this->getPartPrice('INSSPLN'); 
 
         $this->perfSheetFixingBead = $this->getPartPrice('PERFWEG');
-
+		$this->singleLock = $mcvalues['single_lock'];
+        $this->tripleLock = $mcvalues['triple_lock'];
         /** Master Markups **/
         $this->secPerf_dist = $mcvalues['secperf_dist'];
         $this->dgfibr_dist = $mcvalues['dgfibr_dist'];
