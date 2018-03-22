@@ -1212,8 +1212,6 @@ $(document).ready(function () {
 			} else {
 				productOptions.find('td').css('background-color', '#fff');
 			}
-
-
 			//**** Mesh Increasing Amounts *****
 			if ((secDigFibr == 'Insect' || secDigFibr == 'D/Grille') && ssgalpet == 'Pet Mesh') {            
 				productMc.find('tr.insect-mesh-row').show();
@@ -1413,7 +1411,6 @@ $(document).ready(function () {
 					
 			// Sum of All "Calculated" Values:
 			var materialCost = 0.00;
-
 			if (secDigFibr && winDoor) {
 				materialCost = (Number(sqmCalculated) + Number(frameCalculated) + Number(perfSheetFixingCalculated)
 				+ Number(insectMeshCalculated)
@@ -1421,7 +1418,6 @@ $(document).ready(function () {
 				+ Number(customColor) + Number(prColor) + Number(anodizedColor) + Number(specialColor)
 				+ Number(splineCalculated) + Number(freightConsumables) + Number(hingedCalculated)).toFixed(2);
 			}
-			
 			productMc.find('span.product-material-cost').text(materialCost);
 					
 
@@ -1535,6 +1531,7 @@ $(document).ready(function () {
 					var discountPrice = Number(sellPrice * Number(discountPercentage) / 100).toFixed(2);
 					profitPerProduct =  Number(profit - discountPrice).toFixed(2);
 					sellPrice = Number(sellPrice - discountPrice).toFixed(2);
+					sellPricePerProduct = sellPrice;
 			 }
 
 			var inclGst = resultTotal;
@@ -1865,6 +1862,7 @@ $(document).ready(function () {
 					var discountPrice = Number(sellPrice * Number(discountPercentage) / 100).toFixed(2);
 					profitPerProduct =  Number(profit - discountPrice).toFixed(2);
 					sellPrice = Number(sellPrice - discountPrice).toFixed(2);
+					sellPricePerProduct = sellPrice;
 			 }
 
 			var inclGst = resultTotal;
@@ -3033,7 +3031,7 @@ jQuery(document).ready(function (e) {
                     response = JSON.parse(response);
                     if(response.result) {
                         jQuery("#draftid").val(response.id); 
-						$('.save-quote-btn, .new-quote-btn').attr("disabled", false);
+						$('.autosavequote').attr("disabled", false);
                     }
                 }
             });
@@ -3041,10 +3039,13 @@ jQuery(document).ready(function (e) {
     }
 
     setInterval(function(){
-        autoSaveQuote(), $('.save-quote-btn, .new-quote-btn').attr("disabled", true)}, 30000);
+        autoSaveQuote(), $('.autosavequote').attr("disabled", true)}, 30000);
     
 
 
 });
 
 /*************************/
+
+
+

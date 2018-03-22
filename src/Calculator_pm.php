@@ -1330,8 +1330,7 @@ class Calculator_pm
     private function getTitleByValue($value)
     {
         $index = array_search($value, array_column($this->mc_parts, 'price'));
-		pr($this->mc_parts);
-		die('123');
+		
         $numeric_indexed_array = array_values($this->mc_parts);
         $title = ($numeric_indexed_array[$index]['title']);
         $part_number = ($numeric_indexed_array[$index]['part_number']);

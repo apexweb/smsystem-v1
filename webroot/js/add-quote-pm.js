@@ -1696,6 +1696,7 @@ $(document).ready(function () {
                 var discountPrice = Number(sellPrice * Number(discountPercentage) / 100).toFixed(2);
                 profitPerProduct =  Number(profit - discountPrice).toFixed(2);
                 sellPrice = Number(sellPrice - discountPrice).toFixed(2);
+				sellPricePerProduct = sellPrice;
          }
 
         var inclGst = resultTotal;

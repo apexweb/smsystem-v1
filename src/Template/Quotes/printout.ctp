@@ -150,7 +150,7 @@ if ($quote->override_final_price) {
                     <td><?= h($product->product_lock_type) ?></td>
                     <td>
                         <?php if (!$flatCustomPrice): ?>
-                            <span>$</span><?= h($product->product_cost) ?>
+                            <span>$</span><?= h(number_format($product->product_cost, 2, '.', '')) ?>
                         <?php endif; ?>
                     </td>
                 </tr>
