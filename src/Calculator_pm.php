@@ -182,9 +182,14 @@ class Calculator_pm
             $this->totalInstallation = round($this->installation + $this->quote['freight_cost'], 2);
             $this->quote['installation_preset_amount'] = $this->installation;
             $this->quote['installation_custom_amount'] = 0;
-        } else {
+        } else if ($this->quote['installation_type'] == 'custom amount') {
             $this->totalInstallation = round($this->quote['installation_custom_amount'] + $this->quote['freight_cost']);
             $this->quote['installation_preset_amount'] = 0;
+        }
+        else if ($this->quote['installation_type'] == 'incorporate install') {
+            $this->totalInstallation = round($this->installation + $this->quote['freight_cost'], 2);
+            $this->quote['installation_preset_amount'] = 0;
+            $this->quote['installation_custom_amount'] = 0;
         }
 
         $this->quote['discount_amount'] = $this->discountedAmount;
@@ -859,15 +864,21 @@ class Calculator_pm
     private function calculateAccessory($accessory)
     {
         $each = $accessory->accessory_each;
-
+        $markup = $accessory->accessory_markup;
+        
         $price = 0;
         if ($accessory->accessory_name) {
             $price = $this->accessories[$accessory->accessory_name];
         }
-
+        $markedup = round($each * $price * $markup / 100, 2);
+        
         $total = round($price * $each, 2);
+        $totalCharged = round(($price * $each) * ($markup + 100) / 100, 2);
+        
         $accessory->accessory_price = $total;
-        $this->totalSellPrice += $total;
+        $this->profit += $markedup;
+       // $this->totalSellPrice += $total;
+        $this->totalSellPrice += $totalCharged;
     }
 
     private function calculateCustomItem($customItem)
@@ -898,18 +909,42 @@ class Calculator_pm
     {
         $installation = 0;
 
-        if ($qty > 0 && $this->userInstallations) {
+        if ($qty > 0) {
             if ($secDgFibr == '316 S/S' || $secDgFibr == 'D/Grille' || $secDgFibr == 'Perf') {
                 if ($winDoor == 'Door') {
-                    $installation = $this->userInstallations->door_amount * $qty;
+                    if($this->quote['installation_type'] == 'incorporate install'){
+                         $installation = $this->quote['installation_incorporate_amount'] * $qty;
+                    }else{
+                        if($this->userInstallations){
+                            $installation = $this->userInstallations->door_amount * $qty;
+                        }
+                    }
                 } else if ($winDoor == 'Window') {
-                    $installation = $this->userInstallations->window_amount * $qty;;
+                    if($this->quote['installation_type'] == 'incorporate install'){
+                         $installation = $this->quote['installation_incorporate_amount'] * $qty;
+                    }else{
+                        if($this->userInstallations){
+                            $installation = $this->userInstallations->window_amount * $qty;
+                        }
+                    }
                 }
             } else if ($secDgFibr == 'Insect') {
                 if ($winDoor == 'Door') {
-                    $installation = $this->userInstallations->insect_door_amount * $qty;;
+                    if($this->quote['installation_type'] == 'incorporate install'){
+                         $installation = $this->quote['installation_incorporate_amount'] * $qty;
+                    }else{
+                        if($this->userInstallations){
+                            $installation = $this->userInstallations->insect_door_amount * $qty;
+                        }
+                    }
                 } else if ($winDoor == 'Window') {
-                    $installation = $this->userInstallations->insect_window_amount * $qty;;
+                    if($this->quote['installation_type'] == 'incorporate install'){
+                         $installation = $this->quote['installation_incorporate_amount'] * $qty;
+                    }else{
+                        if($this->userInstallations){
+                            $installation = $this->userInstallations->insect_window_amount * $qty;
+                        }
+                    }
                 }
             }
         }

@@ -3038,8 +3038,8 @@ jQuery(document).ready(function (e) {
         }
     }
 
-    setInterval(function(){
-        autoSaveQuote(), $('.autosavequote').attr("disabled", true)}, 30000);
+    //setInterval(function(){
+       // autoSaveQuote(), $('.autosavequote').attr("disabled", true)}, 30000);
     
 
 
