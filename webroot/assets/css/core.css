@@ -3124,7 +3124,9 @@ tr.quote-complete td {
     font-size: 14px;
     font-weight: bold;
 }
-
+.notes-manufactures {
+	font-size: 16px !important;
+}
 .cuttings-table {
     font-size: 13px;
     font-weight: 500;

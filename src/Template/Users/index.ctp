@@ -16,6 +16,7 @@
                 <th scope="col"><?= $this->Paginator->sort('business_name') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('business_abrev', 'Abrev') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('role') ?></th>
+				<th scope="col"><?= $this->Paginator->sort('system_platform', 'System') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('created') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('monthly_fee_report', 'MF Monthly Fee Report') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('email') ?></th>
@@ -31,6 +32,7 @@
                 <td><?= h($user->business_name) ?></td>
                 <td><?= h($user->business_abrev) ?></td>
                 <td><?= h($user->role) ?></td>
+				<td><?= h($user->system_platform) ?></td>
                 <td><?= h($user->created) ?></td>
                 <td>
                     <?php

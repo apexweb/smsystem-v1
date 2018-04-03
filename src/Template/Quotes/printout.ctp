@@ -256,7 +256,7 @@ if ($quote->override_final_price) {
         <?php if (isset($quote->discount_amount) && $quote->discount_amount > 0 && (!$flatCustomPrice)): ?>
             <tr>
                 <td colspan="2"></td>
-                <td colspan="9"></td>
+                <td colspan="8"></td>
                 <td>Discount Applied <?php if($quote->discount) echo ' - '. $quote->discount .'%';?></td>
                 <td><span>$</span><?= h($quote->discount_amount); ?></td>
             </tr>

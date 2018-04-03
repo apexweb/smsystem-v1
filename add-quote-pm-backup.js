@@ -5,13 +5,13 @@ var midrailsCount = 0;
 var midrailMax = 2;
 var midrailMIN = 0;
 var additionalsCount = 4;
-var additionalMAX = 19;
+var additionalMAX = 9;
 var additionalMIN = 4;
 var additionalsLengthCount = 4;
-var additionalLengthMAX = 19;
+var additionalLengthMAX = 9;
 var additionalLengthMIN = 4;
 var customitemsCount = 2;
-var customitemMAx = 19;
+var customitemMAx = 9;
 var customitemMIN = 2;
 var cutsheetsCount = 2;
 var copyToMidrail = 1;
@@ -45,8 +45,8 @@ var tripleLockHng;// = 23.74;
 var lockCyl;// = 23.74;
 var spline;// = 0.11;
 var splineName;
-/* Cost Variables */
 
+/* Cost Variables */
 var screensTotal = [];
 var midrailsTotal = [];
 var productsNoMarkup = [];
@@ -76,8 +76,6 @@ var INSTALLATION_TOTAL = 0;
 var TOTAL_SELL_PRICE = 0;
 var PROFIT = 0; // install not included
 var CUSTOM_QUOTED_AMOUNT = 0;
-
-var isHybrid = false;
 
 
 function calculateScreensTotal() {
@@ -112,7 +110,7 @@ function calculateCustomItemsTotal() {
 function calculateProfit() {
     PROFIT = (markups.getTotalMarkups() - Number(DISCOUNT_AMOUNT)).toFixed(2);
     PROFIT = (Number(PROFIT) + Number(getCustomItemsMarkups())).toFixed(2);
-    PROFIT = (Number(PROFIT) + Number(getPerMeterMarkups()) + Number(getPerLengthMarkups()) ).toFixed(2);
+    PROFIT = (Number(PROFIT) + Number(getPerMeterMarkups()) + Number(getPerLengthMarkups()) + Number(getPerEachMarkups())).toFixed(2);
     $('#profit').val(PROFIT);
 }
 
@@ -148,7 +146,6 @@ function getPerLengthMarkups() {
     }
     return 0;
 }
-/* For Hybrid */
 function getPerEachMarkups() {
     var markup = 0;
 	$.each(additionalPerEach, function (i, item) {
@@ -163,7 +160,6 @@ function getPerEachMarkups() {
     }
     return 0;
 }
-/* End For Hybrid */
 function getCustomItemsMarkups() {
     var markup = 0;
     $.each(customitems, function (i, item) {
@@ -215,6 +211,8 @@ function getCustomItemsCharged() {
 //     $('#discount').trigger('change');
 //     calculateProfit();
 // }
+
+
 function calculateTotalBuy() {
     TOTAL_BUY_PRICE = Number(Number(SCREENS_TOTAL) + Number(MIDRAILS_TOTAL) + Number(SECTIONS_ACC_TOTAL) + Number(CUSTOM_ITEMS_TOTAL)).toFixed(2);
     $('#total-buy-price').val(TOTAL_BUY_PRICE);
@@ -223,10 +221,10 @@ function calculateTotalBuy() {
 
 
 function calculateTotalSell() {
-	TOTAL_SELL_PRICE = (Number(TOTAL_BUY_PRICE) + Number(markups.getTotalMarkups()) - Number(DISCOUNT_AMOUNT) + Number(INSTALLATION_TOTAL)).toFixed(2);
+    TOTAL_SELL_PRICE = (Number(TOTAL_BUY_PRICE) + Number(markups.getTotalMarkups()) - Number(DISCOUNT_AMOUNT) + Number(INSTALLATION_TOTAL)).toFixed(2);
     TOTAL_SELL_PRICE = (Number(TOTAL_SELL_PRICE) + Number(getCustomItemsCharged()) - Number(CUSTOM_ITEMS_TOTAL)).toFixed(2);
     
-    TOTAL_SELL_PRICE = (Number(TOTAL_SELL_PRICE) + Number(getPerMeterMarkups()) + Number(getPerLengthMarkups())).toFixed(2);
+    TOTAL_SELL_PRICE = (Number(TOTAL_SELL_PRICE) + Number(getPerMeterMarkups()) + Number(getPerLengthMarkups()) + Number(getPerEachMarkups())).toFixed(2);
     $('#total-sell-price').val(TOTAL_SELL_PRICE);
 
 
@@ -386,11 +384,11 @@ $(document).ready(function () {
 
     initializePartsVariables();
     initializeRole();
-	initializeTableVariables();
+    initializeTableVariables();
     initializeMatrixTables();
 
 
-     $('input[name="installation_type"]').on('change', function () {
+    $('input[name="installation_type"]').on('change', function () {
         var value = $(this).val();
         if (value == 'preset amount') {
             $('input[name="installation_preset_amount"]').show();
@@ -430,15 +428,14 @@ $(document).ready(function () {
         FREIGHTCOST = Number($(this).val());
         calculateTotalInstallation();
     });
-
-    $('input[name="installation_incorporate_amount"]').on('change', function () {
+	
+	$('input[name="installation_incorporate_amount"]').on('change', function () {
         INCORPORATE_INSTALLATION = Number($(this).val());
         $('.product-options-row').each(function(){
             $(this).find('.product-qty').trigger('change');
 	    });
         calculateTotalInstallation();
     });
-
 
     $('.panel-heading a').on('click', function () {
         if ($(this).hasClass('collapsed')) {
@@ -538,18 +535,16 @@ $(document).ready(function () {
         //***************
 
         productsCount++;
-		
-		/* For Hybrid */
-		//if(isHybrid){
-			if (productsCount > 0) {
-				var productMcTable = productMcTableHtml.replace('product-mc-0', 'product-mc-' + productsCount);
-				var productResultTable = productResultTableHtml.replace('product-result-0', 'product-result-' + productsCount);
-				$('#products-mc-container').append('<div class="clearfix"></div>');
-				$('#products-mc-container').append(productMcTable);
-				$('#products-mc-container').append(productResultTable);
-			}
-		//}
-		/* End For Hybrid */
+        
+        if (productsCount > 0) {
+            
+            var productMcTable = productMcTableHtml.replace('product-mc-0', 'product-mc-' + productsCount);
+            var productResultTable = productResultTableHtml.replace('product-result-0', 'product-result-' + productsCount);
+            $('#products-mc-container').append('<div class="clearfix"></div>');
+            $('#products-mc-container').append(productMcTable);
+            $('#products-mc-container').append(productResultTable);
+        }
+
         if (productsCount >= productMAX) {
             $('.product-btns').css('visibility', 'hidden');
         }
@@ -991,922 +986,766 @@ $(document).ready(function () {
         calculateCustomItemsTotal();
     });
 
-	/*$('body').on('change', '.product-sec-dg-fibr', function (evt, data) {
-		var countProduct = $('.product-sec-dg-fibr').length;
-		var count_product = countProduct-1;
-		var productpm = [];
-		for(var totalproduct=0;totalproduct<=count_product;totalproduct++){
-			var selectname = $('[name="products[' + totalproduct + '][product_sec_dig_perf_fibr]"]').val();
-			if (selectname == '316 S/S' || selectname == 'Perf') {
-				productpm.push('hybrid-pm');
-			}
-			if (selectname == 'D/Grille' || selectname == 'Insect') {
-				productpm.push('hybrid-mx');
-			}
-		}
-		if(jQuery.inArray('hybrid-pm',productpm)){
-			$('.hybrid-pm').css('display','block');
-		}
-		if(jQuery.inArray('hybrid-mx',productpm)){
-			$('.hybrid-mx').css('display','block');
-		}
-	});*/
+
     /*** Products On change Event => Calculator ***/
     $('body').on('change', '.product-options', function (evt, data) {
 
         var product = $(this).parents('.product-options-row');
-		var secDigFibr = product.find('.product-sec-dg-fibr').val();
-		if (secDigFibr == '316 S/S' || secDigFibr == 'Perf') {
-			isHybrid = true;
-		}else{
-			isHybrid = false;
-		}
-		if(isHybrid){
-			var productOptions = product.next();
-			var productIndex = findIndexById(product);
-			var qty = 1;
-			//*****Dom Elements*****:
-			var $qty = product.find('.product-qty');
-			var $lockCount = product.find('.product-lock-qty');
-			var $lockType = product.find('.product-lock-type');
-			//Values
-			var newQty = Number(product.find('.product-qty').val());
-			var secDigFibr = product.find('.product-sec-dg-fibr').val();
-			var ssgalpet = product.find('.product-ss-gal-pet').val();
-			var winDoor = product.find('.product-win-door').val();
-			var height = Number(product.find('.product-height').val());
-			var width = Number(product.find('.product-width').val());
-			var lockCounts = Number($lockCount.val());
-			var lockType = $lockType.val();
-			var includeMidrailCheckbox = productOptions.find('.product-inc-midrail').is(':checked');
-			var includeIncorporateInstallCheckbox = $('#installation-type-incorporate-install').is(':checked');
-			var productConf = product.find('.product-conf').find('option:selected').attr('data-code');
-			var productColour = product.find('.product-colour').val();
-			var discountPercentage = Number($('input[name=discount]').val());
-			//------ Change Dropdown Color on Window/Door change ------)
-			var winDoorDropdown = product.find('.product-win-door');
-			if (winDoor == 'Door') {
-				winDoorDropdown.css('background', '#ffab26');
-			} else if (winDoor == 'Window') {
-				winDoorDropdown.css('background', 'lightblue');
-			} else {
-				//winDoorDropdown.css('background', 'none');
-				winDoorDropdown.css('background', '#fff');
-			}
-
-			//---------- Disable Frame Type When Door is Selected --------------
-			var productFrameType = product.find('.product-frame-type');
-			var frameType = '';
-			switch (productFrameType.val()) {
-				case '9mm':
-					frameType = 'mm9';
-					break;
-				case '11mm':
-					frameType = 'mm11';
-					break;
-				default:
-					frameType = 'default';
-					break;            
-			}
-			if (product.find('.product-win-door').val() == 'Door') {
-				productFrameType.prop('disabled', true);
-				productFrameType.val('');
-			} else {
-				productFrameType.prop('disabled', false);
-			}
-	
-			//------------------------
-
-
-			/***********************/
-			var hrlyRate = 0;
-			var cleanUp = 0;
-			var markup = 0;
-			var tableName = '';
-			var matrixArr = null;
-			var petMeshMarkup = 0;
-			//**** Get Master Calculator Tables *****
-			var productMc = $('table#product-mc-' + productIndex);
-			var productResult = $('table#product-result-' + productIndex);
-			var isSecDoor = false;
-			var isSecWindow = false;
-			var isDgDoor = false;
-			var isDgWindow = false;
-			var isFibrDoor = false;
-			var isFibrWindow = false;
-			var isPerfDoor = false;
-			var isPerfWindow = false;
-			var hasSpline = false;
-			var hasInsectMesh = false;
-			var hasComponentsHinges = false;
-			var hasPvc = false;
-			var hasPerfSheetFixing = false;
-			
-			//**** Common Variables (Window or Door) ****
-			var heightMesh = 0;
-			var widthMesh = 0;
-			var sqmPart = 0;
-			var frame = 0;
-			var cnrStake = 0;
-			var hingedCalculated = 0;
-			if (secDigFibr == '316 S/S') {
-				if (winDoor == 'Door') {
-					heightMesh = Number(height - securityDoorMesh);
-					widthMesh = Number(width - securityDoorMesh);
-					isSecDoor = true;  
-					hasComponentsHinges = true;
-					hasPvc = true;
-					matrixArr = JSON.parse($('input[data-name="S/S Hinged and Sliding Doors"]').val()); 
-					pricingArr = JSON.parse($('input[data-name="secDoor"]').val()); 
-					tableName = $('input[data-name="S/S Hinged and Sliding Doors"]').data('name');
-					cleanUp = secDoorCleanUp;
-					hrlyRate = sdHrlyRate;
-					markup = sdMarkup;                
-					sqmPart = pricingArr.sqmpart.price; //Confirm
-					frame = pricingArr.frame.price;
-					cnrStake = pricingArr.crnstake.price;
-					productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
-					productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
-					productMc.find('span.product-winframe-name').text( pricingArr.frame.label );
-					productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake.label );                                                
-
-				} else if (winDoor == 'Window') {
-					
-					heightMesh = Number(height - securityWindowMesh);
-					widthMesh = Number(width - securityWindowMesh);
-					isSecWindow = true;
-					hasPvc = true;
-					
-					matrixArr = JSON.parse($('input[data-name="S/S Window Screens"]').val());
-					pricingArr = JSON.parse($('input[data-name="secWindow"]').val());
-					tableName = $('input[data-name="S/S Window Screens"]').data('name');
-					cleanUp = secWindowCleanUp;
-					hrlyRate = swHrlyRate;
-					markup = swMarkup;
-					
-					sqmPart = pricingArr.sqmpart.price; //Confirm
-					frame = pricingArr.frame[frameType].price; 
-					cnrStake = pricingArr.crnstake[frameType].price;
-								   
-					productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
-					productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
-					productMc.find('span.product-winframe-name').text( pricingArr.frame[frameType].label );
-					productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake[frameType].label ); 
-				}
-
-				productOptions.find('td').css('background-color', '#FAEBE6');
-
-			} else if (secDigFibr == 'Perf') {
-				if (winDoor == 'Door') {
-					heightMesh = Number(height - perfDoorMesh);
-					widthMesh = Number(width - perfDoorMesh);
-					
-					isPerfDoor = true;
-					hasPerfSheetFixing = true;
-					hasComponentsHinges = true;
-					
-					matrixArr = JSON.parse($('input[data-name="Perf Hinged and Sliding Doors"]').val());
-					tableName = $('input[data-name="Perf Hinged and Sliding Doors"]').data('name');
-					pricingArr = JSON.parse($('input[data-name="perfDoor"]').val());
-					
-					cleanUp = perfDoorCleanup;
-					hrlyRate = pdHrlyRate;
-					markup = pdMarkup;
-					
-					sqmPart = pricingArr.sqmpart.price; //Confirm
-					frame = pricingArr.frame.price;
-					cnrStake = pricingArr.crnstake.price;               
-					
-					productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
-					productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
-					productMc.find('span.product-winframe-name').text( pricingArr.frame.label );
-					productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake.label );
-
-				} else if (winDoor == 'Window') {
-					heightMesh = Number(height - perfWindowMesh);
-					widthMesh = Number(width - perfWindowMesh);
-					
-					isPerfWindow = true;
-					hasPerfSheetFixing = true;
-					
-					matrixArr = JSON.parse($('input[data-name="Perf Windows"]').val());
-					tableName = $('input[data-name="Perf Windows"]').data('name');
-					pricingArr = JSON.parse($('input[data-name="perfWindow"]').val());
-					
-					cleanUp = perfWindowCleanup;
-					hrlyRate = pwHrlyRate;
-					markup = pwMarkup;
-					
-					
-					sqmPart = pricingArr.sqmpart.price; //Confirm
-					frame = pricingArr.frame[frameType].price; 
-					cnrStake = pricingArr.crnstake[frameType].price;
-								   
-					productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
-					productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
-					productMc.find('span.product-winframe-name').text( pricingArr.frame[frameType].label );
-					productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake[frameType].label );
-				}
-
-				productOptions.find('td').css('background-color', '#eaf6ff');
-			} else {
-				productOptions.find('td').css('background-color', '#fff');
-			}
-			//**** Mesh Increasing Amounts *****
-			if ((secDigFibr == 'Insect' || secDigFibr == 'D/Grille') && ssgalpet == 'Pet Mesh') {            
-				productMc.find('tr.insect-mesh-row').show();
-				if (winDoor == 'Door') {
-					petMeshMarkup = Number($('#dg-ins-door-infill').text()).toFixed(2);
-				} else if (winDoor == 'Window') {
-					petMeshMarkup = Number($('#dg-ins-win-infill').text()).toFixed(2);
-				}
-			} else {
-				productMc.find('tr.insect-mesh-row').hide();
-			}
-								   
-			var lSeatCalculated = 0;
-			var pvcCalculated = 0;
-			var splineCalculated = 0;
-			var perfSheetFixingCalculated = 0;
-			var insectMeshCalculated = 0;
-			
-			productMc.find('span.product-mesh-height').text(heightMesh);
-			productMc.find('span.product-mesh-width').text(widthMesh);
-			
-			productMc.find('span.product-height').text(height);
-			productMc.find('span.product-width').text(width);
-			
-			var pwdCoat = ((width + height) * 2 / 5000).toFixed(1);
-			productMc.find('span.product-coat').text(pwdCoat);
-
-			var productLmtr = ((width + height) * 2 / 1000).toFixed(1);
-			productMc.find('span.product-lmtrs').text(productLmtr);
-			
-			var sqm = (heightMesh * widthMesh / 1000000).toFixed(3);
-			productMc.find('span.product-sqm').text(sqm);
-			
-			var sqmCalculated = (sqm * sqmPart).toFixed(2);
-			productMc.find('span.product-sqm-calculated').text(sqmCalculated);
-			
-			productMc.find('span.product-winframe-price').text(frame);
-			
-			var frameCalculated = (frame * productLmtr).toFixed(2);
-			productMc.find('span.product-winframe-calculated').text(frameCalculated);
-			
-			productMc.find('span.product-win-cnrstake-price').text(cnrStake);
-
-			var cnrstakeCalculated = (cnrStake * 4).toFixed(2);
-			productMc.find('span.product-win-cnrstake-calculated').text(cnrstakeCalculated);
-			
-		   
-			if (hasSpline) {
-
-				splineCalculated = (spline * productLmtr).toFixed(2);
-				productMc.find('tr.spline-row').show();
-				productMc.find('span.product-spline-name').text(splineName);
-				productMc.find('span.product-spline').text(spline);
-				productMc.find('span.product-spline-calculated').text(splineCalculated);
-
-			} else {
-				productMc.find('tr.spline-row').hide();
-			}
-			
-			if (hasInsectMesh) {
-				productMc.find('tr.insect-mesh-row').show();
-
-				if (ssgalpet == 'Pet Mesh') {
-					insectMeshCalculated = (sqm * petMesh).toFixed(2);
-				} else {
-					insectMeshCalculated = (sqm * insectMesh).toFixed(2);
-				}
-				productMc.find('span.product-insect-mesh').text(insectMeshCalculated);
-			} else {
-				productMc.find('tr.insect-mesh-row').hide();
-			}
-			
-			if (hasPvc) {
-				productMc.find('tr.pvc-row').show();
-				productMc.find('tr.lseat-row').show();
-				productMc.find('span.product-lseat-name').text(PVCLSeatName);
-				productMc.find('span.product-lseat-price').text(PVCLSeat);
-				
-				lSeatCalculated = (PVCLSeat * productLmtr).toFixed(2);
-				productMc.find('span.product-lseat-calculated').text(lSeatCalculated);
-				
-				productMc.find('span.product-pvc-wedge-price').text(PVCWedge);
-				productMc.find('span.product-pvc-wedge-name').text(PVCWedgeName);
-				
-				pvcCalculated = (PVCWedge * productLmtr).toFixed(2);
-				productMc.find('span.product-pvc-wedge-calculated').text(pvcCalculated);
-				
-			} else {
-				productMc.find('tr.pvc-row').hide();
-				productMc.find('tr.lseat-row').hide();
-			}
-			
-			if (hasComponentsHinges) {
-				hingedCalculated = (rollerHinges * 4).toFixed(2);
-				productMc.find('span.product-components-wheels-hinges').text(rollerHinges);
-				productMc.find('span.product-components-wheels-hinges-calculated').text(hingedCalculated);
-				productMc.find('tr.components-row').show();
-			} else {
-				productMc.find('tr.components-row').hide();
-			}
-			
-			if (hasPerfSheetFixing) {
-
-				productMc.find('tr.perf-sheet-row').show();
-				productMc.find('span.product-perf-sheet-fixing').text(PVCLSeat);
-				if (isPerfDoor) {
-					perfSheetFixingCalculated = (PVCLSeat * perfSheetFixingBead).toFixed(2);
-				} else if (isPerfWindow) {
-					perfSheetFixingCalculated = (PVCLSeat * productLmtr).toFixed(2);
-				}
-
-				productMc.find('span.product-perf-sheet-fixing-calculated').text(perfSheetFixingCalculated);
-
-			} else {
-				productMc.find('tr.perf-sheet-row').hide();
-			}
-			
-			productMc.find('span.product-freight-consumables').text(freightConsumables);
-			
-			// **** Hide or Show MC Tabels ****
-			if (isSecDoor || isSecWindow || isDgDoor || isDgWindow || isFibrDoor || isFibrWindow || isPerfDoor || isPerfWindow) {
-				productMc.show();
-				productResult.show();
-				
-			} else {
-				productMc.hide();
-				productResult.hide();
-			}
-			/*****************/
-
-
-
-			// Custom And Premium Color Costs
-			var customColor = 0;
-			var prColor = 0;
-			var anodizedColor = 0;
-			var specialColor = 0;
-			
-			if (productColour) {
-				var productColourAttr = productColour.split('|');
-				var productColourGroup = productColourAttr[0];
-				var productColourOption = productColourAttr[1];
-				
-				if (winDoor == 'Door') {
-					if (productColourGroup == 'Custom Colour')
-						customColor = (qty * Number($('.custom-color-door').text())).toFixed(2);
-					//if (productColourGroup == 'Standard Color')
-						//customColor = (qty * Number($('.custom-color-door').text())).toFixed(2);
-					if (productColourGroup == 'Anodized')
-						anodizedColor = (qty * Number($('.anodized-color-door').text())).toFixed(2);
-					if (productColourGroup == 'Premium Colour')
-						prColor = (qty * Number($('.pr-color-door').text())).toFixed(2);
-					if (productColourGroup == 'Special Colour')
-						specialColor = (qty * Number($('.special-color-door').text())).toFixed(2);                    
-				} else if (winDoor == 'Window') {
-					if (productColourGroup == 'Custom Colour')
-						customColor = (qty * Number($('.custom-color-win').text())).toFixed(2);
-					//if (productColourGroup == 'Standard Color')
-						//customColor = (qty * Number($('.custom-color-win').text())).toFixed(2);
-					if (productColourGroup == 'Anodized')
-						anodizedColor = (qty * Number($('.anodized-color-win').text())).toFixed(2);
-					if (productColourGroup == 'Premium Colour')
-						prColor = (qty * Number($('.pr-color-win').text())).toFixed(2);
-					if (productColourGroup == 'Special Colour')
-						specialColor = (qty * Number($('.special-color-win').text())).toFixed(2);               
-				}            
-			}else{
-				if (winDoor == 'Door') {
-					if ($('[name="color1_color"]').val() && $('[name="color1"]').is(':checked')) {
-						customColor = (qty * Number($('.custom-color-door').text())).toFixed(2);
-					}
-					if ($('[name="color2_color"]').val() && $('[name="color2"]').is(':checked')) {
-						prColor = (qty * Number($('.pr-color-door').text())).toFixed(2);
-					}
-					if ($('[name="color3_color"]').val() && $('[name="color3"]').is(':checked')) {
-						anodizedColor = (qty * Number($('.anodized-color-door').text())).toFixed(2);
-					}
-					if ($('[name="color4_color"]').val() && $('[name="color4"]').is(':checked')) {
-						specialColor = (qty * Number($('.special-color-door').text())).toFixed(2);
-					}
-
-				} else if (winDoor == 'Window') {
-					if ($('[name="color1_color"]').val() && $('[name="color1"]').is(':checked')) {
-						customColor = (qty * Number($('.custom-color-win').text())).toFixed(2);
-					}
-					if ($('[name="color2_color"]').val() && $('[name="color2"]').is(':checked')) {
-						prColor = (qty * Number($('.pr-color-win').text())).toFixed(2);
-					}
-					if ($('[name="color3_color"]').val() && $('[name="color3"]').is(':checked')) {
-						anodizedColor = (qty * Number($('.anodized-color-win').text())).toFixed(2);
-					}
-					if ($('[name="color4_color"]').val() && $('[name="color4"]').is(':checked')) {
-						specialColor = (qty * Number($('.special-color-win').text())).toFixed(2);
-					}
-				}            
-			}
-					
-			// Sum of All "Calculated" Values:
-			var materialCost = 0.00;
-			if (secDigFibr && winDoor) {
-				materialCost = (Number(sqmCalculated) + Number(frameCalculated) + Number(perfSheetFixingCalculated)
-				+ Number(insectMeshCalculated)
-				+ Number(cnrstakeCalculated) + Number(lSeatCalculated) + Number(pvcCalculated)
-				+ Number(customColor) + Number(prColor) + Number(anodizedColor) + Number(specialColor)
-				+ Number(splineCalculated) + Number(freightConsumables) + Number(hingedCalculated)).toFixed(2);
-			}
-			productMc.find('span.product-material-cost').text(materialCost);
-					
-
-			var price = 0;
-			var filteredArray = [];
-			
-			price = materialCost;
-
-			//Labout inc Cutting Applied - Price multiplied by QTY
-			var labourIncCutting = ((hrlyRate / 60) * cleanUp).toFixed(2);
-			productMc.find('span.product-labour-incl-cutting').text(labourIncCutting);
-			
-			var priceWithLabourIncCutting = (Number(price) + Number(labourIncCutting)).toFixed(2);
-			productMc.find('span.product-total-cost').text(priceWithLabourIncCutting);
-
-			priceWithLabourIncCutting = (Number(priceWithLabourIncCutting) * (Number(petMeshMarkup) + Number(100)) / 100).toFixed(2);
-
-			//var noMarkupCost = (Number(price) + Number(customColor) + Number(prColor)).toFixed(2);
-			var noMarkupCost = (Number(price) + Number(customColor) + Number(prColor) +  Number(anodizedColor) + Number(specialColor)).toFixed(2);
-			//var noMarkupCost = (Number(price)).toFixed(2);
-			price = priceWithLabourIncCutting;
-			
-			
-			//Product Markup Applied by SecDgFibre
-			var resultTotal = (price * (Number(markup) + Number(100)) / 100).toFixed(2);
-			
-			var masterMarkup = getMasterMarkupByMatrixTable(tableName);
-			//Master Markup Applied
-			resultTotal = Number(resultTotal * (Number(masterMarkup) + Number(100)) / 100).toFixed(2);
-			
-			productResult.find('span.product-result-cost').text(resultTotal);
-			productResult.find('span.product-result-quantity').text(newQty);
-			
-
-			calculateInstallation(product, productIndex, true);
-			if (includeMidrailCheckbox) {
-			   
-				resultTotal = (Number(resultTotal) + Number(midrailAmount)).toFixed(2);
-				noMarkupCost = (Number(noMarkupCost) +  Number(midrailCost)).toFixed(2);
-			}
-			
-
-			noMarkupCost = (Number(noMarkupCost) * Number(newQty)).toFixed(2);
-			resultTotal = (Number(resultTotal) * Number(newQty)).toFixed(2);
-
-			var locksTotalCost = 0;
-			//Calculate Lcoks
-			if (winDoor == 'Door') {
-				$lockCount.prop('disabled', false);
-				$lockType.prop('disabled', false);
-				
-			   if (secDigFibr == 'Insect') {               
-				   
-					$lockType.find('option:last').hide();
-				} else {
-					$lockType.find('option:last').show();
-				}
-
-
-				var confRuled = product.attr('data-conf-rule');
-
-				//Decrease cost when LOCK Type is Changed
-							
-				if (lockType == 'Single Sld' && lockCounts) {
-					locksTotalCost = Number( Number(singleLockSld * lockCounts) + lockCyl ).toFixed(2);
-					resultTotal = Number( Number(resultTotal) + Number(locksTotalCost)).toFixed(2);
-					noMarkupCost = Number( Number(noMarkupCost) + Number(locksTotalCost) ).toFixed(2);
-				} else if( lockType == 'Single Hng' && lockCounts){
-					locksTotalCost = Number( Number( (singleLockHng * lockCounts) + lockCyl )).toFixed(2);
-					resultTotal = Number(Number(resultTotal) + Number(locksTotalCost) ).toFixed(2);
-					noMarkupCost = Number( Number(noMarkupCost) + Number(locksTotalCost) ).toFixed(2);
-				} else if (lockType == 'Triple Sld' && lockCounts){
-					locksTotalCost = Number( Number( (tripleLockSld * lockCounts) + lockCyl) ).toFixed(2);
-					resultTotal = Number( Number(resultTotal) + Number(locksTotalCost) ).toFixed(2);
-					noMarkupCost = Number( Number(noMarkupCost) + Number(locksTotalCost) ).toFixed(2);
-				} else if (lockType == 'Triple Hng' && lockCounts){
-					locksTotalCost = Number(Number( (tripleLockHng * lockCounts) + lockCyl)).toFixed(2);
-					resultTotal = Number(Number(resultTotal) + Number(locksTotalCost) ).toFixed(2);
-					noMarkupCost =  Number(Number(noMarkupCost) + Number(locksTotalCost) ).toFixed(2);
-				}
-								 
-
-			} else if (winDoor == 'Window') {
-				$lockCount.val('').prop('disabled', true);
-				$lockType.val('').prop('disabled', true);
-			}
-			
-			productResult.find('span.product-result-locks').text(locksTotalCost);
-			productResult.find('span.product-result-total').text(resultTotal);
-			//--------------
-					
-			
-			productsNoMarkup[productIndex] = noMarkupCost;
-			screensTotal[productIndex] = resultTotal;
-			
-			calculateScreensTotal();
-
-
-			var sellPrice = resultTotal;
-			if (role != 'retailer' && mfrole != 'retailer') {
-				if (secDigFibr) {
-					var selector = getMarkupInputID(secDigFibr);
-					sellPrice = (resultTotal * Number($(selector).val()) / 100).toFixed(2);
-					sellPrice = (Number(resultTotal) + Number(sellPrice)).toFixed(2);
-				}
-			}
-			var profit = (Number(sellPrice) - Number(resultTotal)).toFixed(2);
-			var profitPerProduct = profit;
-			var sellPricePerProduct = sellPrice;
-			if(discountPercentage > 0){
-					var discountPrice = Number(sellPrice * Number(discountPercentage) / 100).toFixed(2);
-					profitPerProduct =  Number(profit - discountPrice).toFixed(2);
-					sellPrice = Number(sellPrice - discountPrice).toFixed(2);
-					sellPricePerProduct = sellPrice;
-			 }
-
-			var inclGst = resultTotal;
-			if (includeIncorporateInstallCheckbox) {
-				sellPricePerProduct = (Number(sellPricePerProduct) + Number(INCORPORATE_INSTALLATION) * Number(newQty)).toFixed(2);
-			}
-			noMarkupCost = (Number(noMarkupCost) * Number(newQty)).toFixed(2);
-			productOptions.find('input.product-price-incl-gst').val(inclGst);
-			productOptions.find('input.product-sell-price').val(sellPricePerProduct);
-
-
-			productOptions.find('input.product-profit').val(profitPerProduct);
-
-			markups.addToMarkups(profit, productIndex, secDigFibr);
-		}else{
-			var productOptions = product.next();
-			var productIndex = findIndexById(product);
-
-			var qty = 1;
-
-			//*****Dom Elements*****:
-			var $qty = product.find('.product-qty');
-			var $lockCount = product.find('.product-lock-qty');
-			var $lockType = product.find('.product-lock-type');
-			
-			//Values
-			var newQty = Number(product.find('.product-qty').val());
-			var secDigFibr = product.find('.product-sec-dg-fibr').val();
-			var ssgalpet = product.find('.product-ss-gal-pet').val();
-			var winDoor = product.find('.product-win-door').val();
-			var height = Number(product.find('.product-height').val());
-			var width = Number(product.find('.product-width').val());
-			var lockCounts = Number($lockCount.val());
-			var lockType = $lockType.val();
-			var includeMidrailCheckbox = productOptions.find('.product-inc-midrail').is(':checked');
-			var includeIncorporateInstallCheckbox = $('#installation-type-incorporate-install').is(':checked');
-			var productConf = product.find('.product-conf').find('option:selected').attr('data-code');
-			var productColour = product.find('.product-colour').val();
-
-			var discountPercentage = Number($('input[name=discount]').val());
-					
-
-			//------ Change Dropdown Color on Window/Door change ------)
-			var winDoorDropdown = product.find('.product-win-door');
-
-			if (winDoor == 'Door') {
-				winDoorDropdown.css('background', '#ffab26');
-			} else if (winDoor == 'Window') {
-				winDoorDropdown.css('background', 'lightblue');
-			} else {
-				//winDoorDropdown.css('background', 'none');
-				winDoorDropdown.css('background', '#fff');
-			}
-
-
-			//---------- Disable Frame Type When Door is Selected --------------
-			var productFrameType = product.find('.product-frame-type');
-			if (product.find('.product-win-door').val() == 'Door') {
-				productFrameType.prop('disabled', true);
-				productFrameType.val('');
-			} else {
-				productFrameType.prop('disabled', false);
-			}
-			//------------------------
-
-
-			/***********************/
-			var hrlyRate = 0;
-			var cleanUp = 0;
-			var markup = 0;
-			var tableName = '';
-			var matrixArr = null;
-			var petMeshMarkup = 0;
-
-			if (secDigFibr == '316 S/S') {
-				if (winDoor == 'Door') {
-
-					matrixArr = JSON.parse($('input[data-name="S/S Hinged and Sliding Doors"]').val());
-					tableName = $('input[data-name="S/S Hinged and Sliding Doors"]').data('name');
-					cleanUp = secDoorCleanUp;
-					hrlyRate = sdHrlyRate;
-					markup = sdMarkup;
-
-				} else if (winDoor == 'Window') {
-					matrixArr = JSON.parse($('input[data-name="S/S Window Screens"]').val());
-					tableName = $('input[data-name="S/S Window Screens"]').data('name');
-					cleanUp = secWindowCleanUp;
-					hrlyRate = swHrlyRate;
-					markup = swMarkup;
-				}
-
-				productOptions.find('td').css('background-color', '#FAEBE6');
-
-			} else if (secDigFibr == 'D/Grille') {
-				if (winDoor == 'Door') {
-					matrixArr = JSON.parse($('input[data-name="DG Hinged and Sliding Doors"]').val());
-					tableName = $('input[data-name="DG Hinged and Sliding Doors"]').data('name');
-					cleanUp = dgDoorCleanup;
-					hrlyRate = ddHrlyRate;
-					markup = ddMarkup;
-
-				} else if (winDoor == 'Window') {
-					matrixArr = JSON.parse($('input[data-name="DG Windows"]').val());
-					tableName = $('input[data-name="DG Windows"]').data('name');
-					cleanUp = dgWindowCleanup;
-					hrlyRate = dwHrlyRate;
-					markup = dwMarkup;
-				}
-
-				productOptions.find('td').css('background-color', '#FCFCE1');
-
-			} else if (secDigFibr == 'Insect') {
-				if (winDoor == 'Door') {
-					matrixArr = JSON.parse($('input[data-name="Insect Hinged and Sliding Doors"]').val());
-					tableName = $('input[data-name="Insect Hinged and Sliding Doors"]').data('name');
-					cleanUp = fibrDoorCleanup;
-					hrlyRate = fdHrlyRate;
-					markup = fdMarkup;
-
-				} else if (winDoor == 'Window') {
-					matrixArr = JSON.parse($('input[data-name="Insect Screens"]').val());
-					tableName = $('input[data-name="Insect Screens"]').data('name');
-					cleanUp = fibrWindowCleanup;
-					hrlyRate = fwHrlyRate;
-					markup = fwMarkup;
-				}
-
-				productOptions.find('td').css('background-color', '#F2F1EF');
-
-			} else if (secDigFibr == 'Perf') {
-				if (winDoor == 'Door') {
-					matrixArr = JSON.parse($('input[data-name="Perf Hinged and Sliding Doors"]').val());
-					tableName = $('input[data-name="Perf Hinged and Sliding Doors"]').data('name');
-					cleanUp = perfDoorCleanup;
-					hrlyRate = pdHrlyRate;
-					markup = pdMarkup;
-
-				} else if (winDoor == 'Window') {
-					matrixArr = JSON.parse($('input[data-name="Perf Windows"]').val());
-					tableName = $('input[data-name="Perf Windows"]').data('name');
-					cleanUp = perfWindowCleanup;
-					hrlyRate = pwHrlyRate;
-					markup = pwMarkup;
-				}
-
-				productOptions.find('td').css('background-color', '#eaf6ff');
-			} else {
-				productOptions.find('td').css('background-color', '#fff');
-			}
-
-
-			//**** Mesh Increasing Amounts *****
-			if ((secDigFibr == 'Insect' || secDigFibr == 'D/Grille') && ssgalpet == 'Pet Mesh') {
-				if (winDoor == 'Door') {
-					petMeshMarkup = Number($('#dg-ins-door-infill').text()).toFixed(2);
-				} else if (winDoor == 'Window') {
-					petMeshMarkup = Number($('#dg-ins-win-infill').text()).toFixed(2);
-				}
-			}
-
-
-
-
-			// Custom And Premium Color Costs
-			var customColor = 0;
-			var prColor = 0;
-			var anodizedColor = 0;
-			var specialColor = 0;
-			
-			if (productColour) {
-				var productColourAttr = productColour.split('|');
-				var productColourGroup = productColourAttr[0];
-				var productColourOption = productColourAttr[1];
-				
-				if (winDoor == 'Door') {
-					if (productColourGroup == 'Custom Colour')
-						customColor = (qty * Number($('.custom-color-door').text())).toFixed(2);
-					//if (productColourGroup == 'Standard Color')
-						//customColor = (qty * Number($('.custom-color-door').text())).toFixed(2);
-					if (productColourGroup == 'Anodized')
-						anodizedColor = (qty * Number($('.anodized-color-door').text())).toFixed(2);
-					if (productColourGroup == 'Premium Colour')
-						prColor = (qty * Number($('.pr-color-door').text())).toFixed(2);
-					if (productColourGroup == 'Special Colour')
-						specialColor = (qty * Number($('.special-color-door').text())).toFixed(2);                    
-				} else if (winDoor == 'Window') {
-					if (productColourGroup == 'Custom Colour')
-						customColor = (qty * Number($('.custom-color-win').text())).toFixed(2);
-					//if (productColourGroup == 'Standard Color')
-						//customColor = (qty * Number($('.custom-color-win').text())).toFixed(2);
-					if (productColourGroup == 'Anodized')
-						anodizedColor = (qty * Number($('.anodized-color-win').text())).toFixed(2);
-					if (productColourGroup == 'Premium Colour')
-						prColor = (qty * Number($('.pr-color-win').text())).toFixed(2);
-					if (productColourGroup == 'Special Colour')
-						specialColor = (qty * Number($('.special-color-win').text())).toFixed(2);               
-				}            
-			}else{
-				if (winDoor == 'Door') {
-					if ($('[name="color1_color"]').val() && $('[name="color1"]').is(':checked')) {
-						customColor = (qty * Number($('.custom-color-door').text())).toFixed(2);
-					}
-					if ($('[name="color2_color"]').val() && $('[name="color2"]').is(':checked')) {
-						prColor = (qty * Number($('.pr-color-door').text())).toFixed(2);
-					}
-					if ($('[name="color3_color"]').val() && $('[name="color3"]').is(':checked')) {
-						anodizedColor = (qty * Number($('.anodized-color-door').text())).toFixed(2);
-					}
-					if ($('[name="color4_color"]').val() && $('[name="color4"]').is(':checked')) {
-						specialColor = (qty * Number($('.special-color-door').text())).toFixed(2);
-					}
-
-				} else if (winDoor == 'Window') {
-					if ($('[name="color1_color"]').val() && $('[name="color1"]').is(':checked')) {
-						customColor = (qty * Number($('.custom-color-win').text())).toFixed(2);
-					}
-					if ($('[name="color2_color"]').val() && $('[name="color2"]').is(':checked')) {
-						prColor = (qty * Number($('.pr-color-win').text())).toFixed(2);
-					}
-					if ($('[name="color3_color"]').val() && $('[name="color3"]').is(':checked')) {
-						anodizedColor = (qty * Number($('.anodized-color-win').text())).toFixed(2);
-					}
-					if ($('[name="color4_color"]').val() && $('[name="color4"]').is(':checked')) {
-						specialColor = (qty * Number($('.special-color-win').text())).toFixed(2);
-					}
-				}            
-			}
-			
-			var price = 0;
-			var filteredArray = [];
-			if (matrixArr) {
-				filteredArray = matrixArr.filter(function (item) {
-					return width <= item.width && height <= item.height;
-				});
-				if (filteredArray.length > 0) {
-					price = Number(filteredArray[0]['price']);
-				}
-			}
-
-			price = Number(price) * Number(qty);
-
-
-			//Labout inc Cutting Applied - Price multiplied by QTY
-			var labourIncCutting = ((hrlyRate / 60) * cleanUp).toFixed(2);
-			var priceWithLabourIncCutting = (Number(price) + Number(labourIncCutting)).toFixed(2);
-
-			priceWithLabourIncCutting = (Number(priceWithLabourIncCutting) * (Number(petMeshMarkup) + Number(100)) / 100).toFixed(2);
-
-			//var noMarkupCost = (Number(price) + Number(customColor) + Number(prColor)).toFixed(2);
-			var noMarkupCost = (Number(price) + Number(customColor) + Number(prColor) +  Number(anodizedColor) + Number(specialColor)).toFixed(2);
-
-			price = priceWithLabourIncCutting;
-
-
-			//Product Markup Applied by SecDgFibre
-			var resultTotal = (price * (Number(markup) + Number(100)) / 100).toFixed(2);
-
-
-			var masterMarkup = getMasterMarkupByMatrixTable(tableName);
-
-			//Master Markup Applied
-			resultTotal = Number(resultTotal * (Number(masterMarkup) + Number(100)) / 100).toFixed(2);
-
-			calculateInstallation(product, productIndex, true);
-
-			//Sum of price and Color costs
-			//resultTotal = (Number(customColor) + Number(prColor) + Number(resultTotal)).toFixed(2);
-			resultTotal = (Number(customColor) + Number(prColor) + Number(anodizedColor) + Number(specialColor) + Number(resultTotal)).toFixed(2);
-			if (includeMidrailCheckbox) {
-				resultTotal = (Number(resultTotal) + Number($('span.inc-midrail-amount').text())).toFixed(2);
-			}
-			if (includeIncorporateInstallCheckbox) {
-				//resultTotal = (Number(resultTotal) + Number(calculateIncorporateInstallation(product)));
-			}
-			noMarkupCost = (Number(noMarkupCost) * Number(newQty)).toFixed(2);
-			resultTotal = (Number(resultTotal) * Number(newQty)).toFixed(2);
-
-
-			//Calculate Lcoks
-			if (winDoor == 'Door') {
-				$lockCount.prop('disabled', false);
-				$lockType.prop('disabled', false);
-				if (secDigFibr == 'Insect') {
-					resultTotal = (Number(resultTotal) - Number(singleLock * newQty)).toFixed(2);
-					noMarkupCost = (Number(noMarkupCost) - Number(singleLock * newQty)).toFixed(2);
-					$lockType.find('option:last').hide();
-				} else {
-					resultTotal = (Number(resultTotal) - Number(tripleLock * newQty)).toFixed(2);
-					noMarkupCost = (Number(noMarkupCost) - Number(tripleLock * newQty)).toFixed(2);
-					$lockType.find('option:last').show();
-				}
-
-
-				var confRuled = product.attr('data-conf-rule');
-				
-				//Decrease cost when LOCK Type is Changed
-				if (lockType == 'Single' && lockCounts) {
-					resultTotal = (Number(resultTotal) + Number(lockCounts * singleLock)).toFixed(2);
-					noMarkupCost = (Number(noMarkupCost) + Number(lockCounts * singleLock)).toFixed(2);
-				} else if (lockType == 'Triple' && lockCounts) {
-					resultTotal = (Number(resultTotal) + Number(lockCounts * tripleLock)).toFixed(2);
-					noMarkupCost = (Number(noMarkupCost) + Number(lockCounts * tripleLock)).toFixed(2);
-				}
-
-			} else if (winDoor == 'Window') {
-				$lockCount.val('').prop('disabled', true);
-				$lockType.val('').prop('disabled', true);
-			}
-			//--------------
-			   
-			productsNoMarkup[productIndex] = noMarkupCost;
-			screensTotal[productIndex] = resultTotal;
-			calculateScreensTotal();
-
-
-			var sellPrice = resultTotal;
-			if (role != 'retailer' && mfrole != 'retailer') {
-				if (secDigFibr) {
-					var selector = getMarkupInputID(secDigFibr);
-					sellPrice = (resultTotal * Number($(selector).val()) / 100).toFixed(2);
-					sellPrice = (Number(resultTotal) + Number(sellPrice)).toFixed(2);
-				}
-			}
-			var profit = (Number(sellPrice) - Number(resultTotal)).toFixed(2);
-			var profitPerProduct = profit;
-			var sellPricePerProduct = sellPrice;
-			if(discountPercentage > 0){
-					var discountPrice = Number(sellPrice * Number(discountPercentage) / 100).toFixed(2);
-					profitPerProduct =  Number(profit - discountPrice).toFixed(2);
-					sellPrice = Number(sellPrice - discountPrice).toFixed(2);
-					sellPricePerProduct = sellPrice;
-			 }
-
-			var inclGst = resultTotal;
-			if (includeIncorporateInstallCheckbox) {
-				//inclGst = (Number(inclGst) - (Number(calculateIncorporateInstallation(product)) * Number(newQty))).toFixed(2);
-				sellPricePerProduct = (Number(sellPricePerProduct) + Number(INCORPORATE_INSTALLATION) * Number(newQty)).toFixed(2);
-			}
-			noMarkupCost = (Number(noMarkupCost) * Number(newQty)).toFixed(2);
-			productOptions.find('input.product-price-incl-gst').val(inclGst);
-			productOptions.find('input.product-sell-price').val(sellPricePerProduct);
-
-
-			productOptions.find('input.product-profit').val(profitPerProduct);
-
-			markups.addToMarkups(profit, productIndex, secDigFibr);
-			
-			var includeMidrail = $('.midrail-inc[data-table="' + tableName + '"]').val();
-
-			var incMidrail = false;
-			if (includeMidrail) {
-				includeMidrail = JSON.parse(includeMidrail);
-				if (includeMidrail && filteredArray.length > 0) {
-					var filteredIncMidrail = includeMidrail.filter(function (item) {
-						return item.w == filteredArray[0].width && item.h == filteredArray[0].height && item.red;
-
-					});
-
-					if (filteredIncMidrail.length > 0) {
-						incMidrail = true;
-						productOptions.find('.inc-midrail-alert').show();
-					}
-				}
-			}
-			if (!incMidrail) {
-				productOptions.find('.inc-midrail-alert').hide();
-			}
-		}
-
+        var productOptions = product.next();
+        var productIndex = findIndexById(product);
+
+        var qty = 1;
+
+        //*****Dom Elements*****:
+        var $qty = product.find('.product-qty');
+        var $lockCount = product.find('.product-lock-qty');
+        var $lockType = product.find('.product-lock-type');
+        
+        //Values
+        var newQty = Number(product.find('.product-qty').val());
+        var secDigFibr = product.find('.product-sec-dg-fibr').val();
+        var ssgalpet = product.find('.product-ss-gal-pet').val();
+        var winDoor = product.find('.product-win-door').val();
+        var height = Number(product.find('.product-height').val());
+        var width = Number(product.find('.product-width').val());
+        var lockCounts = Number($lockCount.val());
+        var lockType = $lockType.val();
+        var includeMidrailCheckbox = productOptions.find('.product-inc-midrail').is(':checked');
+		var includeIncorporateInstallCheckbox = $('#installation-type-incorporate-install').is(':checked');
+        var productConf = product.find('.product-conf').find('option:selected').attr('data-code');
+        var productColour = product.find('.product-colour').val();
+        var discountPercentage = Number($('input[name=discount]').val());
+
+        //------ Change Dropdown Color on Window/Door change ------)
+        var winDoorDropdown = product.find('.product-win-door');
+
+        if (winDoor == 'Door') {
+            winDoorDropdown.css('background', '#ffab26');
+        } else if (winDoor == 'Window') {
+            winDoorDropdown.css('background', 'lightblue');
+        } else {
+            //winDoorDropdown.css('background', 'none');
+            winDoorDropdown.css('background', '#fff');
+        }
+
+
+        //---------- Disable Frame Type When Door is Selected --------------
+        var productFrameType = product.find('.product-frame-type');
+        
+        var frameType = '';
+        switch (productFrameType.val()) {
+            case '9mm':
+                frameType = 'mm9';
+                break;
+            case '11mm':
+                frameType = 'mm11';
+                break;
+            default:
+                frameType = 'default';
+                break;            
+        }
+        
+        if (product.find('.product-win-door').val() == 'Door') {
+            productFrameType.prop('disabled', true);
+            productFrameType.val('');
+        } else {
+            productFrameType.prop('disabled', false);
+        }
+        
+        //------------------------
+
+
+        /***********************/
+        var hrlyRate = 0;
+        var cleanUp = 0;
+        var markup = 0;
+        var tableName = '';
+        var matrixArr = null;
+        var petMeshMarkup = 0;
+        
+        //**** Get Master Calculator Tables *****
+        var productMc = $('table#product-mc-' + productIndex);
+        var productResult = $('table#product-result-' + productIndex);
+        
+        var isSecDoor = false;
+        var isSecWindow = false;
+        var isDgDoor = false;
+        var isDgWindow = false;
+        var isFibrDoor = false;
+        var isFibrWindow = false;
+        var isPerfDoor = false;
+        var isPerfWindow = false;
+        
+        var hasSpline = false;
+        var hasInsectMesh = false;
+        var hasComponentsHinges = false;
+        var hasPvc = false;
+        var hasPerfSheetFixing = false;
+        
+        //**** Common Variables (Window or Door) ****
+        var heightMesh = 0;
+        var widthMesh = 0;
+        var sqmPart = 0;
+        var frame = 0;
+        var cnrStake = 0;
+        var hingedCalculated = 0;
+
+        if (secDigFibr == '316 S/S') {
+            if (winDoor == 'Door') {
+                
+                heightMesh = Number(height - securityDoorMesh);
+                widthMesh = Number(width - securityDoorMesh);
+                isSecDoor = true;  
+                hasComponentsHinges = true;
+                hasPvc = true;
+                
+                matrixArr = JSON.parse($('input[data-name="S/S Hinged and Sliding Doors"]').val()); 
+                pricingArr = JSON.parse($('input[data-name="secDoor"]').val()); 
+                
+                tableName = $('input[data-name="S/S Hinged and Sliding Doors"]').data('name');
+                cleanUp = secDoorCleanUp;
+                hrlyRate = sdHrlyRate;
+                markup = sdMarkup;                
+
+                sqmPart = pricingArr.sqmpart.price; //Confirm
+                frame = pricingArr.frame.price;
+                cnrStake = pricingArr.crnstake.price;
+                
+                productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
+                productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
+                productMc.find('span.product-winframe-name').text( pricingArr.frame.label );
+                productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake.label );                                                
+
+            } else if (winDoor == 'Window') {
+                
+                heightMesh = Number(height - securityWindowMesh);
+                widthMesh = Number(width - securityWindowMesh);
+                isSecWindow = true;
+                hasPvc = true;
+                
+                matrixArr = JSON.parse($('input[data-name="S/S Window Screens"]').val());
+                pricingArr = JSON.parse($('input[data-name="secWindow"]').val());
+                tableName = $('input[data-name="S/S Window Screens"]').data('name');
+                cleanUp = secWindowCleanUp;
+                hrlyRate = swHrlyRate;
+                markup = swMarkup;
+                
+                sqmPart = pricingArr.sqmpart.price; //Confirm
+                frame = pricingArr.frame[frameType].price; 
+                cnrStake = pricingArr.crnstake[frameType].price;
+                               
+                productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
+                productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
+                productMc.find('span.product-winframe-name').text( pricingArr.frame[frameType].label );
+                productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake[frameType].label ); 
+            }
+
+            productOptions.find('td').css('background-color', '#FAEBE6');
+
+        } else if (secDigFibr == 'D/Grille') {
+            if (winDoor == 'Door') {
+                heightMesh = Number(height - dgDoorMesh);
+                widthMesh = Number(width - dgDoorMesh);
+                
+                isDgDoor = true;
+                hasComponentsHinges = true;
+                hasSpline = true;
+                hasInsectMesh = true;
+                
+                matrixArr = JSON.parse($('input[data-name="DG Hinged and Sliding Doors"]').val());
+                pricingArr = JSON.parse($('input[data-name="dgDoor"]').val());
+                tableName = $('input[data-name="DG Hinged and Sliding Doors"]').data('name');
+                cleanUp = dgDoorCleanup;
+                hrlyRate = ddHrlyRate;
+                markup = ddMarkup;              
+                
+                sqmPart = pricingArr.sqmpart.price; //Confirm
+                frame = pricingArr.frame.price;
+                cnrStake = pricingArr.crnstake.price;
+                
+                productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
+                productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
+                productMc.find('span.product-winframe-name').text( pricingArr.frame.label );
+                productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake.label );                
+
+            } else if (winDoor == 'Window') {
+                heightMesh = Number(height - dgWindowMesh);
+                widthMesh = Number(width - dgWindowMesh);
+                isDgWindow = true;
+                hasSpline = true;
+                hasInsectMesh = true;
+                
+                matrixArr = JSON.parse($('input[data-name="DG Windows"]').val());
+                pricingArr = JSON.parse($('input[data-name="dgWindow"]').val());
+                tableName = $('input[data-name="DG Windows"]').data('name');
+                cleanUp = dgWindowCleanup;
+                hrlyRate = dwHrlyRate;
+                markup = dwMarkup;
+                
+                sqmPart = pricingArr.sqmpart.price; //Confirm
+                frame = pricingArr.frame[frameType].price; 
+                cnrStake = pricingArr.crnstake[frameType].price;
+                               
+                productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
+                productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
+                productMc.find('span.product-winframe-name').text( pricingArr.frame[frameType].label );
+                productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake[frameType].label );               
+            }
+
+            productOptions.find('td').css('background-color', '#FCFCE1');
+
+        } else if (secDigFibr == 'Insect') {
+            if (winDoor == 'Door') {
+                heightMesh = Number(height - fibrDoorMesh);
+                widthMesh = Number(height - fibrDoorMesh);
+                
+                isFibrDoor = true;
+                hasComponentsHinges = true;
+                hasSpline = true;
+                
+                matrixArr = JSON.parse($('input[data-name="Insect Hinged and Sliding Doors"]').val());
+                pricingArr = JSON.parse($('input[data-name="fibrDoor"]').val());
+                tableName = $('input[data-name="Insect Hinged and Sliding Doors"]').data('name');
+                cleanUp = fibrDoorCleanup;
+                hrlyRate = fdHrlyRate;
+                markup = fdMarkup;
+                                
+                if (ssgalpet == 'Pet Mesh') {
+                    meshType = 'petmesh';  
+                } else {
+                    meshType = 'mesh'; 
+                }  
+                
+                sqmPart = pricingArr.sqmpart[meshType].price; //Confirm
+                frame = pricingArr.frame.price;
+                cnrStake = pricingArr.crnstake.price;
+                
+                productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
+                productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
+                productMc.find('span.product-winframe-name').text( pricingArr.frame.label );
+                productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake.label );
+
+            } else if (winDoor == 'Window') {
+                heightMesh = Number(height - fibrWindowMesh);
+                widthMesh = Number(height - fibrWindowMesh);
+                isFibrWindow = true;
+                hasSpline = true;
+                matrixArr = JSON.parse($('input[data-name="Insect Screens"]').val());
+                pricingArr = JSON.parse($('input[data-name="fibrWindow"]').val());
+                tableName = $('input[data-name="Insect Screens"]').data('name');
+                cleanUp = fibrWindowCleanup;
+                hrlyRate = fwHrlyRate;
+                markup = fwMarkup;
+                
+                if (ssgalpet == 'Pet Mesh') {
+                    meshType = 'petmesh';  
+                } else {
+                    meshType = 'mesh'; 
+                }  
+                
+                sqmPart = pricingArr.sqmpart[meshType].price; //Confirm
+                frame = pricingArr.frame[frameType].price; 
+                cnrStake = pricingArr.crnstake[frameType].price;
+                               
+                productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
+                productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
+                productMc.find('span.product-winframe-name').text( pricingArr.frame[frameType].label );
+                productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake[frameType].label );                
+                
+            }
+
+            productOptions.find('td').css('background-color', '#F2F1EF');
+
+        } else if (secDigFibr == 'Perf') {
+            if (winDoor == 'Door') {
+                heightMesh = Number(height - perfDoorMesh);
+                widthMesh = Number(width - perfDoorMesh);
+                
+                isPerfDoor = true;
+                hasPerfSheetFixing = true;
+                hasComponentsHinges = true;
+                
+                matrixArr = JSON.parse($('input[data-name="Perf Hinged and Sliding Doors"]').val());
+                tableName = $('input[data-name="Perf Hinged and Sliding Doors"]').data('name');
+                pricingArr = JSON.parse($('input[data-name="perfDoor"]').val());
+                
+                cleanUp = perfDoorCleanup;
+                hrlyRate = pdHrlyRate;
+                markup = pdMarkup;
+                
+                sqmPart = pricingArr.sqmpart.price; //Confirm
+                frame = pricingArr.frame.price;
+                cnrStake = pricingArr.crnstake.price;               
+                
+                productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
+                productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
+                productMc.find('span.product-winframe-name').text( pricingArr.frame.label );
+                productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake.label );
+
+            } else if (winDoor == 'Window') {
+                heightMesh = Number(height - perfWindowMesh);
+                widthMesh = Number(width - perfWindowMesh);
+                
+                isPerfWindow = true;
+                hasPerfSheetFixing = true;
+                
+                matrixArr = JSON.parse($('input[data-name="Perf Windows"]').val());
+                tableName = $('input[data-name="Perf Windows"]').data('name');
+                pricingArr = JSON.parse($('input[data-name="perfWindow"]').val());
+                
+                cleanUp = perfWindowCleanup;
+                hrlyRate = pwHrlyRate;
+                markup = pwMarkup;
+                
+                
+                sqmPart = pricingArr.sqmpart.price; //Confirm
+                frame = pricingArr.frame[frameType].price; 
+                cnrStake = pricingArr.crnstake[frameType].price;
+                               
+                productMc.find('span.product-mc-secdigfibr').text( pricingArr.secdigfibr );
+                productMc.find('span.product-mc-windoor').text( pricingArr.windoor );
+                productMc.find('span.product-winframe-name').text( pricingArr.frame[frameType].label );
+                productMc.find('span.product-win-cnrstake-name').text( pricingArr.crnstake[frameType].label );
+            }
+
+            productOptions.find('td').css('background-color', '#eaf6ff');
+        } else {
+            productOptions.find('td').css('background-color', '#fff');
+        }
+
+
+        //**** Mesh Increasing Amounts *****
+        if ((secDigFibr == 'Insect' || secDigFibr == 'D/Grille') && ssgalpet == 'Pet Mesh') {            
+            productMc.find('tr.insect-mesh-row').show();
+            if (winDoor == 'Door') {
+                petMeshMarkup = Number($('#dg-ins-door-infill').text()).toFixed(2);
+            } else if (winDoor == 'Window') {
+                petMeshMarkup = Number($('#dg-ins-win-infill').text()).toFixed(2);
+            }
+        } else {
+            productMc.find('tr.insect-mesh-row').hide();
+        }
+                               
+        var lSeatCalculated = 0;
+        var pvcCalculated = 0;
+        var splineCalculated = 0;
+        var perfSheetFixingCalculated = 0;
+        var insectMeshCalculated = 0;
+        
+        productMc.find('span.product-mesh-height').text(heightMesh);
+        productMc.find('span.product-mesh-width').text(widthMesh);
+        
+        productMc.find('span.product-height').text(height);
+        productMc.find('span.product-width').text(width);
+        
+        var pwdCoat = ((width + height) * 2 / 5000).toFixed(1);
+        productMc.find('span.product-coat').text(pwdCoat);
+
+        var productLmtr = ((width + height) * 2 / 1000).toFixed(1);
+        productMc.find('span.product-lmtrs').text(productLmtr);
+        
+        var sqm = (heightMesh * widthMesh / 1000000).toFixed(3);
+        productMc.find('span.product-sqm').text(sqm);
+        
+        var sqmCalculated = (sqm * sqmPart).toFixed(2);
+        productMc.find('span.product-sqm-calculated').text(sqmCalculated);
+        
+        productMc.find('span.product-winframe-price').text(frame);
+        
+        var frameCalculated = (frame * productLmtr).toFixed(2);
+        productMc.find('span.product-winframe-calculated').text(frameCalculated);
+        
+        productMc.find('span.product-win-cnrstake-price').text(cnrStake);
+
+        var cnrstakeCalculated = (cnrStake * 4).toFixed(2);
+        productMc.find('span.product-win-cnrstake-calculated').text(cnrstakeCalculated);
+        
+       
+        if (hasSpline) {
+
+            splineCalculated = (spline * productLmtr).toFixed(2);
+            productMc.find('tr.spline-row').show();
+            productMc.find('span.product-spline-name').text(splineName);
+            productMc.find('span.product-spline').text(spline);
+            productMc.find('span.product-spline-calculated').text(splineCalculated);
+
+        } else {
+            productMc.find('tr.spline-row').hide();
+        }
+        
+        if (hasInsectMesh) {
+            productMc.find('tr.insect-mesh-row').show();
+
+            if (ssgalpet == 'Pet Mesh') {
+                insectMeshCalculated = (sqm * petMesh).toFixed(2);
+            } else {
+                insectMeshCalculated = (sqm * insectMesh).toFixed(2);
+            }
+            productMc.find('span.product-insect-mesh').text(insectMeshCalculated);
+        } else {
+            productMc.find('tr.insect-mesh-row').hide();
+        }
+        
+        if (hasPvc) {
+            productMc.find('tr.pvc-row').show();
+            productMc.find('tr.lseat-row').show();
+            productMc.find('span.product-lseat-name').text(PVCLSeatName);
+            productMc.find('span.product-lseat-price').text(PVCLSeat);
+            
+            lSeatCalculated = (PVCLSeat * productLmtr).toFixed(2);
+            productMc.find('span.product-lseat-calculated').text(lSeatCalculated);
+            
+            productMc.find('span.product-pvc-wedge-price').text(PVCWedge);
+            productMc.find('span.product-pvc-wedge-name').text(PVCWedgeName);
+            
+            pvcCalculated = (PVCWedge * productLmtr).toFixed(2);
+            productMc.find('span.product-pvc-wedge-calculated').text(pvcCalculated);
+            
+        } else {
+            productMc.find('tr.pvc-row').hide();
+            productMc.find('tr.lseat-row').hide();
+        }
+        
+        if (hasComponentsHinges) {
+            hingedCalculated = (rollerHinges * 4).toFixed(2);
+            productMc.find('span.product-components-wheels-hinges').text(rollerHinges);
+            productMc.find('span.product-components-wheels-hinges-calculated').text(hingedCalculated);
+            productMc.find('tr.components-row').show();
+        } else {
+            productMc.find('tr.components-row').hide();
+        }
+        
+        if (hasPerfSheetFixing) {
+
+            productMc.find('tr.perf-sheet-row').show();
+            productMc.find('span.product-perf-sheet-fixing').text(PVCLSeat);
+            if (isPerfDoor) {
+                perfSheetFixingCalculated = (PVCLSeat * perfSheetFixingBead).toFixed(2);
+            } else if (isPerfWindow) {
+                perfSheetFixingCalculated = (PVCLSeat * productLmtr).toFixed(2);
+            }
+
+            productMc.find('span.product-perf-sheet-fixing-calculated').text(perfSheetFixingCalculated);
+
+        } else {
+            productMc.find('tr.perf-sheet-row').hide();
+        }
+        
+        productMc.find('span.product-freight-consumables').text(freightConsumables);
+        
+        // **** Hide or Show MC Tabels ****
+        if (isSecDoor || isSecWindow || isDgDoor || isDgWindow || isFibrDoor || isFibrWindow || isPerfDoor || isPerfWindow) {
+            productMc.show();
+            productResult.show();
+            
+        } else {
+            productMc.hide();
+            productResult.hide();
+        }
+        /*****************/
+
+
+
+        // Custom And Premium Color Costs
+        var customColor = 0;
+        var prColor = 0;
+        var anodizedColor = 0;
+        var specialColor = 0;
+        
+        if (productColour) {
+            var productColourAttr = productColour.split('|');
+            var productColourGroup = productColourAttr[0];
+            var productColourOption = productColourAttr[1];
+            
+            if (winDoor == 'Door') {
+                if (productColourGroup == 'Custom Colour')
+                    customColor = (qty * Number($('.custom-color-door').text())).toFixed(2);
+                //if (productColourGroup == 'Standard Color')
+                    //customColor = (qty * Number($('.custom-color-door').text())).toFixed(2);
+                if (productColourGroup == 'Anodized')
+                    anodizedColor = (qty * Number($('.anodized-color-door').text())).toFixed(2);
+                if (productColourGroup == 'Premium Colour')
+                    prColor = (qty * Number($('.pr-color-door').text())).toFixed(2);
+                if (productColourGroup == 'Special Colour')
+                    specialColor = (qty * Number($('.special-color-door').text())).toFixed(2);                    
+            } else if (winDoor == 'Window') {
+                if (productColourGroup == 'Custom Colour')
+                    customColor = (qty * Number($('.custom-color-win').text())).toFixed(2);
+                //if (productColourGroup == 'Standard Color')
+                    //customColor = (qty * Number($('.custom-color-win').text())).toFixed(2);
+                if (productColourGroup == 'Anodized')
+                    anodizedColor = (qty * Number($('.anodized-color-win').text())).toFixed(2);
+                if (productColourGroup == 'Premium Colour')
+                    prColor = (qty * Number($('.pr-color-win').text())).toFixed(2);
+                if (productColourGroup == 'Special Colour')
+                    specialColor = (qty * Number($('.special-color-win').text())).toFixed(2);               
+            }            
+        }else{
+            if (winDoor == 'Door') {
+                if ($('[name="color1_color"]').val() && $('[name="color1"]').is(':checked')) {
+                    customColor = (qty * Number($('.custom-color-door').text())).toFixed(2);
+                }
+                if ($('[name="color2_color"]').val() && $('[name="color2"]').is(':checked')) {
+                    prColor = (qty * Number($('.pr-color-door').text())).toFixed(2);
+                }
+                if ($('[name="color3_color"]').val() && $('[name="color3"]').is(':checked')) {
+                    anodizedColor = (qty * Number($('.anodized-color-door').text())).toFixed(2);
+                }
+                if ($('[name="color4_color"]').val() && $('[name="color4"]').is(':checked')) {
+                    specialColor = (qty * Number($('.special-color-door').text())).toFixed(2);
+                }
+
+            } else if (winDoor == 'Window') {
+                if ($('[name="color1_color"]').val() && $('[name="color1"]').is(':checked')) {
+                    customColor = (qty * Number($('.custom-color-win').text())).toFixed(2);
+                }
+                if ($('[name="color2_color"]').val() && $('[name="color2"]').is(':checked')) {
+                    prColor = (qty * Number($('.pr-color-win').text())).toFixed(2);
+                }
+                if ($('[name="color3_color"]').val() && $('[name="color3"]').is(':checked')) {
+                    anodizedColor = (qty * Number($('.anodized-color-win').text())).toFixed(2);
+                }
+                if ($('[name="color4_color"]').val() && $('[name="color4"]').is(':checked')) {
+                    specialColor = (qty * Number($('.special-color-win').text())).toFixed(2);
+                }
+            }            
+        }
+        
+        
+        
+
+        //*** Calculates Powder Coats ****
+        /*if (winDoor == 'Door') {
+            if ($('[name="color1_color"]').val() && $('[name="color1"]').is(':checked')) {
+                customColor = (qty * Number($('.custom-color-door').text())).toFixed(2);
+            }
+            if ($('[name="color2_color"]').val() && $('[name="color2"]').is(':checked')) {
+                prColor = (qty * Number($('.pr-color-door').text())).toFixed(2);
+            }
+
+        } else if (winDoor == 'Window') {
+            if ($('[name="color1_color"]').val() && $('[name="color1"]').is(':checked')) {
+                customColor = (qty * Number($('.custom-color-win').text())).toFixed(2);
+            }
+            if ($('[name="color2_color"]').val() && $('[name="color2"]').is(':checked')) {
+                prColor = (qty * Number($('.pr-color-win').text())).toFixed(2);
+            }
+        }*/
+        
+        
+        // Sum of All "Calculated" Values:
+        var materialCost = 0.00;
+
+        if (secDigFibr && winDoor) {
+            materialCost = (Number(sqmCalculated) + Number(frameCalculated) + Number(perfSheetFixingCalculated)
+            + Number(insectMeshCalculated)
+            + Number(cnrstakeCalculated) + Number(lSeatCalculated) + Number(pvcCalculated)
+            + Number(customColor) + Number(prColor) + Number(anodizedColor) + Number(specialColor)
+            + Number(splineCalculated) + Number(freightConsumables) + Number(hingedCalculated)).toFixed(2);
+        }
+        
+        productMc.find('span.product-material-cost').text(materialCost);
+                
+
+        var price = 0;
+        var filteredArray = [];
+        /*if (matrixArr) {
+            filteredArray = matrixArr.filter(function (item) {
+                return width <= item.width && height <= item.height;
+            });
+            if (filteredArray.length > 0) {
+                price = Number(filteredArray[0]['price']);
+            }
+        }
+        
+
+        price = Number(price) * Number(qty);*/
+        
+        price = materialCost;
+
+        //Labout inc Cutting Applied - Price multiplied by QTY
+        var labourIncCutting = ((hrlyRate / 60) * cleanUp).toFixed(2);
+        productMc.find('span.product-labour-incl-cutting').text(labourIncCutting);
+        
+        var priceWithLabourIncCutting = (Number(price) + Number(labourIncCutting)).toFixed(2);
+        productMc.find('span.product-total-cost').text(priceWithLabourIncCutting);
+
+        priceWithLabourIncCutting = (Number(priceWithLabourIncCutting) * (Number(petMeshMarkup) + Number(100)) / 100).toFixed(2);
+
+        //var noMarkupCost = (Number(price) + Number(customColor) + Number(prColor)).toFixed(2);
+        var noMarkupCost = (Number(price) + Number(customColor) + Number(prColor) +  Number(anodizedColor) + Number(specialColor)).toFixed(2);
+        //var noMarkupCost = (Number(price)).toFixed(2);
+        price = priceWithLabourIncCutting;
+        
+        
+        //Product Markup Applied by SecDgFibre
+        var resultTotal = (price * (Number(markup) + Number(100)) / 100).toFixed(2);
+        
+        var masterMarkup = getMasterMarkupByMatrixTable(tableName);
+        //Master Markup Applied
+        resultTotal = Number(resultTotal * (Number(masterMarkup) + Number(100)) / 100).toFixed(2);
+        
+        productResult.find('span.product-result-cost').text(resultTotal);
+        productResult.find('span.product-result-quantity').text(newQty);
+        
+
+        calculateInstallation(product, productIndex, true);
+
+        //Sum of price and Color costs
+        //resultTotal = (Number(customColor) + Number(prColor) + Number(resultTotal)).toFixed(2);
+        //resultTotal = (Number(customColor) + Number(prColor) + Number(anodizedColor) + Number(specialColor) + Number(resultTotal)).toFixed(2);
+        
+        if (includeMidrailCheckbox) {
+           
+            resultTotal = (Number(resultTotal) + Number(midrailAmount)).toFixed(2);
+            //var midrailMarkupPrice = midrailCost * midrailMarkup / 100;           
+            //resultTotal = (Number(resultTotal) +  Number(midrailMarkupPrice)).toFixed(2); 
+            noMarkupCost = (Number(noMarkupCost) +  Number(midrailCost)).toFixed(2);
+        }
+        
+
+        noMarkupCost = (Number(noMarkupCost) * Number(newQty)).toFixed(2);
+        resultTotal = (Number(resultTotal) * Number(newQty)).toFixed(2);
+
+        var locksTotalCost = 0;
+        //Calculate Lcoks
+        if (winDoor == 'Door') {
+            $lockCount.prop('disabled', false);
+            $lockType.prop('disabled', false);
+            
+           if (secDigFibr == 'Insect') {               
+               
+                //locksTotalCost = Number(singleLock * lockCounts).toFixed(2);
+                //resultTotal = (Number(resultTotal) - Number(singleLock * newQty)).toFixed(2);
+                //noMarkupCost = (Number(noMarkupCost) - Number(singleLock * newQty)).toFixed(2);
+                $lockType.find('option:last').hide();
+            } else {
+                //locksTotalCost = Number(tripleLock * lockCounts).toFixed(2);
+                //resultTotal = (Number(resultTotal) - Number(tripleLock * newQty)).toFixed(2);
+                //noMarkupCost = (Number(noMarkupCost) - Number(tripleLock * newQty)).toFixed(2);
+                $lockType.find('option:last').show();
+            }
+
+
+            var confRuled = product.attr('data-conf-rule');
+            /*if ($(this).hasClass('product-conf') || (isEdit && !data && !$(this).hasClass('product-lock-type') && !$(this).hasClass('product-lock-qty'))) {
+                $lockType.find('option:eq(0)').prop('disabled', false);
+                if (productConf == 'SD' || productConf == 'HD') {
+                    $lockType.val('Triple');
+                    return $lockCount.val('1').trigger('change', {a: true});
+                } else if (productConf == 'DBHD') {
+                    $('option[data-code="DRFLUBLT"]:first').prop('selected', true).parents('tr').find('input:eq(2)').val('1').trigger('change');
+                    $('option[data-code="DBLHNGDRCV"]:first').prop('selected', true).parents('tr').find('input:eq(2)').val('1').trigger('change');
+
+                    $lockType.val('Triple');
+                    $lockType.find('option:eq(0)').prop('disabled', true);
+                    return $lockCount.val('1').trigger('change', {a: true});
+                }
+
+            }*/
+
+            //Decrease cost when LOCK Type is Changed
+                        
+            if (lockType == 'Single Sld' && lockCounts) {
+                locksTotalCost = Number( Number(singleLockSld * lockCounts) + lockCyl ).toFixed(2);
+                resultTotal = Number( Number(resultTotal) + Number(locksTotalCost)).toFixed(2);
+                noMarkupCost = Number( Number(noMarkupCost) + Number(locksTotalCost) ).toFixed(2);
+            } else if( lockType == 'Single Hng' && lockCounts){
+                locksTotalCost = Number( Number( (singleLockHng * lockCounts) + lockCyl )).toFixed(2);
+                resultTotal = Number(Number(resultTotal) + Number(locksTotalCost) ).toFixed(2);
+                noMarkupCost = Number( Number(noMarkupCost) + Number(locksTotalCost) ).toFixed(2);
+            } else if (lockType == 'Triple Sld' && lockCounts){
+                locksTotalCost = Number( Number( (tripleLockSld * lockCounts) + lockCyl) ).toFixed(2);
+                resultTotal = Number( Number(resultTotal) + Number(locksTotalCost) ).toFixed(2);
+                noMarkupCost = Number( Number(noMarkupCost) + Number(locksTotalCost) ).toFixed(2);
+            } else if (lockType == 'Triple Hng' && lockCounts){
+                locksTotalCost = Number(Number( (tripleLockHng * lockCounts) + lockCyl)).toFixed(2);
+                resultTotal = Number(Number(resultTotal) + Number(locksTotalCost) ).toFixed(2);
+                noMarkupCost =  Number(Number(noMarkupCost) + Number(locksTotalCost) ).toFixed(2);
+            }
+                             
+
+        } else if (winDoor == 'Window') {
+            $lockCount.val('').prop('disabled', true);
+            $lockType.val('').prop('disabled', true);
+        }
+        
+        productResult.find('span.product-result-locks').text(locksTotalCost);
+        productResult.find('span.product-result-total').text(resultTotal);
+        //--------------
+                
+        
+        productsNoMarkup[productIndex] = noMarkupCost;
+        screensTotal[productIndex] = resultTotal;
+        
+        calculateScreensTotal();
+
+
+        var sellPrice = resultTotal;
+        if (role != 'retailer' && mfrole != 'retailer') {
+            if (secDigFibr) {
+                var selector = getMarkupInputID(secDigFibr);
+                sellPrice = (resultTotal * Number($(selector).val()) / 100).toFixed(2);
+                sellPrice = (Number(resultTotal) + Number(sellPrice)).toFixed(2);
+            }
+        }
+        var profit = (Number(sellPrice) - Number(resultTotal)).toFixed(2);
+		var profitPerProduct = profit;
+        var sellPricePerProduct = sellPrice;
+        if(discountPercentage > 0){
+                var discountPrice = Number(sellPrice * Number(discountPercentage) / 100).toFixed(2);
+                profitPerProduct =  Number(profit - discountPrice).toFixed(2);
+                sellPrice = Number(sellPrice - discountPrice).toFixed(2);
+				sellPricePerProduct = sellPrice;
+         }
+
+        var inclGst = resultTotal;
+        if (includeIncorporateInstallCheckbox) {
+            //inclGst = (Number(inclGst) - (Number(calculateIncorporateInstallation(product)) * Number(newQty))).toFixed(2);
+            sellPricePerProduct = (Number(sellPricePerProduct) + Number(INCORPORATE_INSTALLATION) * Number(newQty)).toFixed(2);
+        }
+        noMarkupCost = (Number(noMarkupCost) * Number(newQty)).toFixed(2);
+        productOptions.find('input.product-price-incl-gst').val(inclGst);
+        productOptions.find('input.product-sell-price').val(sellPricePerProduct);
+
+
+        productOptions.find('input.product-profit').val(profitPerProduct);
+        
+        //productOptions.find('input.product-price-incl-gst').val(resultTotal);
+        //productOptions.find('input.product-sell-price').val(sellPrice);
+       // productOptions.find('input.product-profit').val(profit);
+
+        markups.addToMarkups(profit, productIndex, secDigFibr);
+        
+        /*var includeMidrail = $('.midrail-inc[data-table="' + tableName + '"]').val();
+
+        var incMidrail = false;
+        if (includeMidrail) {
+            includeMidrail = JSON.parse(includeMidrail);
+            if (includeMidrail && filteredArray.length > 0) {
+                var filteredIncMidrail = includeMidrail.filter(function (item) {
+                    return item.w == filteredArray[0].width && item.h == filteredArray[0].height && item.red;
+
+                });
+
+                if (filteredIncMidrail.length > 0) {
+                    incMidrail = true;
+                    productOptions.find('.inc-midrail-alert').show();
+                }
+            }
+        }
+        if (!incMidrail) {
+            productOptions.find('.inc-midrail-alert').hide();
+        }*/
+        
     });
-
+    
+    
 
     $('body').on('change', '.product-inc-midrail', function () {
         $(this).parents('tr').prev().find('.product-qty').trigger('change');
     });
+
 
     /* Midrails On change Event => Calculator */
     $('body').on('change', '.midrail-options', function () {
@@ -1994,7 +1833,31 @@ $(document).ready(function () {
 
     });
 
-
+	$('body').on('change', '.cutsheets-additional-colour', function () {
+        //var selected = $('option:selected', this).attr('class');
+        //var optionText = $('.editable').text();    
+        var additionalRow = $(this).parents('tr');
+        var name = additionalRow.find('.additional-select-colour').val();
+        var select_name = additionalRow.find('.additional-select-colour').attr('name');
+        var input_name = additionalRow.find('.additional-input-colour').attr('name');
+        if (name) {
+            if(name == 'Other'){
+                additionalRow.find('.additional-input-colour').show();
+                additionalRow.find('.additional-input-colour').focus();
+                additionalRow.find('.additional-select-colour').attr('name', select_name.replace('colour', 'col_our'));
+                additionalRow.find('.additional-input-colour').attr('name', input_name.replace('col_our', 'colour'));
+                
+            }else{
+                additionalRow.find('.additional-input-colour').hide();
+                additionalRow.find('.additional-select-colour').attr('name', select_name.replace('col_our', 'colour')); 
+                additionalRow.find('.additional-input-colour').attr('name', input_name.replace('colour', 'col_our'));
+            }
+        }else{
+            additionalRow.find('.additional-input-colour').hide(); 
+            additionalRow.find('.additional-select-colour').attr('name', select_name.replace('col_our', 'colour'));
+            additionalRow.find('.additional-input-colour').attr('name', input_name.replace('colour', 'col_our'));            
+        }
+    });
     /* ON Change Powder Coats Checkbox and Dropdowns */
     $('.color_s').on('change', function () {
 
@@ -2006,10 +1869,10 @@ $(document).ready(function () {
         // });
     });
     
-    /*$('.coating').on('click', function () {
+    $('.coating').on('click', function () {
         $('.coating').prop ('checked', false);
         $(this).prop ('checked', true);  
-    });*/
+    });
 
 
     /* Calculates Additional Sections Prices */
@@ -2072,32 +1935,6 @@ $(document).ready(function () {
         }
     });
     
-    $('body').on('change', '.cutsheets-additional-colour', function () {
-        //var selected = $('option:selected', this).attr('class');
-        //var optionText = $('.editable').text();    
-        var additionalRow = $(this).parents('tr');
-        var name = additionalRow.find('.additional-select-colour').val();
-        var select_name = additionalRow.find('.additional-select-colour').attr('name');
-        var input_name = additionalRow.find('.additional-input-colour').attr('name');
-        if (name) {
-            if(name == 'Other'){
-                additionalRow.find('.additional-input-colour').show();
-                additionalRow.find('.additional-input-colour').focus();
-                additionalRow.find('.additional-select-colour').attr('name', select_name.replace('colour', 'col_our'));
-                additionalRow.find('.additional-input-colour').attr('name', input_name.replace('col_our', 'colour'));
-                
-            }else{
-                additionalRow.find('.additional-input-colour').hide();
-                additionalRow.find('.additional-select-colour').attr('name', select_name.replace('col_our', 'colour')); 
-                additionalRow.find('.additional-input-colour').attr('name', input_name.replace('colour', 'col_our'));
-            }
-        }else{
-            additionalRow.find('.additional-input-colour').hide(); 
-            additionalRow.find('.additional-select-colour').attr('name', select_name.replace('col_our', 'colour'));
-            additionalRow.find('.additional-input-colour').attr('name', input_name.replace('colour', 'col_our'));            
-        }
-    });
-    
     $('body').on('change', '.additional-per-length', function () {
         var additionalRow = $(this).parents('tr');
         var name = additionalRow.find('.additional-name').val();
@@ -2136,21 +1973,20 @@ $(document).ready(function () {
         if (name) {
             var price = additionalRow.find('.accessory-name').find(':selected').data('price');
             var each = additionalRow.find('.accessory-each').val();
-            var markup = Number(additionalRow.find('.accessory-markup').val());
+			var markup = Number(additionalRow.find('.accessory-markup').val());
 
-            var totalPrice = Number(price * each).toFixed(2);
-            
+			var totalPrice = Number(price * each).toFixed(2);
             var markedup = totalPrice * markup / 100;
             var totalCharged = (Number(totalPrice) + Number(markedup)).toFixed(2); 
+
             additionalRow.find('.accessory-total-price').val(totalPrice);
-            additionalRow.find('.accessory-charged').val(totalCharged);
+			additionalRow.find('.accessory-charged').val(totalCharged);
             accessories[index] = totalPrice;
 			additionalPerEach[index] = [totalPrice, markedup, totalCharged];
         } else {
             additionalRow.find('.accessory-total-price').val('');
-            additionalRow.find('.accessory-charged').val('');
-            
-            accessories[index] = 0;
+			additionalRow.find('.accessory-charged').val(totalCharged);
+			additionalPerEach[index] = [];
         }
         calculateAddtionalsTotal();
     });
@@ -2226,17 +2062,20 @@ $(document).ready(function () {
                 productOptions.find('input.product-sell-price').val(sellPriceAfterDiscount);
                 productOptions.find('input.product-profit').val(profitAfterDiscount);
                 markups.addToMarkups(profit, productIndex, secdgfibr, true);
+                /*productOptions.find('input.product-sell-price').val(sellPriceAfterDiscount);
+                productOptions.find('input.product-profit').val(profitAfterDiscount);
                 
                
-                /*productOptions.find('input.product-sell-price').val(sellPrice);
-                productOptions.find('input.product-profit').val(profit);
-                markups.addToMarkups(profit, productIndex, secdgfibr, true);*/
+                //productOptions.find('input.product-sell-price').val(sellPrice);
+                //productOptions.find('input.product-profit').val(profit);
 
-                
+                markups.addToMarkups(profitAfterDiscount, productIndex, secdgfibr, true);*/
             }
             markups._updateMarkups();
 
         });
+
+
     });
 
 
@@ -2247,11 +2086,10 @@ $(document).ready(function () {
         DISCOUNT = percent;
         DISCOUNT_AMOUNT = discountedAmount;
         calculateProfit();
-        calculateTotalSell();        
-        
-        if(!param){
-            updateOrderTablePrice();
-        }
+        calculateTotalSell();  
+		if(!param){
+			updateOrderTablePrice();
+		}
     });
 
     /************************************/
@@ -2324,12 +2162,11 @@ $(document).ready(function () {
         var self = $(this);
         if (validate('order')) {
             $('#is-ordered').val(true);
-            $('#sendtoinstaller').val(false);
-            /*if (confirm('Send installsheet to installer?')) {
+            if (confirm('Send installsheet to installer?')) {
                 $('#sendtoinstaller').val(true);
             } else {
                 $('#sendtoinstaller').val(false);
-            }*/
+            }
             self.parents('form').submit();
         }
     });
@@ -2459,7 +2296,7 @@ var markups = {
         $('#perf-markup-amount').val(perfTotal);
 
         //console.log('_updateMarkups default');
-        $('#discount').trigger('change',[true]);
+        $('#discount').trigger('change');
 
     },
 
@@ -2672,16 +2509,42 @@ function removeDublications(arr) {
 }
 
 
+
 function initializePartsVariables() {
-	partPrice = JSON.parse($('input[data-name="partVariables"]').val());
     
-    insectMesh = Number(partPrice.insectMesh.price);//Number($('.mc-list-15').text());
-    petMesh = Number(partPrice.petMesh.price);//Number($('.mc-list-16').text());
-    spline = Number(partPrice.spline.price);
-    splineName =  partPrice.spline.label;
-    rollerHinges = Number(partPrice.rollerHinges.price);//Number($('.mc-list-19').text());
-        
-    sgSSMesh = Number(partPrice.sgSSMesh.price);perfSheetFixingBead = Number(partPrice.perfSheetFixingBead.price);;
+    partPrice = JSON.parse($('input[data-name="partVariables"]').val());
+    
+    // sgSSMesh = Number($('.mc-list-1').text());
+    // perfAliMesh = Number($('.mc-list-2').text());
+    // grille7mm = Number($('.mc-list-3').text());
+    // secDoorFrame = Number($('.mc-list-4').text());
+    // secWinFrame = Number($('.mc-list-5').text());
+    // midrailPart = Number($('.mc-list-6').text());
+    // dgDoorFrame = Number($('.mc-list-7').text());
+    // dgWindowFrame = Number($('.mc-list-8').text());
+    // flyFrame = Number($('.mc-list-9').text());
+    // doorCnrStake = Number($('.mc-list-10').text());
+    // winCnrStake = Number($('.mc-list-11').text());
+    // perfSheetFixingBead = Number($('.mc-list-12').text());
+    // PVCLSeat = Number($('.mc-list-13').text());
+    // PVCWedge = Number($('.mc-list-14').text());
+     insectMesh = Number(partPrice.insectMesh.price);//Number($('.mc-list-15').text());
+     petMesh = Number(partPrice.petMesh.price);//Number($('.mc-list-16').text());
+     spline = Number(partPrice.spline.price);
+     splineName =  partPrice.spline.label;
+    // cnrStakeFFrame = Number($('.mc-list-18').text());
+     rollerHinges = Number(partPrice.rollerHinges.price);//Number($('.mc-list-19').text());
+    //
+    // singleLock = Number($('.mc-list-20').text());
+    // tripleHngd = Number($('.mc-list-21').text());
+    // tripleSliding = Number($('.mc-list-22').text());
+    //
+    // crossBrace = Number($('.mc-list-23').text());
+    
+    sgSSMesh = Number(partPrice.sgSSMesh.price);
+    //grille7mm = Number($('.mc-list-3').text());
+    
+    perfSheetFixingBead = Number(partPrice.perfSheetFixingBead.price);;
     PVCLSeat = Number(partPrice.PVCLSeat.price);
     PVCLSeatName = partPrice.PVCLSeat.label;
     PVCWedge = Number(partPrice.PVCWedge.price);
@@ -2726,8 +2589,8 @@ function initializePartsVariables() {
     midrailAmount = Number($('span.inc-midrail-amount').text());
 
     /** Powder Coatings **/
-    singleLock = Number($('.mc-list-1').text());
-    tripleLock = Number($('.mc-list-2').text());
+    //singleLock = Number($('.mc-list-1').text());
+    //tripleLock = Number($('.mc-list-2').text());
     //NEED TO CROSS CHECK HOW LOCK PRICE DEDUCTION WAS IMPLEMENTED @TODO
     singleLockSld = Number(partPrice.singleLockSld.price);
     singleLockHng = Number(partPrice.singleLockHng.price);
@@ -2745,6 +2608,12 @@ function initializePartsVariables() {
     fibrWindowMesh = Number($('#iw-deduction').text());
     perfDoorMesh = Number($('#pd-deduction').text());
     perfWindowMesh = Number($('#pw-deduction').text());
+
+    // std = Number($('.std').text());
+    // spec1 = Number($('.spec1').text());
+    // spec2 = Number($('.spec2').text());
+    // spec3 = Number($('.spec3').text());
+    // spec4 = Number($('.spec4').text());
 }
 
 
@@ -2819,7 +2688,7 @@ function editPageFunctions() {
 
     /** Inialize Variables **/
     CUSTOM_INSTALLATION = Number($('#installation-custom-amount').val());
-    INCORPORATE_INSTALLATION = Number($('#installation-incorporate-amount').val());
+	INCORPORATE_INSTALLATION = Number($('#installation-incorporate-amount').val());
     FREIGHTCOST = Number($('#freight-cost').val());
 
 
@@ -2833,7 +2702,7 @@ function editPageFunctions() {
 
         if (i > 0) {
             productsCount++;
-			var productMcTable = productMcTableHtml.replace('product-mc-0', 'product-mc-' + productsCount);
+            var productMcTable = productMcTableHtml.replace('product-mc-0', 'product-mc-' + productsCount);
             var productResultTable = productResultTableHtml.replace('product-result-0', 'product-result-' + productsCount);
             $('#products-mc-container').append('<div class="clearfix"></div>');
             $('#products-mc-container').append(productMcTable);
@@ -2945,12 +2814,27 @@ function validate(type) {
     $('.product-options-row').each(function (i, el) {
         var lockType = $(el).find('.product-lock-type').val();
         var lockHeight = $(el).find('.product-lock-height').val();
-
-
+        var lockCounts = Number($(el).find('.product-lock-qty').val());
+        var winDoor = $(el).find('.product-win-door').val();
+        
         if (!error) {
-            if (lockType && !lockHeight) {
-                errorMsg += 'Lock handle height is empty. \n';
-            }
+            if (winDoor == 'Door') {            
+                if (!lockType) {
+                    errorMsg += 'Lock type is not selected. \n';
+                    error = true;
+                }
+                if (!lockCounts) {
+                    errorMsg += 'Door needs a lock. \n';
+                    error = true;
+                }
+                if (!lockHeight) {
+                    errorMsg += 'Lock handle height is empty. \n';
+                    error = true;
+                }    
+            }                
+            //if (lockType && !lockHeight) {
+               // errorMsg += 'Lock handle height is empty. \n';
+            //}
         }
 
 
@@ -3016,36 +2900,8 @@ jQuery(document).ready(function (e) {
         });
         
     }));
-    function autoSaveQuote(){
-        var myForm = document.getElementById('add-quote-form');
-        if(myForm){
-            jQuery.ajax({
-                url: ajaxurl + "quotes/autosavequote", // Url to which the request is send
-                type: "POST",             // Type of request to be send, called as method
-                data: new FormData(myForm), // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-                contentType: false,       // The content type used when sending data to the server.
-                cache: false,             // To unable request pages to be cached
-                processData:false,        // To send DOMDocument or non processed data file it is set to false
-                success: function(response)   // A function to be called if request succeeds
-                {
-                    response = JSON.parse(response);
-                    if(response.result) {
-                        jQuery("#draftid").val(response.id); 
-						$('.autosavequote').attr("disabled", false);
-                    }
-                }
-            });
-        }
-    }
-
-    //setInterval(function(){
-       // autoSaveQuote(), $('.autosavequote').attr("disabled", true)}, 30000);
-    
 
 
 });
 
 /*************************/
-
-
-

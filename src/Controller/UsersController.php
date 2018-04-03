@@ -40,7 +40,7 @@ class UsersController extends AppController
 
         $users = null;
         if ($this->Auth->user('role') == 'admin') {
-            $users = $this->paginate($this->Users, ['fields' => ['id', 'created', 'username', 'business_name', 'business_abrev', 'role', 'modified', 'email', 'parentusername', 'monthly_fee_report'],
+            $users = $this->paginate($this->Users, ['fields' => ['id', 'created', 'username', 'business_name', 'business_abrev', 'role', 'system_platform', 'modified', 'email', 'parentusername', 'monthly_fee_report'],
                 'limit' => 20,
                 'order' => [
                     'Users.created' => 'DESC'
@@ -48,7 +48,7 @@ class UsersController extends AppController
         } else {
             $users = $this->paginate($this->Users->find('all')
                 ->where(['role IN' => ['distributer', 'wholesaler', 'retailer', 'installer', 'candidate']]),
-                ['fields' => ['id', 'created', 'username', 'business_name', 'business_abrev', 'role', 'modified', 'email', 'parentusername', 'monthly_fee_report'],
+                ['fields' => ['id', 'created', 'username', 'business_name', 'business_abrev', 'role', 'system_platform', 'modified', 'email', 'parentusername', 'monthly_fee_report'],
                     'limit' => 20,
                     'order' => [
                         'Users.created' => 'DESC'

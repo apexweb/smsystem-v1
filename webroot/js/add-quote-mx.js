@@ -1577,10 +1577,10 @@ $(document).ready(function () {
         // });
     });
     
-    $('.coating').on('click', function () {
+    /*$('.coating').on('click', function () {
         $('.coating').prop ('checked', false);
         $(this).prop ('checked', true);  
-    });
+    });*/
 
 
     /* Calculates Additional Sections Prices */
@@ -2599,8 +2599,8 @@ jQuery(document).ready(function (e) {
         }
     }
 
-    setInterval(function(){
-        autoSaveQuote(), $('.autosavequote').attr("disabled", true)}, 30000);
+    //setInterval(function(){
+        //autoSaveQuote(), $('.autosavequote').attr("disabled", true)}, 30000);
 
 
 });

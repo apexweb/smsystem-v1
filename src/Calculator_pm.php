@@ -13,7 +13,7 @@ use Cake\Core\Configure;
 
 class Calculator_pm
 {
-    private $quote;
+     private $quote;
     private $ssMarkedup = 0;
     private $dgMarkedup = 0;
     private $fibrMarkedup = 0;
@@ -143,6 +143,8 @@ class Calculator_pm
     private $pr_color_win;
     private $dgInsDoorPetMarkup;// = 0;
     private $dgInsWinPetMarkup;// = 0;
+
+
 	// **********
 
 
@@ -156,12 +158,14 @@ class Calculator_pm
     }
 
 
+
     public function calculatePrices()
     {
         foreach ($this->quote['products'] as $product) {
             $this->calculateProduct($product);
+			pr($product);
         }
-
+	die('123');
         foreach ($this->quote['additionalpermeters'] as $additionalpermeter) {
             $this->calculateAdditionalM($additionalpermeter);
         }
@@ -217,7 +221,6 @@ class Calculator_pm
         $lockType = $product->product_lock_type;
         $emergencyWindow = $product->product_emergency_window;
         $incMidrail = $product->product_inc_midrail;
-
 
         $isSecDoor = false;
         $isSecWindow = false;
@@ -367,8 +370,8 @@ class Calculator_pm
             $markup = $this->pwMarkup;
         }
 
-        $sqm = ($heightMesh * $widthMesh / 1000000);
-        $sqmCalculated = ($sqm * $sqmPart);
+        $sqm = number_format(($heightMesh * $widthMesh / 1000000), 3, '.', '');
+        $sqmCalculated = number_format(($sqm * $sqmPart), 2, '.', '');
          
         $frameCalculated = ($frame * $productLmtr);
         $cnrstakeCalculated = ($cnrStake * 4);

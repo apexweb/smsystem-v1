@@ -135,20 +135,20 @@
             if (($role == 'admin' || $role == 'supplier' || $role == 'manufacturer' || $role == 'candidate') && $systemPlatform != '') {
                 $style = 'display:none;';
             }
-
             ?>
 			<div class="btn-group system-platform" style="<?= $style; ?>">
 				<?= $this->Form->input('system_platform', [
 					'options' => $system_platform,
 					'class' => 'form-control',
-					'label' => 'System Platfrom'
+					'label' => 'System Platfrom',
+					'disabled' => 'disabled'
 				]) ?>
 			</div>
 		</div>
 	</div>
     <div class="form-group">
         <div class="col-lg-3 col-md-4 col-xs-12">
-            <?= $this->Form->input('monthly_fee_report', ['class' => 'form-control']) ?>
+            <?= $this->Form->input('monthly_fee_report', ['class' => 'form-control','maxlength' => '10']) ?>
         </div>
     </div>
     <hr>

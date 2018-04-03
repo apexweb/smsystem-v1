@@ -24,7 +24,7 @@
 
     <p>
         <span>Notes to Manufacturer: </span>
-        <span class="big-span"><?= h($quote->notes_manufacturer) ?></span>
+        <span class="big-span notes-manufactures"><?= h($quote->notes_manufacturer) ?></span>
     </p>
 </div>
 
@@ -87,22 +87,22 @@
 
 
         <tr>
-            <th>ITEM</th>
-            <th class="width-50">PANEL QTY</th>
-            <th colspan="2" class="width-250">CONFIGURATION</th>
-            <th>WIN OR DOOR</th>
-            <th>MIDRAIL</th>
-            <th>COLOUR</th>
-            <th>FRAME</th>
-            <th>QTY</th>
+            <th>Item</th>
+            <th class="width-50">Panel qty</th>
+            <th colspan="2" class="width-250">Configuration</th>
+            <th>Win or door</th>
+            <th>Midrail</th>
+            <th>Colour</th>
+            <th>Frame</th>
+            <th>Qty cut</th>
             <th></th>
-            <th>HEIGHT</th>
-            <th>QTY</th>
+            <th>Height</th>
+            <th>Qty cut</th>
             <th></th>
-            <th>WIDTH</th>
-            <th colspan="2" class="width-100">LOCK TYPE</th>
-            <th>HANDLE HEIGHT</th>
-            <th class="width-250">LOCATION / NOTES / COLOURS</th>
+            <th>Width</th>
+            <th colspan="2" class="width-100">Lock type</th>
+            <th>Handle height</th>
+            <th class="width-250">Locatoin / Notes / Colours</th>
             <!--            <th>LOCK QTY</th>-->
         </tr>
 

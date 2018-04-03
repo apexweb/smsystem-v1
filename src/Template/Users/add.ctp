@@ -118,7 +118,11 @@ $system_platform = array('mx'=>'MX','pm'=>'PM','hybrid'=>'Hybrid');
                 </div>
             </div>
         </div>
-        
+        <div class="form-group">
+			<div class="col-lg-3 col-md-4 col-xs-12">
+				<?= $this->Form->input('monthly_fee_report', ['class' => 'form-control','maxlength' => '10']) ?>
+			</div>
+		</div>
         <?php if ($authUser['role'] == 'admin'): ?>        
         
             <div class="checkbox checkbox-custom checkbox-single" style="margin:0px;">
