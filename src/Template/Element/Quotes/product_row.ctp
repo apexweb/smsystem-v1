@@ -44,13 +44,45 @@
     </td>
     
     <td>
-        <?= $this->Form->select(
-            'products.' . $i . '.product_colour',
-            array_merge($colours, array('Other'=>'Other')),
-            ['empty' => ' ', 'label' => false,
-                'class' => 'product-options form-control product-colour', 'data-style' => 'btn-primary']
-        );
-        ?>
+	
+		<?php    
+			$select_style = '';
+			$input_style = 'width:81%;display:none;';
+			$select_name = 'product_colour'; 
+			$input_name = 'col_ours';
+			//echo $quote->cutsheets[$i]->colour;
+			if(isset($quote->cutsheets[$i]->colour)){
+				if(!isset($colours[$quote->cutsheets[$i]->colour]) ){
+					$select_style = '';
+					$input_style = 'width:81%;';
+					$select_name = 'col_ours'; 
+					$input_name = 'product_colour';
+				}
+			}
+		?>       
+		<?= $this->Form->input(
+			'products.' . $i . '.'.$select_name,
+			[
+				'type' => 'select',
+				'options' => array_merge($colours, array('Other'=>'Other')),
+				'empty' => true,
+				'label' => false,
+				'class' => 'form-control input-sm product-custom-color additional-selected-colour product-options product-colour',
+				'templates' => [
+					'inputContainer' => '{{content}}'],
+				'style' => $select_style
+				]                    
+		); ?>
+		<?= $this->Form->input('products.' . $i . '.'.$input_name,  [
+				'label' => false, 
+				'class' => 'form-control input-sm editOption additional-input-coloured product-options product-colour', 
+				'style' => $input_style, 
+				'templates' => [
+					'inputContainer' => '{{content}}']
+				]                    
+			);
+		?>
+        
     </td>
 
   <td>

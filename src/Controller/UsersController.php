@@ -6,6 +6,7 @@ use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use Cake\ORM\Behavior\ad;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Cake\I18n\Time;
 
 /**
  * Users Controller
@@ -137,9 +138,36 @@ class UsersController extends AppController
                 $parentUser = $this->Users->get($user->parent_id);
                 $user->parentusername = $parentUser->username;
             }
+			if(isset($this->request->data['terms']) && $this->request->data['terms'] != ''){
+				$user->terms = $this->request->data['terms'];
+			}else{
+				$user->terms = '<table cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">*Estimate is subject to check measure Creadit card payment incurs 1% fee</td><td class="no-border" style="border:none !important;">*Installation includes any freight/delivery charges if applicable</td><td class="no-border" style="border:none !important;">Bank Details</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">*This estimate is valid for 30 days*</td><td class="no-border" style="border:none !important;"><strong>Please use the Order No as your payment reference</strong></td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">&nbsp;</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">&nbsp;</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">Please sign and return as authorisation that you would like to proceed with this Estimate, but please be aware in doing so that you have acknowledged this estimate and agree with the Terms and Conditions it in their entirety.</td></tr></tbody></table>';
+			}
+			
+			$meta_key = 'invoice-settings';
+			$meta_value = 'YToxOntzOjg6InNldHRpbmdzIjthOjQ6e3M6ODoicHJvZHVjdHMiO2E6Mjp7czo1OiJ2YWx1ZSI7YTo1OntzOjE5OiJwcm9kdWN0X2l0ZW1fbnVtYmVyIjtzOjE6IjEiO3M6MTE6InByb2R1Y3RfcXR5IjtzOjE6IjEiO3M6MjU6InByb2R1Y3Rfc2VjX2RpZ19wZXJmX2ZpYnIiO3M6MToiMSI7czoyMjoicHJvZHVjdF93aW5kb3dfb3JfZG9vciI7czoxOiIxIjtzOjIxOiJwcm9kdWN0X2NvbmZpZ3VyYXRpb24iO3M6MToiMSI7fXM6NToibGFiZWwiO2E6NTp7czoxOToicHJvZHVjdF9pdGVtX251bWJlciI7czozOiJOTy4iO3M6MTE6InByb2R1Y3RfcXR5IjtzOjg6IlF1YW50aXR5IjtzOjI1OiJwcm9kdWN0X3NlY19kaWdfcGVyZl9maWJyIjtzOjEyOiJQcm9kdWN0IFR5cGUiO3M6MjI6InByb2R1Y3Rfd2luZG93X29yX2Rvb3IiO3M6MTE6IldpbmRvdy9Eb29yIjtzOjIxOiJwcm9kdWN0X2NvbmZpZ3VyYXRpb24iO3M6MTM6IkNvbmZpZ3VyYXRpb24iO319czoyMDoiYWRkaXRpb25hbF9wZXJfbWV0ZXIiO2E6Mjp7czo1OiJ2YWx1ZSI7YTozOntzOjIyOiJhZGRpdGlvbmFsX2l0ZW1fbnVtYmVyIjtzOjE6IjEiO3M6MjA6ImFkZGl0aW9uYWxfcGVyX21ldGVyIjtzOjE6IjEiO3M6MTU6ImFkZGl0aW9uYWxfbmFtZSI7czoxOiIxIjt9czo1OiJsYWJlbCI7YTozOntzOjIyOiJhZGRpdGlvbmFsX2l0ZW1fbnVtYmVyIjtzOjg6Ikl0ZW0gTm8uIjtzOjIwOiJhZGRpdGlvbmFsX3Blcl9tZXRlciI7czo5OiJQZXIgTWV0ZXIiO3M6MTU6ImFkZGl0aW9uYWxfbmFtZSI7czoxODoiQWRkaXRpb25hbCBTZWN0aW9uIjt9fXM6MjE6ImFkZGl0aW9uYWxfcGVyX2xlbmd0aCI7YToyOntzOjU6InZhbHVlIjthOjM6e3M6MjI6ImFkZGl0aW9uYWxfaXRlbV9udW1iZXIiO3M6MToiMSI7czoyMToiYWRkaXRpb25hbF9wZXJfbGVuZ3RoIjtzOjE6IjEiO3M6MTU6ImFkZGl0aW9uYWxfbmFtZSI7czoxOiIxIjt9czo1OiJsYWJlbCI7YTozOntzOjIyOiJhZGRpdGlvbmFsX2l0ZW1fbnVtYmVyIjtzOjg6Ikl0ZW0gTm8uIjtzOjIxOiJhZGRpdGlvbmFsX3Blcl9sZW5ndGgiO3M6MTA6IlBlciBMZW5ndGgiO3M6MTU6ImFkZGl0aW9uYWxfbmFtZSI7czoxODoiQWRkaXRpb25hbCBTZWN0aW9uIjt9fXM6MTE6ImFjY2Vzc29yaWVzIjthOjI6e3M6NToidmFsdWUiO2E6Mzp7czoyMToiYWNjZXNzb3J5X2l0ZW1fbnVtYmVyIjtzOjE6IjEiO3M6MTQ6ImFjY2Vzc29yeV9lYWNoIjtzOjE6IjEiO3M6MTQ6ImFjY2Vzc29yeV9uYW1lIjtzOjE6IjEiO31zOjU6ImxhYmVsIjthOjM6e3M6MjE6ImFjY2Vzc29yeV9pdGVtX251bWJlciI7czo4OiJJdGVtIE5vLiI7czoxNDoiYWNjZXNzb3J5X2VhY2giO3M6NDoiRWFjaCI7czoxNDoiYWNjZXNzb3J5X25hbWUiO3M6MTk6IkFjY2Vzc29yaWVzIFNlY3Rpb24iO319fX0=';
+			$datetime = date("Y-m-d H:i:s");
+			$usersTable = TableRegistry::get('users');
+			$users_settings = TableRegistry::get('users_settings');
+			$settings = $users_settings->newEntity();
+			
+			
+			//$user->terms = serialize($this->request->data['terms']);
+            //if ($this->Users->save($user)) {
+				//$rec=$usersTable->save($user)
+			if ($rec=$usersTable->save($user)) {
+				$record_id = $rec->id; 
+				if(isset($record_id)){
+					$settings->id=null;
+					$settings->user_id = $record_id;
+					$settings->meta_key = $meta_key;
+					$settings->meta_value = $meta_value;
+					$settings->created = $datetime;					
 
-            if ($this->Users->save($user)) {
-                
+					//$fields = array('user_id'=> $record_id,'meta_key'=> $meta_key,'meta_value'=> $meta_value,'created'=> $datetime);
+					$users_settings->save($settings);
+				}
+
                 if (isset($this->request->data['send_notification'])) {
                     $this->sendEmail($user->email, 'new_user', $user);
                 }
@@ -241,9 +269,12 @@ class UsersController extends AppController
                 $user->parent_id = null;
                 $user->parentusername = '';
             }
-           
-
-            if ($this->Users->save($user)) {
+           	if(isset($this->request->data['terms']) && $this->request->data['terms'] != ''){
+				$user->terms = $this->request->data['terms'];
+			}else{
+				$user->terms = '<table cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">*Estimate is subject to check measure Creadit card payment incurs 1% fee</td><td class="no-border" style="border:none !important;">*Installation includes any freight/delivery charges if applicable</td><td class="no-border" style="border:none !important;">Bank Details</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">*This estimate is valid for 30 days*</td><td class="no-border" style="border:none !important;"><strong>Please use the Order No as your payment reference</strong></td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">&nbsp;</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">&nbsp;</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">Please sign and return as authorisation that you would like to proceed with this Estimate, but please be aware in doing so that you have acknowledged this estimate and agree with the Terms and Conditions it in their entirety.</td></tr></tbody></table>';
+			}
+			if ($this->Users->save($user)) {
                 if ($user->role == 'manufacturer') {
                     $this->copyallpartstomf($user->id);
                 }

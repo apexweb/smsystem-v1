@@ -44,9 +44,14 @@ class Product extends Entity
     
     protected function _getColour() {
         $product_colour = '';
-        if ($this->_properties['product_colour']) {
-            list($colourGroup, $product_colour) = explode('|', $this->_properties['product_colour']);
-        }        
+		$checkPipeline = preg_match("/\|/", $this->_properties['product_colour']);
+		if($checkPipeline == 0){
+			$product_colour = $this->_properties['product_colour'];
+		}else {
+			if ($this->_properties['product_colour']) {
+				list($colourGroup, $product_colour) = explode('|', $this->_properties['product_colour']);
+			}
+		}        
         return $product_colour;
     }
 

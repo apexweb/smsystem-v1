@@ -20,8 +20,12 @@
                     <td>
                         <?= $this->Form->input('hrly_sd', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
-                    <td>90</td>
-                    <td>0</td>
+                    <td>
+						<?= $this->Form->input('sd_order', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
+                    <td>
+						<?= $this->Form->input('sd_orders', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
                     <td>
                         <?= $this->Form->input('cleanup_sd', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
@@ -34,8 +38,13 @@
                     <td>
                         <?= $this->Form->input('hrly_sw', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
-                    <td>30</td>
-                    <td>0</td>
+					<td>
+						<?= $this->Form->input('sw_order', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
+                    <td>
+						<?= $this->Form->input('sw_orders', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
+                    
                     <td>
                         <?= $this->Form->input('cleanup_sw', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
@@ -48,8 +57,12 @@
                     <td>
                         <?= $this->Form->input('hrly_dd', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
-                    <td></td>
-                    <td></td>
+                    <td>
+						<?= $this->Form->input('dgd_order', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
+                    <td>
+						<?= $this->Form->input('dgd_orders', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
                     <td>
                         <?= $this->Form->input('cleanup_dd', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
@@ -62,8 +75,12 @@
                     <td>
                         <?= $this->Form->input('hrly_dw', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
-                    <td></td>
-                    <td></td>
+                    <td>
+						<?= $this->Form->input('dgw_order', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
+                    <td>
+						<?= $this->Form->input('dgw_orders', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
                     <td>
                         <?= $this->Form->input('cleanup_dw', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
@@ -76,8 +93,12 @@
                     <td>
                         <?= $this->Form->input('hrly_fd', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
-                    <td></td>
-                    <td></td>
+                    <td>
+						<?= $this->Form->input('fd_order', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
+                    <td>
+						<?= $this->Form->input('fd_orders', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
                     <td>
                         <?= $this->Form->input('cleanup_fd', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
@@ -90,8 +111,12 @@
                     <td>
                         <?= $this->Form->input('hrly_fw', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
-                    <td></td>
-                    <td></td>
+                    <td>
+						<?= $this->Form->input('fw_order', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
+                    <td>
+						<?= $this->Form->input('fw_orders', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
                     <td>
                         <?= $this->Form->input('cleanup_fw', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
@@ -104,8 +129,12 @@
                     <td>
                         <?= $this->Form->input('hrly_pd', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
-                    <td>90</td>
-                    <td>0</td>
+                    <td>
+						<?= $this->Form->input('pd_order', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
+                    <td>
+						<?= $this->Form->input('pd_orders', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
                     <td>
                         <?= $this->Form->input('cleanup_pd', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
@@ -118,8 +147,12 @@
                     <td>
                         <?= $this->Form->input('hrly_pw', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
-                    <td>30</td>
-                    <td>0</td>
+                    <td>
+						<?= $this->Form->input('pw_order', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
+                    <td>
+						<?= $this->Form->input('pw_orders', ['class' => 'form-control input-sm', 'label' => false]) ?>
+					</td>
                     <td>
                         <?= $this->Form->input('cleanup_pw', ['class' => 'form-control input-sm', 'label' => false]) ?>
                     </td>
@@ -141,6 +174,15 @@
                 <tr>
                     <th class="grey">Triple Lock</th>
                     <td><?= $this->Form->input('triple_lock', ['class' => 'form-control input-sm', 'label' => '']) ?></td>
+                </tr>
+            </table>
+			<table class="table table-bordered mcvalues-table small-padding">
+                <tr>
+                    <th class="grey" colspan="2">Oversized Screen Charge</th>
+                </tr>
+                <tr>
+                    <th class="grey">316S/S Window</th>
+                    <td><?= $this->Form->input('window_greater_size', ['class' => 'form-control input-sm', 'label' => '']) ?></td>
                 </tr>
             </table>
         </div>

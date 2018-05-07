@@ -171,8 +171,12 @@
             <td>
                 <span class="hrly-sd"><?= h($mcvalues['hrly_sd']) ?></span>
             </td>
-            <td>90</td>
-            <td>0</td>
+            <td>
+				<?= h($mcvalues['sd_order']) ?>
+			</td>
+            <td>
+				<?= h($mcvalues['sd_orders']) ?>
+			</td>
             <td>
                 <span class="cleanup-sd"><?= h($mcvalues['cleanup_sd']) ?></span>
             </td>
@@ -185,8 +189,12 @@
             <td>
                 <span class="hrly-sw"><?= h($mcvalues['hrly_sw']) ?></span>
             </td>
-            <td>30</td>
-            <td>0</td>
+            <td>
+				<?= h($mcvalues['sw_order']) ?>
+			</td>
+            <td>
+				<?= h($mcvalues['sw_orders']) ?>
+			</td>
             <td>
                 <span class="cleanup-sw"><?= h($mcvalues['cleanup_sw']) ?></span>
             </td>
@@ -199,8 +207,12 @@
             <td>
                 <span class="hrly-dd"><?= h($mcvalues['hrly_dd']) ?></span>
             </td>
-            <td></td>
-            <td></td>
+            <td>
+				<?= h($mcvalues['dgd_order']) ?>
+			</td>
+            <td>
+				<?= h($mcvalues['dgd_orders']) ?>
+			</td>
             <td>
                 <span class="cleanup-dd"><?= h($mcvalues['cleanup_dd']) ?></span>
             </td>
@@ -213,8 +225,12 @@
             <td>
                 <span class="hrly-dw"><?= h($mcvalues['hrly_dw']) ?></span>
             </td>
-            <td></td>
-            <td></td>
+            <td>
+				<?= h($mcvalues['dgw_order']) ?>
+			</td>
+            <td>
+				<?= h($mcvalues['dgw_orders']) ?>
+			</td>
             <td>
                 <span class="cleanup-dw"><?= h($mcvalues['cleanup_dw']) ?></span>
             </td>
@@ -227,8 +243,12 @@
             <td>
                 <span class="hrly-fd"><?= h($mcvalues['hrly_fd']) ?></span>
             </td>
-            <td></td>
-            <td></td>
+            <td>
+				<?= h($mcvalues['fd_order']) ?>
+			</td>
+            <td>
+				<?= h($mcvalues['fd_orders']) ?>
+			</td>
             <td>
                 <span class="cleanup-fd"><?= h($mcvalues['cleanup_fd']) ?></span>
             </td>
@@ -241,8 +261,12 @@
             <td>
                 <span class="hrly-fw"><?= h($mcvalues['hrly_fw']) ?></span>
             </td>
-            <td></td>
-            <td></td>
+            <td>
+				<?= h($mcvalues['fw_order']) ?>
+			</td>
+            <td>
+				<?= h($mcvalues['fw_orders']) ?>
+			</td>
             <td>
                 <span class="cleanup-fw"><?= h($mcvalues['cleanup_fw']) ?></span>
             </td>
@@ -255,8 +279,12 @@
             <td>
                 <span class="hrly-pd"><?= h($mcvalues['hrly_pd']) ?></span>
             </td>
-            <td>90</td>
-            <td>0</td>
+            <td>
+				<?= h($mcvalues['pd_order']) ?>
+			</td>
+            <td>
+				<?= h($mcvalues['pd_orders']) ?>
+			</td>
             <td>
                 <span class="cleanup-pd"><?= h($mcvalues['cleanup_pd']) ?></span>
             </td>
@@ -269,8 +297,12 @@
             <td>
                 <span class="hrly-pw"><?= h($mcvalues['hrly_pw']) ?></span>
             </td>
-            <td>30</td>
-            <td>0</td>
+            <td>
+				<?= h($mcvalues['pw_order']) ?>
+			</td>
+            <td>
+				<?= h($mcvalues['pw_orders']) ?>
+			</td>
             <td>
                 <span class="cleanup-pw"><?= h($mcvalues['cleanup_pw']) ?></span>
             </td>

@@ -60,7 +60,7 @@ $system_platform = array('mx'=>'MX','pm'=>'PM','hybrid'=>'Hybrid');
         
         <div class="form-group">
             <div class="col-lg-3 col-md-4 col-xs-12">
-                <?= $this->Form->input('business_abrev', ['class' => 'form-control']) ?>
+                <?= $this->Form->input('business_abrev', ['class' => 'form-control','required']) ?>
             </div>
         </div>
         
@@ -123,6 +123,25 @@ $system_platform = array('mx'=>'MX','pm'=>'PM','hybrid'=>'Hybrid');
 				<?= $this->Form->input('monthly_fee_report', ['class' => 'form-control','maxlength' => '10']) ?>
 			</div>
 		</div>
+		<div class="form-group">
+            <div class="col-lg-3 col-md-4 col-xs-12">
+                <?= $this->Form->textarea('business_address', ['class' => 'form-control', 'placeholder' => 'Business Address']) ?>
+            </div>
+        </div>
+		<div class="form-group">
+			<?php 
+				$termValue = '<table cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">*Estimate is subject to check measure Creadit card payment incurs 1% fee</td><td class="no-border" style="border:none !important;">*Installation includes any freight/delivery charges if applicable</td><td class="no-border" style="border:none !important;">Bank Details</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">*This estimate is valid for 30 days*</td><td class="no-border" style="border:none !important;"><strong>Please use the Order No as your payment reference</strong></td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">&nbsp;</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">&nbsp;</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">Please sign and return as authorisation that you would like to proceed with this Estimate, but please be aware in doing so that you have acknowledged this estimate and agree with the Terms and Conditions it in their entirety.</td></tr></tbody></table>';
+			 ?>
+			<div class="col-lg-10 col-md-10 col-xs-12">
+				<input type="hidden" class="term_Defult" value='<table cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">*Estimate is subject to check measure Creadit card payment incurs 1% fee</td><td class="no-border" style="border:none !important;">*Installation includes any freight/delivery charges if applicable</td><td class="no-border" style="border:none !important;">Bank Details</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">*This estimate is valid for 30 days*</td><td class="no-border" style="border:none !important;"><strong>Please use the Order No as your payment reference</strong></td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">&nbsp;</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">&nbsp;</td></tr></tbody></table><table align="left" cellpadding="1" cellspacing="1"><tbody><tr><td class="no-border" style="border:none !important;">Please sign and return as authorisation that you would like to proceed with this Estimate, but please be aware in doing so that you have acknowledged this estimate and agree with the Terms and Conditions it in their entirety.</td></tr></tbody></table>'>
+				<label>Terms</label>
+				<div class="termDefult">Reset Default Terms</div>
+				<div style="clear: both;">
+					<?= $this->Form->textarea('terms', ['cols' => '80','rows' => '10','id' => 'editor1', 'class' => 'form-control','value' => $termValue]) ?>
+				</div>
+			</div>
+		</div>
+		
         <?php if ($authUser['role'] == 'admin'): ?>        
         
             <div class="checkbox checkbox-custom checkbox-single" style="margin:0px;">

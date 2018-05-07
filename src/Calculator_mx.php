@@ -102,6 +102,7 @@ class Calculator_mx
     private $special_color_door;
     private $special_color_win;
 
+	private $window_greater_size;
 
     private $dgInsDoorPetMarkup;// = 0;
     private $dgInsWinPetMarkup;// = 0;
@@ -177,7 +178,7 @@ class Calculator_mx
 
     private function calculateProduct($product)
     {
-        $qty = 1;
+		$qty = 1;
         $newQty = $product->product_qty;
         $secDigFibr = $product->product_sec_dig_perf_fibr;
         $winDoor = $product->product_window_or_door;
@@ -277,70 +278,73 @@ class Calculator_mx
         $premiumColor = 0;
         $anodizedColor = 0;
         $specialColor = 0;
+		if ($productColour) {
+			$checkPipeline = preg_match("/\|/", $productColour);
+			if($checkPipeline == 0){
 
-        if ($productColour) {
-            list($colourGroup, $pColour) = explode('|', $productColour);
-            
-            if ($winDoor == 'Door') {
-                if ($colourGroup == 'Custom Colour') {
-                    $customColor = ($qty * $this->custom_color_door);
-                }
-                if ($colourGroup == 'Anodized') {
-                    $anodizedColor = ($qty * $this->anodized_color_door);
-                }
-                if ($colourGroup == 'Premium Colour') {
-                    $premiumColor = ($qty * $this->pr_color_door);
-                }
-                if ($colourGroup == 'Special Colour') {
-                    $specialColor = ($qty * $this->special_color_door);
-                }                    
-            } else if ($winDoor == 'Window') {
-                if ($colourGroup == 'Custom Colour') {
-                    $customColor = ($qty * $this->custom_color_win);
-                }
-                if ($colourGroup == 'Anodized') {
-                    $anodizedColor = ($qty * $this->anodized_color_win);
-                }
-                if ($colourGroup == 'Premium Colour') {
-                    $premiumColor = ($qty * $this->pr_color_win);
-                }
-                if ($colourGroup == 'Special Colour') {
-                    $specialColor = ($qty * $this->special_color_win);
-                } 
-            }               
-        
-        } else {
-            //*** Calculates Powder Coats ****
-            if ($winDoor == 'Door') {
-                
-                if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
-                    $customColor = ($qty * $this->custom_color_door);
-                }
-                if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
-                    $premiumColor = ($qty * $this->pr_color_door);
-                }
-                if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
-                    $anodizedColor = ($qty * $this->anodized_color_door);
-                }
-                if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
-                    $specialColor = ($qty * $this->special_color_door);
-                }
-            } else if ($winDoor == 'Window') { 
-                
-                if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
-                    $customColor = ($qty * $this->custom_color_win);
-                }
-                if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
-                    $premiumColor = ($qty * $this->pr_color_win);
-                }
-                if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
-                    $anodizedColor = ($qty * $this->anodized_color_win);
-                }
-                if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
-                    $specialColor = ($qty * $this->special_color_win);
-                }
-            }
-        }
+			}else{
+				list($colourGroup, $pColour) = explode('|', $productColour);
+				if ($winDoor == 'Door') {
+					if ($colourGroup == 'Custom Colour') {
+						$customColor = ($qty * $this->custom_color_door);
+					}
+					if ($colourGroup == 'Anodized') {
+						$anodizedColor = ($qty * $this->anodized_color_door);
+					}
+					if ($colourGroup == 'Premium Colour') {
+						$premiumColor = ($qty * $this->pr_color_door);
+					}
+					if ($colourGroup == 'Special Colour') {
+						$specialColor = ($qty * $this->special_color_door);
+					}                    
+				} else if ($winDoor == 'Window') {
+					if ($colourGroup == 'Custom Colour') {
+						$customColor = ($qty * $this->custom_color_win);
+					}
+					if ($colourGroup == 'Anodized') {
+						$anodizedColor = ($qty * $this->anodized_color_win);
+					}
+					if ($colourGroup == 'Premium Colour') {
+						$premiumColor = ($qty * $this->pr_color_win);
+					}
+					if ($colourGroup == 'Special Colour') {
+						$specialColor = ($qty * $this->special_color_win);
+					} 
+				}
+			}               
+		
+		} else {
+			//*** Calculates Powder Coats ****
+			if ($winDoor == 'Door') {
+				
+				if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
+					$customColor = ($qty * $this->custom_color_door);
+				}
+				if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
+					$premiumColor = ($qty * $this->pr_color_door);
+				}
+				if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
+					$anodizedColor = ($qty * $this->anodized_color_door);
+				}
+				if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
+					$specialColor = ($qty * $this->special_color_door);
+				}
+			} else if ($winDoor == 'Window') { 
+				
+				if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
+					$customColor = ($qty * $this->custom_color_win);
+				}
+				if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
+					$premiumColor = ($qty * $this->pr_color_win);
+				}
+				if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
+					$anodizedColor = ($qty * $this->anodized_color_win);
+				}
+				if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
+					$specialColor = ($qty * $this->special_color_win);
+				}
+			}
+		}
        
 
         $petMeshMarkup = 0;
@@ -424,11 +428,16 @@ class Calculator_mx
             $discounted = round($sellPrice * $discount / 100, 2);
             $this->discountedAmount += $discounted;
         }
-
-        $this->profit += $profit;
-        $this->totalSellPrice += round($sellPrice, 2);
-
-        $product->product_cost = round($sellPrice, 2);
+		if($this->window_greater_size > 0 && $secDigFibr != '' && $secDigFibr == '316 S/S' && $sellPrice <= 0){
+			$this->profit += $profit;
+			$this->totalSellPrice += round(($sellPrice+$this->window_greater_size), 2);
+			$product->product_cost = round($this->window_greater_size, 2);
+		}else{
+			$this->profit += $profit;
+			$this->totalSellPrice += round($sellPrice, 2);
+			$product->product_cost = round($sellPrice, 2);
+		}
+       
        
     }
 
@@ -666,6 +675,7 @@ class Calculator_mx
     private function setValues()
     {
         $parts = TableRegistry::get('Parts');
+		$userParts = TableRegistry::get('Users_parts');
         $mcvaluesTable = TableRegistry::get('Mcvalues');
         $installations = TableRegistry::get('Installations');
         $matrixTables = TableRegistry::get('Matrixtables');
@@ -696,7 +706,7 @@ class Calculator_mx
 
         $this->userInstallations = $installations->find('all')->where(['user_id' => $this->auth->user('id')])->first();
 
-        $parts = $parts->find('all')->contain(['users_parts' => function ($q) {
+        $parts = $userParts->find('all')->contain(['Parts' => function ($q) {
             $role = $this->auth->user('role');
             if ($role == 'manufacturer') {
                 $userId = $this->auth->user('id');
@@ -810,6 +820,7 @@ class Calculator_mx
         $this->anodized_color_win = $mcvalues->anodized_color_win;
         $this->special_color_door = $mcvalues->special_color_door;
         $this->special_color_win = $mcvalues->special_color_win;
+		$this->window_greater_size = $mcvalues->window_greater_size;
          
         
         
@@ -841,31 +852,31 @@ class Calculator_mx
     private function initializeParts($parts)
     {
         foreach ($parts as $part) {
-            $id = $part->id;
-            $title = $part->title;
-            $price = $part->users_parts[0]->price_per_unit;
+            $id = $part->part->id;
+            $title = $part->part->title;
+            $price = $part->price_per_unit;
             
-            if ($part->users_parts[0]->show_in_additional_section_dropdown) {
+            if ($part->show_in_additional_section_dropdown) {
                 $this->additionals_m[$title] = $price;
-            } else if ($part->show_in_additional_section_by_length_dropdown) {
+            } else if ($part->part->show_in_additional_section_by_length_dropdown) {
                 $this->additionals_l[$title] = $price;
             }
                                    
-            if ($part->users_parts[0]->show_in_additional_section_by_length_dropdown) {
+            if ($part->show_in_additional_section_by_length_dropdown) {
                 $this->additionals_l[$title] = $price;
-            } else if ($part->show_in_additional_section_by_length_dropdown) {
+            } else if ($part->part->show_in_additional_section_by_length_dropdown) {
                 $this->additionals_l[$title] = $price;
             }
             
-            if ($part->users_parts[0]->show_in_accessories_dropdown) {
+            if ($part->show_in_accessories_dropdown) {
                 $this->accessories[$title] = $price;
-            } else if ($part->show_in_accessories_dropdown) {
+            } else if ($part->part->show_in_accessories_dropdown) {
                 $this->accessories[$title] = $price;
             }
             
-            if ($part->users_parts[0]->master_calculator_value) {
+            if ($part->master_calculator_value) {
                 $this->mc_parts[$id] = ['title' => $title, 'price' => $price];
-            } else if ($part->master_calculator_value) {
+            } else if ($part->part->master_calculator_value) {
                 $this->mc_parts[$id] = ['title' => $title, 'price' => $price];
             }
             

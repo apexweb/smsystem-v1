@@ -8,6 +8,8 @@ use App\Calculator_hybrid;
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
 use CakePdf\Pdf\CakePdf;
+use Cake\Datasource\ConnectionManager;
+
 
 
 /**
@@ -228,10 +230,10 @@ class QuotesController extends AppController
             ->order(['Quotes.orderin_date' => 'DESC', 'FIELD(Quotes.role, "wholesaler", "manufacturer") DESC']);//, 
 
         $users = TableRegistry::get('Users');
-         $userIds = $users->find('list', ['keyField' => 'id', 'valueField' => 'id'])
+        $userIds = $users->find('list', ['keyField' => 'id', 'valueField' => 'id'])
                 ->where(['Users.parent_id' => $id]);
 
-         $userIds = $userIds->toArray();
+        $userIds = $userIds->toArray();
          array_push($userIds, $id);
          
          
@@ -239,13 +241,19 @@ class QuotesController extends AppController
          
         //$quotes->where(['Quotes.user_id' => $id]);
         
-        $quotes->andWhere(function ($exp) {
+        /*$quotes->andWhere(function ($exp) {
                 return $exp->or_([
                     'Quotes.status' => 'complete',
+					'Quotes.status' => 'in progress',
                     ]);
-                });
-         
-        $quotes->orWhere(['Quotes.status' => 'in progress']);
+                });*/
+        $quotes->andWhere([
+            'OR'=>[
+                ['Quotes.status' => 'complete'],
+                ['Quotes.status' => 'in progress']
+            ]
+        ]); 
+       // $quotes->orWhere(['Quotes.status' => 'in progress']);
                
         if (isset($this->request->query['month'])) {
             $month = $this->request->query['month'];
@@ -481,7 +489,8 @@ class QuotesController extends AppController
         
 
         $currentUserId = $this->Auth->user('id');
-        $quotes->where(['OR' => [['Users.id' => $currentUserId], ['Users.parent_id' => $currentUserId]]]);
+        //$quotes->where(['Users.id' => $currentUserId]);
+		$quotes->where(['OR' => [['Users.id' => $currentUserId], ['Users.parent_id' => $currentUserId]]]);
 
 
         if ($search != null) {
@@ -652,7 +661,29 @@ class QuotesController extends AppController
 			}
 
             $stocks = $cal->calculatePrices();
-                       
+
+			$dropdowns = TableRegistry::get('Dropdowns');
+			$connection = ConnectionManager::get('default');
+			$dropdownType = [];
+			$colorType = '';
+			if($quote->color4_color){
+				$colorType = 'Color 4';
+			}
+			$results = $connection->execute("SELECT name FROM dropdowns WHERE user_id = ".$this->Auth->user('id')." AND type = '".$colorType."'")->fetchAll('assoc');
+			foreach($results as $result){
+				$dropdownType[] = $result['name'];
+			}
+
+			if (!in_array($quote->color4_color, $dropdownType)){
+				$connection->insert('dropdowns', [
+				'name' => $quote->color4_color,
+				'type' => $colorType,
+				'user_id' => $this->Auth->user('id')]);
+			}
+			//$conditions = array('user_id' => $this->Auth->user('id'));
+			//$fields = array('sd_order'=> $sd_order,'sd_orders'=> $sd_orders,'sw_order'=> $sw_order,'sw_orders'=> $sw_orders,'pd_order'=> $pd_order,'pd_orders'=> $pd_orders,'pw_order'=> $pw_order,'pw_orders'=> $pw_orders,'dgd_order'=> $dgd_order,'dgd_orders'=> $dgd_orders,'dgw_order'=> $dgw_order,'dgw_orders'=> $dgw_orders,'fd_order'=> $fd_order,'fd_orders'=> $fd_orders,'fw_order'=> $fw_order,'fw_orders'=> $fw_orders);
+			//$dropdowns->insert($fields, $conditions);
+
             if ($this->Quotes->save($quote)) {
                 
                 //$this->Quotes->Stockmetas->link($quote, $stocks);                
@@ -683,6 +714,7 @@ class QuotesController extends AppController
 
 
         $parts = TableRegistry::get('Parts');
+		$users_parts = TableRegistry::get('Users_parts');
         $dropdowns = TableRegistry::get('Dropdowns');
         $mcvaluesTable = TableRegistry::get('Mcvalues');
         $matrixTables = TableRegistry::get('Matrixtables');
@@ -691,7 +723,7 @@ class QuotesController extends AppController
 
 
 
-        $parts = $parts->find('all',['order' => 'display_order ASC',])->contain(['users_parts' => function ($q) {
+        $parts = $users_parts->find('all',['order' => 'display_order ASC',])->contain(['Parts' => function ($q) {
             $role = $this->Auth->user('role');
             if ($role == 'manufacturer') {
                 $userId = $this->Auth->user('id');
@@ -848,7 +880,26 @@ class QuotesController extends AppController
             //     }
             // }
                         
+			//pr($quote);
+			$dropdowns = TableRegistry::get('Dropdowns');
+			$connection = ConnectionManager::get('default');
+			$dropdownType = [];
+			$colorType = '';
+			if($quote->color4_color){
+				$colorType = 'Color 4';
+			}
+			$results = $connection->execute("SELECT name FROM dropdowns WHERE user_id = ".$this->Auth->user('id')." AND type = '".$colorType."'")->fetchAll('assoc');
+			foreach($results as $result){
+				$dropdownType[] = $result['name'];
+			}
 
+			if (!in_array($quote->color4_color, $dropdownType)){
+				$connection->insert('dropdowns', [
+				'name' => $quote->color4_color,
+				'type' => $colorType,
+				'user_id' => $this->Auth->user('id')]);
+			}
+			
             if ($this->Quotes->save($quote)) {
                 if ($isNew) {
                     //$this->Quotes->Stockmetas->link($quote, $stocks);
@@ -875,6 +926,7 @@ class QuotesController extends AppController
 
 
         $parts = TableRegistry::get('Parts');
+		$users_parts = TableRegistry::get('Users_parts');
         $dropdowns = TableRegistry::get('Dropdowns');
         $mcvaluesTable = TableRegistry::get('Mcvalues');
         $installations = TableRegistry::get('Installations');
@@ -882,7 +934,7 @@ class QuotesController extends AppController
 
         $installation = $installations->find('all')->where(['user_id' => $this->Auth->user('id')])->first();
 
-        $parts = $parts->find('all')->contain(['users_parts' => function ($q) {
+        $parts = $users_parts->find('all')->contain(['Parts' => function ($q) {
             $role = $this->Auth->user('role');
             if ($role == 'manufacturer') {
                 $userId = $this->Auth->user('id');
@@ -891,8 +943,8 @@ class QuotesController extends AppController
             }
             return $q->where(['user_id' => $userId]);
         }]);
-
-
+		
+		
         if ($this->Auth->user('role') == 'manufacturer') {
             $mcvalues = $mcvaluesTable->find('all')->where(['user_id' => $this->Auth->user('id')])->first();
             $matrixTables = $matrixTables->find('all',
@@ -1334,13 +1386,19 @@ class QuotesController extends AppController
          
         $quotes->where(['Quotes.user_id IN ' => $userIds]);
         
-        $quotes->andWhere(function ($exp) {
+        /*$quotes->andWhere(function ($exp) {
                 return $exp->or_([
                     'Quotes.status' => 'complete',
+					'Quotes.status' => 'in progress',
                     ]);
-                });
-         
-        $quotes->orWhere(['Quotes.status' => 'in progress']);
+                });*/
+        $quotes->andWhere([
+            'OR'=>[
+                ['Quotes.status' => 'complete'],
+                ['Quotes.status' => 'in progress']
+            ]
+        ]); 
+       // $quotes->orWhere(['Quotes.status' => 'in progress']);
         
                
         if (isset($this->request->query['month'])) {

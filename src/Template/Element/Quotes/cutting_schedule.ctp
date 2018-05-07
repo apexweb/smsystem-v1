@@ -94,10 +94,10 @@
             <th>Midrail</th>
             <th>Colour</th>
             <th>Frame</th>
-            <th>Qty cut</th>
+            <th class="width-50">Cut qty</th>
             <th></th>
             <th>Height</th>
-            <th>Qty cut</th>
+            <th class="width-50">Cut qty</th>
             <th></th>
             <th>Width</th>
             <th colspan="2" class="width-100">Lock type</th>

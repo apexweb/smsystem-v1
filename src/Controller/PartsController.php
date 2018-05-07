@@ -21,7 +21,7 @@ class PartsController extends AppController
         // You should not add the "login" action to allow list. Doing so would
         // cause problems with normal functioning of AuthComponent.
         if ($this->Auth->user()) {
-            $this->Auth->allow(['index', 'add', 'edit', 'delete', 'selectmf', 'all', 'factoryedit', 'factorydelete', 'uploadcsv']);
+            $this->Auth->allow(['index', 'add', 'edit', 'delete', 'selectmf', 'all', 'factoryedit', 'factorydelete', 'uploadcsv','custompartsdefine']);
         }
     }
 
@@ -85,16 +85,19 @@ class PartsController extends AppController
         }
 
         $mf = $this->request->query('mf');
-        $userparts = TableRegistry::get('users_parts');
-
+        $UserPart = TableRegistry::get('users_parts');
+		$userparts = TableRegistry::get('parts');
+		$id = $this->Auth->user('id');
+		$usersPartID = $UserPart->find('all')->where(['user_id' => $mf]);
         $parts = null;
         if ($role == 'supplier') {
-            $parts = $userparts->find('all')->where(['user_id' => $mf])->contain(['Parts'])->orderAsc('Parts.display_order');
-        } elseif ($role == 'manufacturer') {
-            $id = $this->Auth->user('id');
-            $parts = $userparts->find('all')->where(['user_id' => $id])->contain(['Parts'])->orderAsc('Parts.display_order');
+            $parts = $userparts->find('all')->contain(['users_parts'])->orderAsc('parts.display_order');
+		} elseif ($role == 'manufacturer') {
+            $parts = $UserPart->find('all')->where(['user_id' => $id])->contain(['Parts'])->orderAsc('Parts.display_order');
         }
         $parts->orderAsc('title');
+
+        $this->set(compact('parts', 'filterby'));
 
         $filterby = null;
         if (isset($this->request->query['filterby'])) {
@@ -126,7 +129,7 @@ class PartsController extends AppController
         }
 
 
-        $this->set(compact('parts', 'filterby', 'mf', 'search'));
+        $this->set(compact('parts', 'filterby', 'mf', 'search', 'usersPartID','role'));
     }
 
     /**
@@ -198,34 +201,48 @@ class PartsController extends AppController
     {
         $this->authorize(['supplier', 'manufacturer']);
         $role = $this->Auth->user('role');
-
         $userparts = TableRegistry::get('users_parts');
-        $part = $userparts->find('all')->where(['users_parts.id' => $id])->contain(['Parts'])->first();
-
-        if ($this->request->is(['post', 'put'])) {
-            $userparts->patchEntity($part, $this->request->data);
-            if ($userparts->save($part, ['associated' => false])) {
-                $this->Flash->success(__('Your part has been updated.'));
-                if ($role == 'supplier') {
-                    return $this->redirect(['action' => 'index', 'mf' => $part->user_id]);
-                }
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('Unable to update your part.'));
-        }
-
-        $this->set('part', $part);
+		$parts = TableRegistry::get('parts');
+        		
+		if($role == 'supplier'){
+			$part = $parts->find('all')->where(['id' => $id])->contain(['users_parts'])->first();
+			if ($this->request->is(['post', 'put'])) {
+				$parts->patchEntity($part, $this->request->data);
+				if ($parts->save($part)) {
+					$this->Flash->success(__('Your part has been updated.'));
+					if ($role == 'supplier') {
+						return $this->redirect(['action' => 'index', 'mf' => $part->user_id]);
+					}
+					return $this->redirect(['action' => 'index']);
+				}
+				$this->Flash->error(__('Unable to update your part.'));
+			}
+		}
+		if($role == 'manufacturer'){
+			//$part = $parts->find('all')->where(['id' => $id])->contain(['users_parts'])->first();
+            $part = $userparts->find('all')->where(['part_id' => $id])->contain(['Parts'])->first();
+			if ($this->request->is(['post', 'put'])) {
+				$userparts->patchEntity($part, $this->request->data);
+				if ($userparts->save($part)) {
+					$this->Flash->success(__('Your part has been updated.'));
+					if ($role == 'supplier') {
+						return $this->redirect(['action' => 'index', 'mf' => $part->user_id]);
+					}
+					return $this->redirect(['action' => 'index']);
+				}
+				$this->Flash->error(__('Unable to update your part.'));
+			}
+		}
+        //$this->set('part', $part);
+		$this->set(compact('part','role'),$part);
     }
 
 
     public function factoryedit($id = null)
     {
         $this->authorize(['supplier']);
-
         $part = $this->Parts->get($id);
-
         if ($this->request->is(['post', 'put'])) {
-
             $this->Parts->patchEntity($part, $this->request->data);
             if ($this->Parts->save($part)) {
                 $this->Flash->success(__('Your part has been updated.'));
@@ -250,19 +267,26 @@ class PartsController extends AppController
     {
         $this->authorize(['supplier', 'manufacturer']);
         $this->request->allowMethod(['post', 'delete']);
-        $role = $this->Auth->user('role');
+		$users_parts = TableRegistry::get('users_parts');
+		//$part = $users_parts->find('all')->where(['id' => $id]);
+        $part = $users_parts->get($id);
+        if ($users_parts->delete($part)) {
+            $this->Flash->success(__('The user part with id: {0} has been deleted.', h($id)));
+            return $this->redirect(['action' => 'all']);
+        }
 
-        $userparts = TableRegistry::get('users_parts');
-        $userpart = $userparts->get($id);
-        $userId = $userpart->user_id;
 
-        if ($userparts->delete($userpart)) {
+		/*$role = $this->Auth->user('role');
+		$partsTable = TableRegistry::get('parts');
+		$part = $partsTable->find('all')->where(['id' => $id])->contain(['users_parts'])->first();
+		
+        if ($partsTable->delete($part)) {
             $this->Flash->success(__('The part has been deleted.'));
             if ($role == 'supplier') {
-                return $this->redirect(['action' => 'index', 'mf' => $userId]);
+                return $this->redirect(['action' => 'index', 'mf' => '47']);
             }
             return $this->redirect(['action' => 'index']);
-        }
+        }*/
     }
 
 
@@ -270,19 +294,67 @@ class PartsController extends AppController
     {
         $this->authorize(['supplier']);
         $this->request->allowMethod(['post', 'delete']);
+		$role = $this->Auth->user('role');
+		$partsTable = TableRegistry::get('parts');
+		$part = $partsTable->find('all')->where(['id' => $id])->contain(['users_parts'])->first();
 
-        $part = $this->Parts->get($id);
-        if ($this->Parts->delete($part)) {
+		if ($partsTable->delete($part)) {
             $this->Flash->success(__('The part with id: {0} has been deleted.', h($id)));
             return $this->redirect(['action' => 'all']);
         }
+        /*$part = $this->Parts->get($id);
+        if ($this->Parts->delete($part)) {
+            $this->Flash->success(__('The part with id: {0} has been deleted.', h($id)));
+            return $this->redirect(['action' => 'all']);
+        }*/
 
     }
-
+	public function custompartsdefine()
+	{
+		$this->authorize(['supplier']);
+		$userparts = TableRegistry::get('parts');
+		$users_parts = TableRegistry::get('users_parts');
+		if ($this->request->is('post')) {
+			$parts = $userparts->find('all')->where(['id IN ' => $this->request->data['userParts']]);
+			$users = $users_parts->find('all')->where(['user_id' => $this->request->data['userID']]);
+			$partsIDs = [];
+			$usersID = [];
+			foreach($users as $usersIDs){
+				$usersID[] = $usersIDs->user_id;
+				$partsIDs[] = $usersIDs->part_id;
+			}
+			if(!empty($usersID)){
+				$users_parts->deleteAll(['user_id IN' => $usersID]);
+			}
+			$entities = [];
+			foreach ($parts as $part) {
+				$entity = $users_parts->newEntity();
+				$entity->buy_price_include_GST = $part->buy_price_include_GST;
+				$entity->unit = $part->unit;
+				$entity->size = $part->size;
+				$entity->mark_up = $part->mark_up;
+				$entity->marked_up = $part->marked_up;
+				$entity->price_per_unit = $part->price_per_unit;
+				$entity->user_id = $this->request->data['userID'];
+				$entity->part_id = $part->id;
+				$entity->description = $part->description;
+				$entity->show_in_additional_section_dropdown = $part->show_in_additional_section_dropdown;
+				$entity->show_in_additional_section_by_length_dropdown = $part->show_in_additional_section_by_length_dropdown;
+				$entity->show_in_accessories_dropdown = $part->show_in_accessories_dropdown;
+				$entity->master_calculator_value = $part->master_calculator_value;
+				$entity->display_order = $part->display_order;
+				$entities[] = $entity;
+			}
+			if (!$users_parts->saveMany($entities)) {
+				$this->Flash->error(__('MF Parts could not be updated, Please try again.'));
+			}
+			return $this->redirect(['action' => 'index', 'mf' => $this->request->data['userID']]);
+		}
+	}
     public function uploadcsv()
     {
         $this->authorize(['supplier']);
-
+		
         $parts = null;
         if ($this->request->is('post')) {
             if (!empty($this->request->data['file']['name'])) {
@@ -296,7 +368,7 @@ class PartsController extends AppController
                 }
 
                 if (is_array($parts)) {
-//                    die(debug($parts));
+					//die(debug($parts));
                     $entities = [];
                     foreach ($parts as $part) {
                         if (isset($part[1]) && !$this->strictEmpty($part[1])) {
@@ -333,7 +405,7 @@ class PartsController extends AppController
                         $this->Parts->deleteAll([]);
                     }
                     if ($this->Parts->saveMany($entities)) {
-                        $this->updateAllMfsParts($entities);
+                        //$this->updateAllMfsParts($entities);
                         $this->Flash->success(__('The CSV file has been successfully imported.'));
                         return $this->redirect(['action' => 'all']);
                     }

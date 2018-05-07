@@ -179,6 +179,7 @@ if(isset($fieldSettings->meta_value) && $fieldSettings->meta_value != '') {
                             }
                         }
                         ?>
+						<td></td>
                     </tr>
                     <?php
                 }
@@ -193,15 +194,17 @@ if(isset($fieldSettings->meta_value) && $fieldSettings->meta_value != '') {
                    // $sum_length += $additionalperlength->additional_per_length;
                 ?>
                     <tr>
+					
                         <?php
                         if(isset($selected_fields['settings']['additional_per_length']['value']) && !empty($selected_fields['settings']['additional_per_length']['value'])){
                             foreach($selected_fields['settings']['additional_per_length']['value'] as $name => $val) {
                                 if($val == 1){ ?>
-                                    <td><?= $additionalperlength->$name ?></td>
+                                    <td style="width:100%;"><?= $additionalperlength->$name ?></td>
                         <?php   }
                             }
                         }
                         ?>
+					<td></td>
                     </tr>
                 <?php
                 }

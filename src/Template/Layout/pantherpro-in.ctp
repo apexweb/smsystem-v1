@@ -17,8 +17,6 @@ $cakeDescription = 'SMS Screen Management System';
 $role = $authUser['role'];
 
 ?>
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -342,7 +340,17 @@ span.profile-name{padding-right:5px;right:0 !important;}
 <?= $this->element('Layout/jsfiles') ?>
 
 <?= $this->fetch('script') ?>
-
+<script src="https://cdn.ckeditor.com/4.9.1/standard-all/ckeditor.js"></script>
+<script>
+	CKEDITOR.replace( 'editor1', {
+		extraPlugins: 'colordialog,tableresize',
+		height: 470
+	} );
+	jQuery('.termDefult').click(function(){
+		var termDefult = jQuery('.term_Defult').val();		
+        CKEDITOR.instances['editor1'].setData(termDefult);		
+	});
+</script>
 
 </body>
 </html>

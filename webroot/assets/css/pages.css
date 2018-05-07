@@ -1801,3 +1801,13 @@ button.confirm {
 .signup-signin-page {
   width: auto;
 }
+.termDefult{cursor:pointer;padding: 3px;background:  lightblue;width:  auto;float:  right;position: relative;border-radius: 3px;clear:  both;}
+.termsTable table tr td {border:0px solid !important;}
+.customSort{
+	background-image: url("../images/sort.png");
+    background-repeat: no-repeat, repeat;
+    float:right;width:15px;height:15px;
+	background-size: 85%;
+}
+table#datatable th {cursor:pointer;}
+table.table-bordered th:last-child, table.table-bordered td:last-child{border-right-width:1px !important;}

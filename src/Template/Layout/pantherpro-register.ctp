@@ -15,8 +15,6 @@
 
 $cakeDescription = 'SMS Screen Management System';
 ?>
-
-
 <!DOCTYPE html>
 <html>
 <head>

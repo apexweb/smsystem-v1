@@ -31,7 +31,8 @@
                 <div class="col-md-4 col-md-offset-1 col-sm-offset-0 font-13">
                     <table class="table table-responsive">
                         <tr><td><h3>Bill To:</h3></td></tr>
-                        <tr><td><?= $user->business_name ?></td></tr>            
+                        <tr><td><?= $user->business_name ?></td></tr>   
+						<tr><td><?= $user->business_address ?></td></tr>  
                     </table>
                 </div>
             </td>
@@ -41,7 +42,7 @@
                     <table class="table table-responsive invoice-table table-bordered">
                         <tr><td><h3>Tax Invoice:</h3></td></tr>
                         <tr>
-                            <td>Date: <?= h(date('m/d/Y'));?>
+                            <td>Date: <?= h(date('d/m/Y'));?>
                                 <br/>
                                 Invoice #: <?= h(str_pad($invoice_no,5,"0",STR_PAD_LEFT));?>   
                             </td></tr>
@@ -167,12 +168,24 @@
             <tr><td>
                 <address>
                 <strong>Name: Apex Web Design Pty Ltd.</strong><br>
-                Bank: Bank of Queensland<br>
+				Bank: Bank of Queensland<br>
                 BSB: 124-001<br>
                 Acc No. 22267993                
               </address>               
         </td></tr>            
         </table>
+		<!-- <table class="table table-responsive invoice-table table-bordered">
+            <tr>
+				<td><h3>Address</h3></td>
+			</tr>
+            <tr>
+				<td>
+					<address>
+					<?= $user->business_address ?>               
+				  </address>               
+				</td>
+			</tr>            
+        </table> -->
     </div>  
 
 </div>

@@ -75,10 +75,10 @@
         <thead>
         <tr>
 
-            <th>Title</th>
-            <th>Code</th>
-            <th>Part No.</th>
-            <th>Supplier</th>
+            <th id="sortTitle">Title <div class="customSort"></div></th>
+            <th id="sortCode">Code <div class="customSort"></div></th>
+            <th id="sortPart">Part No. <div class="customSort"></div></th>
+            <th id="sortSupplier">Supplier <div class="customSort"></div></th>
             <th>Buy price include GST</th>
             <th>Unit</th>
             <th>Size</th>

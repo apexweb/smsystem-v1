@@ -304,3 +304,24 @@ var wow = new WOW(
 );
 wow.init();
 
+
+jQuery(document).ready(function(){
+	jQuery(".terms_table table").addClass('table table-responsive table-bordered quote-printout small-padding');
+	jQuery(".terms_table table").css( 'width', '100%' );
+	jQuery(".terms_table table tr td").css( 'width', '0%' );
+
+	$('th#sortTitle,th#sortCode,th#sortPart,th#sortSupplier').click(function(){
+		var table = $(this).parents('table').eq(0)
+		var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).index()))
+		this.asc = !this.asc
+		if (!this.asc){rows = rows.reverse()}
+		for (var i = 0; i < rows.length; i++){table.append(rows[i])}
+	});
+});
+function comparer(index) {
+    return function(a, b) {
+        var valA = getCellValue(a, index), valB = getCellValue(b, index)
+        return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+    }
+}
+function getCellValue(row, index){ return $(row).children('td').eq(index).text() }

@@ -163,9 +163,7 @@ class Calculator_pm
     {
         foreach ($this->quote['products'] as $product) {
             $this->calculateProduct($product);
-			pr($product);
         }
-	die('123');
         foreach ($this->quote['additionalpermeters'] as $additionalpermeter) {
             $this->calculateAdditionalM($additionalpermeter);
         }
@@ -222,6 +220,10 @@ class Calculator_pm
         $emergencyWindow = $product->product_emergency_window;
         $incMidrail = $product->product_inc_midrail;
 
+		$lockCount = $product->product_lock_qty;
+
+		$productColour = $product->product_colour;
+
         $isSecDoor = false;
         $isSecWindow = false;
         $isDgDoor = false;
@@ -271,7 +273,7 @@ class Calculator_pm
         $hasPvc = false;
         $hasPerfSheetFixing = false;
 
-
+		
         if ($isSecDoor) {
             $heightMesh = $height - $this->securityDoorMesh;
             $widthMesh = $width - $this->securityDoorMesh;
@@ -369,13 +371,12 @@ class Calculator_pm
             $hasPerfSheetFixing = true;
             $markup = $this->pwMarkup;
         }
-
+		
         $sqm = number_format(($heightMesh * $widthMesh / 1000000), 3, '.', '');
         $sqmCalculated = number_format(($sqm * $sqmPart), 2, '.', '');
-         
+        //echo $frame .'<br>'. $cnrStake;
         $frameCalculated = ($frame * $productLmtr);
         $cnrstakeCalculated = ($cnrStake * 4);
-
 
         $lSeatCalculated = 0;
         $pvcCalculated = 0;
@@ -391,13 +392,13 @@ class Calculator_pm
             $splineCalculated = ($this->spline * $productLmtr);
             $this->fillStocks($this->spline, 'component');
         }
-
+		
         if ($hasInsectMesh) {
-            if ($ssgalpet == 'Insect') {
-                $insectMeshCalculated = ($sqm * $this->insectMesh);
+            if ($ssgalpet == 'Fibre') {
+                $insectMeshCalculated = (number_format($sqm, 2, '.', '') * $this->insectMesh);
                 $this->fillStocks($this->insectMesh, 'component');
             } else {
-                $insectMeshCalculated = ($sqm * $this->petMesh);
+                $insectMeshCalculated = (number_format($sqm, 2, '.', '') * $this->petMesh);
                 $this->fillStocks($this->petMesh, 'component');
             }
         }
@@ -445,20 +446,92 @@ class Calculator_pm
             $pwdCoatSpec4 = ($this->spec4 * $pwdCoat);
         }
 
+		$customColor = 0;
+        $premiumColor = 0;
+        $anodizedColor = 0;
+        $specialColor = 0;
+		
+		if ($productColour) {
+			$checkPipeline = preg_match("/\|/", $productColour);
+			if($checkPipeline == 0){
 
+			}else{
+				list($colourGroup, $pColour) = explode('|', $productColour);
+				
+				if ($winDoor == 'Door') {
+					if ($colourGroup == 'Custom Colour') {
+						$customColor = ($qty * $this->custom_color_door);
+					}
+					if ($colourGroup == 'Anodized') {
+						$anodizedColor = ($qty * $this->anodized_color_door);
+					}
+					if ($colourGroup == 'Premium Colour') {
+						$premiumColor = ($qty * $this->pr_color_door);
+					}
+					if ($colourGroup == 'Special Colour') {
+						$specialColor = ($qty * $this->special_color_door);
+					}                    
+				} else if ($winDoor == 'Window') {
+					if ($colourGroup == 'Custom Colour') {
+						$customColor = ($qty * $this->custom_color_win);
+					}
+					if ($colourGroup == 'Anodized') {
+						$anodizedColor = ($qty * $this->anodized_color_win);
+					}
+					if ($colourGroup == 'Premium Colour') {
+						$premiumColor = ($qty * $this->pr_color_win);
+					}
+					if ($colourGroup == 'Special Colour') {
+						echo $specialColor = ($qty * $this->special_color_win).' hhhh <br>';
+					} 
+				}  
+			}
+		
+		} else {
+			//*** Calculates Powder Coats ****
+			if ($winDoor == 'Door') {
+				
+				if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
+					$customColor = ($qty * $this->custom_color_door);
+				}
+				if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
+					$premiumColor = ($qty * $this->pr_color_door);
+				}
+				if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
+					$anodizedColor = ($qty * $this->anodized_color_door);
+				}
+				if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
+					$specialColor = ($qty * $this->special_color_door);
+				}
+			} else if ($winDoor == 'Window') { 
+				
+				if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
+					$customColor = ($qty * $this->custom_color_win);
+				}
+				if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
+					$premiumColor = ($qty * $this->pr_color_win);
+				}
+				if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
+					$anodizedColor = ($qty * $this->anodized_color_win);
+				}
+				if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
+					$specialColor = ($qty * $this->special_color_win);
+				}
+			}
+		}
         // Sum of All "Calculated" Values:
         $materialCost = 0.00;
 
         if ($secDigFibr && $winDoor) {
-            $materialCost = $sqmCalculated + $frameCalculated + $perfSheetFixingCalculated + $insectMeshCalculated
+            $materialCost = $sqmCalculated + $frameCalculated + $perfSheetFixingCalculated + number_format($insectMeshCalculated, 2, '.', '')
                 + $cnrstakeCalculated + $lSeatCalculated + $pvcCalculated
                 + $pwdCoatSpec1 + $pwdCoatSpec2 + $pwdCoatSpec3 + $pwdCoatSpec4
                 + $splineCalculated + $this->freightConsumables + $hingedCalculated;
         }
 
         $labourIncCutting = ($hrlyRate / 60) * $cleanUp;
-
-        $totalCost = ($materialCost + $labourIncCutting);
+		
+        $totalCost = ($materialCost + $labourIncCutting + $customColor + $premiumColor + $anodizedColor + $specialColor);
 
         $increasedTotalCost = ($totalCost * ($markup + 100)) / 100;
 
@@ -959,6 +1032,7 @@ class Calculator_pm
     private function setValues()
     {
         $parts = TableRegistry::get('Parts');
+		$userParts = TableRegistry::get('Users_parts');
         $mcvaluesTable = TableRegistry::get('Mcvalues');
         $installations = TableRegistry::get('Installations');
         $matrixTables = TableRegistry::get('Matrixtables');
@@ -989,7 +1063,7 @@ class Calculator_pm
 
         $this->userInstallations = $installations->find('all')->where(['user_id' => $this->auth->user('id')])->first();
 
-        $parts = $parts->find('all')->contain(['users_parts' => function ($q) {
+        $parts = $userParts->find('all')->contain(['Parts' => function ($q) {
             $role = $this->auth->user('role');
             if ($role == 'manufacturer') {
                 $userId = $this->auth->user('id');
@@ -1135,7 +1209,7 @@ class Calculator_pm
         $this->dgDoorCnrStake			= $this->getPartPrice('DGDRCRNSTK'); 
         $this->dgWindowPart				= $this->getPartPrice('7MMDG'); 
         $this->dgWindowFrame			= $this->getPartPrice('DGWNFRM9'); 
-        $this->dgWindowCnrStake			= $this->getPartPrice('DGWNFRM9');
+        $this->dgWindowCnrStake			= $this->getPartPrice('DGWNCRNSTK9');
         
         $this->fibrDoorPartPetMesh		= $this->getPartPrice('INSPETMSH');
         $this->fibrDoorPartMesh			= $this->getPartPrice('INSMSH');
@@ -1193,7 +1267,7 @@ class Calculator_pm
 
 	function getPartPrice($key = null){
 		$pm_price = Configure::read('PM_DEFAULT_PRICE');
-        if(isset($this->mc_partsArray[$key]['price'])){
+		if(isset($this->mc_partsArray[$key]['price'])){
 			return $this->mc_partsArray[$key]['price'];
 		}else if(isset($pm_price[$key])){
 			return Configure::read('PM_DEFAULT_PRICE.'.$key);           
@@ -1206,34 +1280,34 @@ class Calculator_pm
     private function initializeParts($parts)
     {
         foreach ($parts as $part) {
-            $id = $part->id;
-            $title = $part->title;
-            $price = (isset($part->users_parts[0]->price_per_unit))?$part->users_parts[0]->price_per_unit:$part->price_per_unit;
-            $part_code = trim($part->part_code);
-            $part_number = $part->part_number;
+            $id = $part->part->id;
+            $title = $part->part->title;
+            $price = (isset($part->price_per_unit))?$part->price_per_unit:$part->part->price_per_unit;
+            $part_code = trim($part->part->part_code);
+            $part_number = $part->part->part_number;
             
-            if (isset($part->users_parts[0]->show_in_additional_section_dropdown)) {
+            if (isset($part->show_in_additional_section_dropdown)) {
                 $this->additionals_m[$title] = $price;
-            } else if ($part->show_in_additional_section_by_length_dropdown) {
+            } else if ($part->part->show_in_additional_section_by_length_dropdown) {
                 $this->additionals_l[$title] = $price;
             }
                                    
-            if (isset($part->users_parts[0]->show_in_additional_section_by_length_dropdown)) {
+            if (isset($part->show_in_additional_section_by_length_dropdown)) {
                 $this->additionals_l[$title] = $price;
-            } else if ($part->show_in_additional_section_by_length_dropdown) {
+            } else if ($part->part->show_in_additional_section_by_length_dropdown) {
                 $this->additionals_l[$title] = $price;
             }
             
-            if (isset($part->users_parts[0]->show_in_accessories_dropdown)) {
+            if (isset($part->show_in_accessories_dropdown)) {
                 $this->accessories[$title] = $price;
-            } else if ($part->show_in_accessories_dropdown) {
+            } else if ($part->part->show_in_accessories_dropdown) {
                 $this->accessories[$title] = $price;
             }
             
-            if (isset($part->users_parts[0]->master_calculator_value)) {
+            if (isset($part->master_calculator_value)) {
                 $this->mc_parts[$id] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
                 $this->mc_partsArray[$part_code] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
-            } else if ($part->master_calculator_value) {
+            } else if ($part->part->master_calculator_value) {
                 $this->mc_parts[$id] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
                 $this->mc_partsArray[$part_code] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
             }

@@ -231,6 +231,8 @@ class Calculator_hybrid
         $emergencyWindow = $product->product_emergency_window;
         $incMidrail = $product->product_inc_midrail;
 
+		$productColour = $product->product_colour;
+
 
         $isSecDoor = false;
         $isSecWindow = false;
@@ -401,8 +403,16 @@ class Calculator_hybrid
             $splineCalculated = ($this->spline * $productLmtr);
             $this->fillStocks($this->spline, 'component');
         }
-
-        if ($hasInsectMesh) {
+		if ($hasInsectMesh) {
+            if ($ssgalpet == 'Fibre') {
+                $insectMeshCalculated = (number_format($sqm, 2, '.', '') * $this->insectMesh);
+                $this->fillStocks($this->insectMesh, 'component');
+            } else {
+                $insectMeshCalculated = (number_format($sqm, 2, '.', '') * $this->petMesh);
+                $this->fillStocks($this->petMesh, 'component');
+            }
+        }
+        /*if ($hasInsectMesh) {
             if ($ssgalpet == 'Insect') {
                 $insectMeshCalculated = ($sqm * $this->insectMesh);
                 $this->fillStocks($this->insectMesh, 'component');
@@ -410,7 +420,7 @@ class Calculator_hybrid
                 $insectMeshCalculated = ($sqm * $this->petMesh);
                 $this->fillStocks($this->petMesh, 'component');
             }
-        }
+        }*/
 
         if ($hasPvc) {
             $lSeatCalculated = ($this->PVCLSeat * $productLmtr);
@@ -463,9 +473,93 @@ class Calculator_hybrid
             $materialCost = $sqmCalculated + $frameCalculated + $perfSheetFixingCalculated + $insectMeshCalculated + $cnrstakeCalculated + $lSeatCalculated + $pvcCalculated + $pwdCoatSpec1 + $pwdCoatSpec2 + $pwdCoatSpec3 + $pwdCoatSpec4 + $splineCalculated + $this->freightConsumables + $hingedCalculated;
         }
 		
+		$customColor = 0;
+        $premiumColor = 0;
+        $anodizedColor = 0;
+        $specialColor = 0;
+		
+		if ($productColour) {
+			$checkPipeline = preg_match("/\|/", $productColour);
+			if($checkPipeline == 0){
+
+			}else{
+				list($colourGroup, $pColour) = explode('|', $productColour);
+				
+				if ($winDoor == 'Door') {
+					if ($colourGroup == 'Custom Colour') {
+						$customColor = ($qty * $this->custom_color_door);
+					}
+					if ($colourGroup == 'Anodized') {
+						$anodizedColor = ($qty * $this->anodized_color_door);
+					}
+					if ($colourGroup == 'Premium Colour') {
+						$premiumColor = ($qty * $this->pr_color_door);
+					}
+					if ($colourGroup == 'Special Colour') {
+						$specialColor = ($qty * $this->special_color_door);
+					}                    
+				} else if ($winDoor == 'Window') {
+					if ($colourGroup == 'Custom Colour') {
+						$customColor = ($qty * $this->custom_color_win);
+					}
+					if ($colourGroup == 'Anodized') {
+						$anodizedColor = ($qty * $this->anodized_color_win);
+					}
+					if ($colourGroup == 'Premium Colour') {
+						$premiumColor = ($qty * $this->pr_color_win);
+					}
+					if ($colourGroup == 'Special Colour') {
+						$specialColor = ($qty * $this->special_color_win);
+					} 
+				} 
+			}
+		
+		} else {
+			//*** Calculates Powder Coats ****
+			if ($winDoor == 'Door') {
+				
+				if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
+					$customColor = ($qty * $this->custom_color_door);
+				}
+				if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
+					$premiumColor = ($qty * $this->pr_color_door);
+				}
+				if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
+					$anodizedColor = ($qty * $this->anodized_color_door);
+				}
+				if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
+					$specialColor = ($qty * $this->special_color_door);
+				}
+			} else if ($winDoor == 'Window') { 
+				
+				if (!empty($this->quote['color1_color']) && $this->quote['color1']) {
+					$customColor = ($qty * $this->custom_color_win);
+				}
+				if (!empty($this->quote['color2_color']) && $this->quote['color2']) {
+					$premiumColor = ($qty * $this->pr_color_win);
+				}
+				if (!empty($this->quote['color3_color']) && $this->quote['color3']) {
+					$anodizedColor = ($qty * $this->anodized_color_win);
+				}
+				if (!empty($this->quote['color4_color']) && $this->quote['color4']) {
+					$specialColor = ($qty * $this->special_color_win);
+				}
+			}
+		}
+       
+
+        $petMeshMarkup = 0;
+        if (($secDigFibr == 'Insect' || $secDigFibr == 'D/Grille') && $infill == 'Pet Mesh') {
+            if ($winDoor == 'Door') {
+                $petMeshMarkup = $this->dgInsDoorPetMarkup;
+            } else if ($winDoor == 'Window') {
+                $petMeshMarkup = $this->dgInsWinPetMarkup;
+            }
+        }
+
         $labourIncCutting = ($hrlyRate / 60) * $cleanUp;
 
-        $totalCost = ($materialCost + $labourIncCutting);
+        $totalCost = ($materialCost + $labourIncCutting + $customColor + $premiumColor + $anodizedColor + $specialColor);
 		
         $increasedTotalCost = ($totalCost * ($markup + 100)) / 100;
 
@@ -1049,6 +1143,7 @@ class Calculator_hybrid
     private function setValues()
     {
         $parts = TableRegistry::get('Parts');
+		$userParts = TableRegistry::get('Users_parts');
         $mcvaluesTable = TableRegistry::get('Mcvalues');
         $installations = TableRegistry::get('Installations');
         $matrixTables = TableRegistry::get('Matrixtables');
@@ -1077,7 +1172,7 @@ class Calculator_hybrid
 
         $this->userInstallations = $installations->find('all')->where(['user_id' => $this->auth->user('id')])->first();
 
-        $parts = $parts->find('all')->contain(['users_parts' => function ($q) {
+        $parts = $userParts->find('all')->contain(['Parts' => function ($q) {
             $role = $this->auth->user('role');
             if ($role == 'manufacturer') {
                 $userId = $this->auth->user('id');
@@ -1222,7 +1317,7 @@ class Calculator_hybrid
         $this->dgDoorCnrStake			= $this->getPartPrice('DGDRCRNSTK'); 
         $this->dgWindowPart				= $this->getPartPrice('7MMDG'); 
         $this->dgWindowFrame			= $this->getPartPrice('DGWNFRM9'); 
-        $this->dgWindowCnrStake			= $this->getPartPrice('DGWNFRM9');
+        $this->dgWindowCnrStake			= $this->getPartPrice('DGWNCRNSTK9');
         
         $this->fibrDoorPartPetMesh		= $this->getPartPrice('INSPETMSH');
         $this->fibrDoorPartMesh			= $this->getPartPrice('INSMSH');
@@ -1297,27 +1392,27 @@ class Calculator_hybrid
     private function initializeParts($parts)
     {
         foreach ($parts as $part) {
-            $id = $part->id;
-            $title = $part->title;
-            $price = $part->users_parts[0]->price_per_unit;
-			$part_code = trim($part->part_code);
-            $part_number = $part->part_number;
+            $id = $part->part->id;
+            $title = $part->part->title;
+            $price = $part->price_per_unit;
+			$part_code = trim($part->part->part_code);
+            $part_number = $part->part->part_number;
             
-            if ($part->users_parts[0]->show_in_additional_section_dropdown) {
+            if ($part->show_in_additional_section_dropdown) {
                 $this->additionals_m[$title] = $price;
-            } else if ($part->show_in_additional_section_by_length_dropdown) {
+            } else if ($part->part->show_in_additional_section_by_length_dropdown) {
                 $this->additionals_l[$title] = $price;
             }
                                    
-            if ($part->users_parts[0]->show_in_additional_section_by_length_dropdown) {
+            if ($part->show_in_additional_section_by_length_dropdown) {
                 $this->additionals_l[$title] = $price;
-            } else if ($part->show_in_additional_section_by_length_dropdown) {
+            } else if ($part->part->show_in_additional_section_by_length_dropdown) {
                 $this->additionals_l[$title] = $price;
             }
             
-            if ($part->users_parts[0]->show_in_accessories_dropdown) {
+            if ($part->show_in_accessories_dropdown) {
                 $this->accessories[$title] = $price;
-            } else if ($part->show_in_accessories_dropdown) {
+            } else if ($part->part->show_in_accessories_dropdown) {
                 $this->accessories[$title] = $price;
             }
             
@@ -1327,10 +1422,10 @@ class Calculator_hybrid
                 $this->mc_parts[$id] = ['title' => $title, 'price' => $price];
             }*/
 
-			if (isset($part->users_parts[0]->master_calculator_value)) {
+			if (isset($part->master_calculator_value)) {
                 $this->mc_parts[$id] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
                 $this->mc_partsArray[$part_code] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
-            } else if ($part->master_calculator_value) {
+            } else if ($part->part->master_calculator_value) {
                 $this->mc_parts[$id] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
                 $this->mc_partsArray[$part_code] = ['title' => $title, 'price' => $price, 'part_number' => $part_number, 'part-code' => $part_code];
             }

@@ -474,6 +474,13 @@ $(document).ready(function () {
     initializeRole();
     initializeMatrixTables();
 
+	/* Numeric*/
+	(function(b){var c={allowFloat:false,allowNegative:false};b.fn.numericInput=function(e){var f=b.extend({},c,e);var d=f.allowFloat;var g=f.allowNegative;this.keypress(function(j){var i=j.which;var h=b(this).val();if(i>0&&(i<48||i>57)){if(d==true&&i==46){if(g==true&&a(this)==0&&h.charAt(0)=="-"){return false}if(h.match(/[.]/)){return false}}else{if(g==true&&i==45){if(h.charAt(0)=="-"){return false}if(a(this)!=0){return false}}else{if(i==8){return true}else{return false}}}}else{if(i>0&&(i>=48&&i<=57)){if(g==true&&h.charAt(0)=="-"&&a(this)==0){return false}}}});return this};function a(d){if(d.selectionStart){return d.selectionStart}else{if(document.selection){d.focus();var f=document.selection.createRange();if(f==null){return 0}var e=d.createTextRange(),g=e.duplicate();e.moveToBookmark(f.getBookmark());g.setEndPoint("EndToStart",e);return g.text.length}}return 0}}(jQuery));
+
+	$(function() {
+	   $(".order_sd").numericInput({ allowFloat: true, allowNegative: true });
+	});
+	/* End Numeric*/
 
      $('input[name="installation_type"]').on('change', function () {
         var value = $(this).val();
@@ -538,7 +545,7 @@ $(document).ready(function () {
         var row = $('.cutsheets-table tr:eq(2)').html();
         var numberOfTds = $('.cutsheets-table tr:eq(2) td').length;
 
-        for (var i = 0; i < numberOfTds; i++) {
+        for (var i = 0; i < 10; i++) {
             row = row.replace('cutsheets[0]', 'cutsheets[' + (cutsheetsCount + 1) + ']');
             row = row.replace('cutsheets-0', 'cutsheets-' + (cutsheetsCount + 1));
         }
@@ -1308,16 +1315,23 @@ $(document).ready(function () {
 
 
         var price = 0;
+		var lastWidth = 0;
+		var lastHeight = 0;
         var filteredArray = [];
         if (matrixArr) {
             filteredArray = matrixArr.filter(function (item) {
+				lastWidth = item.width;
+				lastHeight = item.height;
                 return width <= item.width && height <= item.height;
             });
             if (filteredArray.length > 0) {
                 price = Number(filteredArray[0]['price']);
             }
         }
-
+		if((width > lastWidth && height > lastHeight) || (width > lastWidth && height <= lastHeight) || (width <= lastWidth && height > lastHeight)){
+			var window_greater_size = $('[name="window_greater_size"]').val();
+			price = Number(window_greater_size).toFixed(2);
+		}
         price = Number(price) * Number(qty);
 
 
@@ -1668,7 +1682,58 @@ $(document).ready(function () {
             additionalRow.find('.additional-input-colour').attr('name', input_name.replace('colour', 'col_our'));            
         }
     });
-    
+    $('body').on('change', '.product-custom-color', function () {
+        //var selected = $('option:selected', this).attr('class');
+        //var optionText = $('.editable').text();    
+        var additionalRow = $(this).parents('tr');
+        var name = additionalRow.find('.additional-selected-colour').val();
+        var select_name = additionalRow.find('.additional-selected-colour').attr('name');
+        var input_name = additionalRow.find('.additional-input-coloured').attr('name');
+        if (name) {
+            if(name == 'Other'){
+                additionalRow.find('.additional-input-coloured').show();
+                additionalRow.find('.additional-input-coloured').focus();
+                additionalRow.find('.additional-selected-colour').attr('name', select_name.replace('product_colour', 'col_ours'));
+                additionalRow.find('.additional-input-coloured').attr('name', input_name.replace('col_ours', 'product_colour'));
+                
+            }else{
+                additionalRow.find('.additional-input-coloured').hide();
+                additionalRow.find('.additional-selected-colour').attr('name', select_name.replace('col_ours', 'product_colour')); 
+                additionalRow.find('.additional-input-coloured').attr('name', input_name.replace('product_colour', 'col_ours'));
+            }
+        }else{
+            additionalRow.find('.additional-input-coloured').hide(); 
+            additionalRow.find('.additional-selected-colour').attr('name', select_name.replace('col_ours', 'product_colour'));
+            additionalRow.find('.additional-input-coloured').attr('name', input_name.replace('product_colour', 'col_ours'));            
+        }
+    });
+	$('body').on('change', '.special-custom-color', function () {
+		//var selected = $('option:selected', this).attr('class');
+        //var optionText = $('.editable').text();    
+        //var additionalRow = $(this).parents('div');
+        var name = $(this).parents('div').find('.special-selected-colour').val();
+        var select_name = $(this).parents('div').find('.special-selected-colour').attr('name');
+        var input_name = $(this).parents('div').find('.special-input-coloured').attr('name');
+
+		if (name) {
+            if(name == 'Other'){
+                $(this).parents('div').find('.special-input-coloured').show();
+                $(this).parents('div').find('.special-input-coloured').focus();
+                $(this).parents('div').find('.special-selected-colour').attr('name', select_name.replace('color4_color', 'col4_ours'));
+                $(this).parents('div').find('.special-input-coloured').attr('name', input_name.replace('col4_ours', 'color4_color'));
+                
+            }else{
+                $(this).parents('div').find('.special-input-coloured').hide();
+                $(this).parents('div').find('.special-selected-colour').attr('name', select_name.replace('col4_ours', 'color4_color')); 
+                $(this).parents('div').find('.special-input-coloured').attr('name', input_name.replace('color4_color', 'col4_ours'));
+            }
+        }else{
+            $(this).parents('div').find('.special-input-coloured').hide(); 
+            $(this).parents('div').find('.special-selected-colour').attr('name', select_name.replace('col4_ours', 'color4_color'));
+            $(this).parents('div').find('.special-input-coloured').attr('name', input_name.replace('color4_color', 'col4_ours'));            
+        }
+        
+    });
     $('body').on('change', '.additional-per-length', function () {
         var additionalRow = $(this).parents('tr');
         var name = additionalRow.find('.additional-name').val();

@@ -101,23 +101,24 @@
             'secdigfibr' => 'Perforated Aluminium',
             'windoor' => 'Door',
             'sqmpart' => ['label' => isset($mc_parts['PERFMESH']['title'])?$mc_parts['PERFMESH']['title']:'', 'price' => isset($mc_parts['PERFMESH']['price'])?$mc_parts['PERFMESH']['price']:'', 'color' => ''],
-            'frame' => ['label' => isset($mc_parts['SECDRFRM']['title'])?$mc_parts['SECDRFRM']['title']:'', 'price' => isset($mc_parts['SECDRFRM']['price'])?$mc_parts['SECDRFRM']['price']:'', 'color' => ''],
-            'crnstake' => ['label' => isset($mc_parts['SECDRCRNSTK']['title'])?$mc_parts['SECDRCRNSTK']['title']:'', 'price' => isset($mc_parts['SECDRCRNSTK']['price'])?$mc_parts['SECDRCRNSTK']['price']:'', 'color' => '']                    
+            'frame' => ['label' => isset($mc_parts['SECDRFRM']['title'])?$mc_parts['SECDRFRM']['title']:'', 'price' => isset($mc_parts['SECDRFRM']['price'])?$mc_parts['SECDRFRM']['price']:'5.37', 'color' => ''],
+            'crnstake' => ['label' => isset($mc_parts['SECDRCRNSTK']['title'])?$mc_parts['SECDRCRNSTK']['title']:'', 'price' => isset($mc_parts['SECDRCRNSTK']['price'])?$mc_parts['SECDRCRNSTK']['price']:'0.69', 'color' => '']                    
         ];
+    
     
     $perfWindow = [
             'secdigfibr' => 'Perforated Aluminium',
             'windoor' => 'Windows',
             'sqmpart' => ['label' => isset($mc_parts['PERFMESH']['title'])?$mc_parts['PERFMESH']['title']:'', 'price' => isset($mc_parts['PERFMESH']['price'])?$mc_parts['PERFMESH']['price']:'', 'color' => ''],
             'frame' => [
-                    'default' => ['label' => isset($mc_parts['SECWNFRM9']['title'])?$mc_parts['SECWNFRM9']['title']:'', 'price' => isset($mc_parts['SECWNFRM9']['price'])?$mc_parts['SECWNFRM9']['price']:'', 'color' => ''],
-                    'mm9' => ['label' => isset($mc_parts['SECWNFRM9']['title'])?$mc_parts['SECWNFRM9']['title']:'', 'price' => isset($mc_parts['SECWNFRM9']['price'])?$mc_parts['SECWNFRM9']['price']:'', 'color' => ''],
-                    'mm11' => ['label' => isset($mc_parts['SECWNFRM11']['title'])?$mc_parts['SECWNFRM11']['title']:'', 'price' => isset($mc_parts['SECWNFRM11']['price'])?$mc_parts['SECWNFRM11']['price']:'', 'color' => ''],
+                    'default' => ['label' => isset($mc_parts['SECWNFRM9']['title'])?$mc_parts['SECWNFRM9']['title']:'', 'price' => isset($mc_parts['SECWNFRM9']['price'])?$mc_parts['SECWNFRM9']['price']:'2.93', 'color' => ''],
+                    'mm9' => ['label' => isset($mc_parts['SECWNFRM9']['title'])?$mc_parts['SECWNFRM9']['title']:'', 'price' => isset($mc_parts['SECWNFRM9']['price'])?$mc_parts['SECWNFRM9']['price']:'2.93', 'color' => ''],
+                    'mm11' => ['label' => isset($mc_parts['SECWNFRM11']['title'])?$mc_parts['SECWNFRM11']['title']:'', 'price' => isset($mc_parts['SECWNFRM11']['price'])?$mc_parts['SECWNFRM11']['price']:'2.93', 'color' => ''],
                     ],
             'crnstake' => [
-                    'default' => ['label' => isset($mc_parts['SECWNCRNSTK9']['title'])?$mc_parts['SECWNCRNSTK9']['title']:'', 'price' => isset($mc_parts['SECWNCRNSTK9']['price'])?$mc_parts['SECWNCRNSTK9']['price']:'', 'color' => ''],
-                    'mm9' => ['label' => isset($mc_parts['SECWNCRNSTK9']['title'])?$mc_parts['SECWNCRNSTK9']['title']:'', 'price' => isset($mc_parts['SECWNCRNSTK9']['price'])?$mc_parts['SECWNCRNSTK9']['price']:'', 'color' => ''],
-                    'mm11' => ['label' => isset($mc_parts['SECWNCRNSTK11']['title'])?$mc_parts['SECWNCRNSTK11']['title']:'', 'price' => isset($mc_parts['SECWNCRNSTK11']['price'])?$mc_parts['SECWNCRNSTK11']['price']:'', 'color' => ''],
+                    'default' => ['label' => isset($mc_parts['SECWNCRNSTK9']['title'])?$mc_parts['SECWNCRNSTK9']['title']:'', 'price' => isset($mc_parts['SECWNCRNSTK9']['price'])?$mc_parts['SECWNCRNSTK9']['price']:'0.51', 'color' => ''],
+                    'mm9' => ['label' => isset($mc_parts['SECWNCRNSTK9']['title'])?$mc_parts['SECWNCRNSTK9']['title']:'', 'price' => isset($mc_parts['SECWNCRNSTK9']['price'])?$mc_parts['SECWNCRNSTK9']['price']:'0.51', 'color' => ''],
+                    'mm11' => ['label' => isset($mc_parts['SECWNCRNSTK11']['title'])?$mc_parts['SECWNCRNSTK11']['title']:'', 'price' => isset($mc_parts['SECWNCRNSTK11']['price'])?$mc_parts['SECWNCRNSTK11']['price']:'0.51', 'color' => ''],
                     ],
         ] ;
 

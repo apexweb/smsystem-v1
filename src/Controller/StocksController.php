@@ -118,8 +118,8 @@ class StocksController extends AppController
         $stockId = $this->request->data('stock');
         $new = $this->request->data('new');
 
-//
-//
+		//
+		//
         if ($new) {
             $stock = $this->Stocks->newEntity();
             $stock->status = 'active';

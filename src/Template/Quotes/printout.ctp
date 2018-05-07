@@ -329,36 +329,99 @@ if ($quote->override_final_price) {
                 ?>
             </td>
         </tr>
-        <tr>
-            <td colspan="4">*Estimate is subject to check measure</td>
-            <td colspan="4">*Installation includes any freight/delivery charges if applicable</td>
-            <td colspan="2">Bank Details</td>
+		<?php  //$unserialize = unserialize($authUser->terms);
+		
+		if(isset($_SESSION['Auth']['User']['terms'])){?>
+			<tr>
+				<td colspan="10" style="border:none !important;">
+					<div class="terms_table">
+						<?php echo $_SESSION['Auth']['User']['terms']; ?>
+					</div>
+				</td>
+				<td colspan="2" style="border:none !important;">	
+					<table class="table table-responsive table-bordered quote-printout small-padding removetrtd">
+						<tr>
+							<td>Bank</td>
+							<td><?= h($authUser['bank_name']) ?></td>
+						</tr>
+						<tr>
+							<td>Account Name</td>
+							<td><?= h($authUser['bank_account_name']) ?></td>
+						</tr>
+						<tr>
+							<td>BSB</td>
+							<td><?= h($authUser['bsb']) ?></td>
+						</tr>
+						<tr>
+							<td>Acc No.</td>
+							<td><?= h($authUser['bank_account_number']) ?></td>
+						</tr>
+						<tr>
+							<td colspan="4" class="no-border"></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		<?php } else { ?>
+			<tr>
+				<td colspan="4">*Estimate is subject to check measure</td>
+				<td colspan="4">*Installation includes any freight/delivery charges if applicable</td>
+				<td colspan="2">Bank Details</td>
+				<td>Bank</td>
+				<td><?= h($authUser['bank_name']) ?></td>
+			</tr>
+			<tr>
+				<td colspan="4">*This estimate is valid for 30 days*</td>
+				<td colspan="6"><strong>Please use the Order No as your payment reference</strong></td>
+				<td>Account Name</td>
+				<td><?= h($authUser['bank_account_name']) ?></td>
+			</tr>
+			<tr>
+				<td colspan="10"></td>
+				<td>BSB</td>
+				<td><?= h($authUser['bsb']) ?></td>
+			</tr>
+			<tr>
+				<td colspan="10"></td>
+				<td>Acc No.</td>
+				<td><?= h($authUser['bank_account_number']) ?></td>
+			</tr>
+			<tr>
+				<td colspan="8">Please sign and return as authorisation that you would like to proceed with this Estimate,
+					but please be aware in doing so that you have acknowledged this estimate and agree with the Terms and
+					Conditions it in their entirety.
+				</td>
+				<td colspan="4"></td>
+			</tr>
+		<?php } ?>
+        <!-- <tr>
+            <td colspan="4"><?php echo $unserialize[0]['measure']; ?></td>
+            <td colspan="4"><?php echo $unserialize[1]['installation']; ?></td>
+            <td colspan="2"><?php echo $unserialize[2]['bank_detail']; ?></td>
             <td>Bank</td>
             <td><?= h($authUser['bank_name']) ?></td>
         </tr>
         <tr>
-            <td colspan="4">*This estimate is valid for 30 days*</td>
-            <td colspan="6"><strong>Please use the Order No as your payment reference</strong></td>
+            <td colspan="4"><?php echo $unserialize[3]['estimate_days']; ?></td>
+            <td colspan="6"><strong><?php echo $unserialize[4]['payment_reference']; ?></strong></td>
             <td>Account Name</td>
             <td><?= h($authUser['bank_account_name']) ?></td>
         </tr>
         <tr>
-            <td colspan="10"></td>
+            <td colspan="10"><?= h($unserialize[6]['bsb']) ?></td>
             <td>BSB</td>
             <td><?= h($authUser['bsb']) ?></td>
         </tr>
         <tr>
-            <td colspan="10"></td>
+            <td colspan="10"><?= h($unserialize[5]['account_name']) ?></td>
             <td>Acc No.</td>
             <td><?= h($authUser['bank_account_number']) ?></td>
         </tr>
         <tr>
-            <td colspan="8">Please sign and return as authorisation that you would like to proceed with this Estimate,
-                but please be aware in doing so that you have acknowledged this estimate and agree with the Terms and
-                Conditions it in their entirety.
+            <td colspan="8"><?= h($unserialize[7]['authorisation']) ?>
             </td>
             <td colspan="4"></td>
-        </tr>
+        </tr> -->
         <tr>
             <td style="padding: 40px 0;"></td>
             <th colspan="2">Customers Signature</th>
@@ -379,3 +442,4 @@ if ($quote->override_final_price) {
         </tr>
     </table>
 </div>
+

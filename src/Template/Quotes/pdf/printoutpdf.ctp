@@ -12,7 +12,9 @@ if ($quote->override_final_price) {
 
 ?>
 
-
+<style>
+.terms_table table tr td {border:none !important;vertical-align: initial;}
+</style>
 <div class="card-box printout">
 
     <?php if ($quote->user->avatar): ?>
@@ -333,36 +335,70 @@ if ($quote->override_final_price) {
                 ?>
             </td>
         </tr>
-        <tr>
-            <td class="no-border" colspan="4">*Estimate is subject to check measure</td>
-            <td class="no-border" colspan="3">*Installation includes any freight/delivery charges if applicable</td>
-            <td class="no-border" align="right">Bank Details</td>
-            <td class="no-border" colspan="3">Bank</td>
-            <td class="no-border"><?= h($authUser['bank_name']) ?></td>
-        </tr>
-        <tr>
-            <td colspan="4"  class="no-border">*This estimate is valid for 30 days*</td>
-            <td colspan="4" class="no-border"><strong>Please use the Order No as your payment reference</strong></td>
-            <td class="no-border" colspan="3">Account Name</td>
-            <td class="no-border"> <?= h($authUser['bank_account_name']) ?></td>
-        </tr>
-        <tr>
-            <td colspan="8" class="no-border"></td>
-            <td class="no-border" colspan="3">BSB</td>
-            <td class="no-border"><?= h($authUser['bsb']) ?></td>
-        </tr>
-        <tr>
-            <td class="no-border" colspan="8"></td>
-            <td class="no-border" colspan="3">Acc No.</td>
-            <td class="no-border"><?= h($authUser['bank_account_number']) ?></td>
-        </tr>
-        <tr>
-            <td class="no-border" colspan="8">Please sign and return as authorisation that you would like to proceed with this Estimate,
-                but please be aware in doing so that you have acknowledged this estimate and agree with the Terms and
-                Conditions it in their entirety.
-            </td>
-            <td colspan="4" class="no-border"></td>
-        </tr>
+		<?php if(isset($_SESSION['Auth']['User']['terms'])){?>
+			<tr>
+				<td colspan="8" style="border:none !important;">
+					<div class="terms_table">
+						<?php echo $_SESSION['Auth']['User']['terms']; ?>
+						
+					</div>
+				</td>
+				<td colspan="4" style="border:none !important;">	
+					<table summary="removetrtd" class="table table-responsive small-padding">
+						<tr>
+							<td class="no-border" colspan="2" >Bank</td>
+							<td class="no-border" colspan="2"><?= h($authUser['bank_name']) ?></td>
+						</tr>
+						<tr>
+							<td class="no-border" colspan="2">Account Name</td>
+							<td class="no-border" colspan="2"><?= h($authUser['bank_account_name']) ?></td>
+						</tr>
+						<tr>
+							<td class="no-border" colspan="2">BSB</td>
+							<td class="no-border" colspan="2"><?= h($authUser['bsb']) ?></td>
+						</tr>
+						<tr>
+							<td class="no-border" colspan="2">Acc No.</td>
+							<td class="no-border" colspan="2"><?= h($authUser['bank_account_number']) ?></td>
+						</tr>
+						<tr>
+							<td colspan="4" class="no-border"></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		<?php } else { ?>
+			<tr>
+				<td class="no-border" colspan="4">*Estimate is subject to check measure</td>
+				<td class="no-border" colspan="3">*Installation includes any freight/delivery charges if applicable</td>
+				<td class="no-border" align="right">Bank Details</td>
+				<td class="no-border" colspan="3">Bank</td>
+				<td class="no-border"><?= h($authUser['bank_name']) ?></td>
+			</tr>
+			<tr>
+				<td colspan="4"  class="no-border">*This estimate is valid for 30 days*</td>
+				<td colspan="4" class="no-border"><strong>Please use the Order No as your payment reference</strong></td>
+				<td class="no-border" colspan="3">Account Name</td>
+				<td class="no-border"> <?= h($authUser['bank_account_name']) ?></td>
+			</tr>
+			<tr>
+				<td colspan="8" class="no-border"></td>
+				<td class="no-border" colspan="3">BSB</td>
+				<td class="no-border"><?= h($authUser['bsb']) ?></td>
+			</tr>
+			<tr>
+				<td class="no-border" colspan="8"></td>
+				<td class="no-border" colspan="3">Acc No.</td>
+				<td class="no-border"><?= h($authUser['bank_account_number']) ?></td>
+			</tr>
+			<tr>
+				<td class="no-border" colspan="8">Please sign and return as authorisation that you would like to proceed with this Estimate,
+					but please be aware in doing so that you have acknowledged this estimate and agree with the Terms and
+					Conditions it in their entirety.
+				</td>
+				<td colspan="4" class="no-border"></td>
+			</tr>
+		<?php } ?>
         <tr>
             <td class="no-border" style="padding: 30px 0;"></td>
             <td class="no-border" colspan="3"><strong>Customers Signature</strong></td>
@@ -382,6 +418,8 @@ if ($quote->override_final_price) {
         </tr>
     </table>
 </div>
+
+<?= $this->Html->script('/assets/js/jquery.app.js', ['block' => 'script']); ?>
 <style>
 @page {
     margin: 0.2cm 0.2cm 0.2cm 0.2cm;  

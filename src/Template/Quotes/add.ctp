@@ -55,21 +55,21 @@ if($systemPlatform != ''){
 
 
 		foreach ($parts as $part) {
-			$id = $part->id;
-			$title = $part->title;
-			$price = $part->users_parts[0]->price_per_unit;
-			$code = $part->part_code;
+			$id = $part->part->id;
+			$title = $part->part->title;
+			$price = $part->price_per_unit;
+			$code = $part->part->part_code;
 
-			if ($part->users_parts[0]->show_in_additional_section_dropdown) {
+			if ($part->show_in_additional_section_dropdown) {
 				$additional_per_meter[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
-			if ($part->users_parts[0]->show_in_additional_section_by_length_dropdown) {
+			if ($part->show_in_additional_section_by_length_dropdown) {
 				$additional_per_length[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
-			if ($part->users_parts[0]->show_in_accessories_dropdown) {
+			if ($part->show_in_accessories_dropdown) {
 				$accessories[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
-			if ($part->users_parts[0]->master_calculator_value) {
+			if ($part->master_calculator_value) {
 				$mc_parts[$id] = ['title' => $title, 'price' => $price, 'data-code' => $code];
 			}
 		}
@@ -125,19 +125,19 @@ if($systemPlatform != ''){
 			$colours['Special Colour'] = $SpecialColour;
 		
 		foreach ($parts as $part) {
-			$id = $part->id;
-			$title = $part->title;
-			$price = $part->users_parts[0]->price_per_unit;
-			$code = $part->part_code;
-			$color_code = $part->color_code;
+			$id = $part->part->id;
+			$title = $part->part->title;
+			$price = $part->price_per_unit;
+			$code = $part->part->part_code;
+			$color_code = $part->part->color_code;
 
-			if (isset($part->users_parts[0]->show_in_additional_section_dropdown)) {
+			if (isset($part->show_in_additional_section_dropdown)) {
 				$additional_per_meter[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
-			if (isset($part->users_parts[0]->show_in_additional_section_by_length_dropdown)) {
+			if (isset($part->show_in_additional_section_by_length_dropdown)) {
 				$additional_per_length[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
-			if (isset($part->users_parts[0]->show_in_accessories_dropdown)) {
+			if (isset($part->show_in_accessories_dropdown)) {
 				$accessories[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
 			if ($part->master_calculator_value) {
@@ -194,19 +194,19 @@ if($systemPlatform != ''){
 			$colours['Special Colour'] = $SpecialColour;
 
 		foreach ($parts as $part) {
-			$id = $part->id;
-			$title = $part->title;
-			$price = $part->users_parts[0]->price_per_unit;
-			$code = $part->part_code;
-			$color_code = $part->color_code;
+			$id = $part->part->id;
+			$title = $part->part->title;
+			$price = $part->price_per_unit;
+			$code = $part->part->part_code;
+			$color_code = $part->part->color_code;
 
-			if ($part->users_parts[0]->show_in_additional_section_dropdown) {
+			if ($part->show_in_additional_section_dropdown) {
 				$additional_per_meter[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
-			if ($part->users_parts[0]->show_in_additional_section_by_length_dropdown) {
+			if ($part->show_in_additional_section_by_length_dropdown) {
 				$additional_per_length[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
-			if ($part->users_parts[0]->show_in_accessories_dropdown) {
+			if ($part->show_in_accessories_dropdown) {
 				$accessories[] = ['text' => $title, 'value' => $title, 'data-price' => $price, 'data-code' => $code];
 			}
 			/*if ($part->users_parts[0]->master_calculator_value) {
@@ -254,7 +254,7 @@ if($systemPlatform != ''){
 
 <?php endif; ?>
 
-
+<input type="hidden" name="window_greater_size" value="<?php echo $this->viewVars['mcvalues']->window_greater_size; ?>">
 <div class="panel-group">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -309,6 +309,7 @@ if($systemPlatform != ''){
                 </a>
             </h4>
         </div>
+		
         <div id="collapseThree-2" class="panel-collapse collapse">
             <div class="panel-body">
 
