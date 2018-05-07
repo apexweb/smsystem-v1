@@ -8,7 +8,7 @@
 
 
     <h1>
-        <small>Quotes List hhhh</small>
+        <small>Quotes List</small>
     </h1>
 
     <div class="card-box font-13">
